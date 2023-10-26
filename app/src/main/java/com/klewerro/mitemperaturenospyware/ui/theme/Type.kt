@@ -1,4 +1,4 @@
-package com.example.mitemperaturenospyware.ui.theme
+package com.klewerro.mitemperaturenospyware.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

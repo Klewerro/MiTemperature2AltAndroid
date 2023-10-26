@@ -1,4 +1,4 @@
-package com.example.mitemperaturenospyware
+package com.klewerro.mitemperaturenospyware
 
 import org.junit.Test
 

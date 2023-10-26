@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mitemperaturenospyware"
+    namespace = "com.klewerro.mitemperaturenospyware"
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.example.mitemperaturenospyware"
+        applicationId = "com.klewerro.mitemperaturenospyware"
         minSdk = 26
         targetSdk = 33
         versionCode = 1

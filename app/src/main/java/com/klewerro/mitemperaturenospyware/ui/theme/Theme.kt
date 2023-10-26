@@ -1,4 +1,4 @@
-package com.example.mitemperaturenospyware.ui.theme
+package com.klewerro.mitemperaturenospyware.ui.theme
 
 import android.app.Activity
 import android.os.Build
