@@ -1,4 +1,4 @@
-package com.klewerro.mitemperaturenospyware
+package com.klewerro.temperatureSensor
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

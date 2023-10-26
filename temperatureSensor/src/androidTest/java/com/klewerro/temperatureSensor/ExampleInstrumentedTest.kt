@@ -1,4 +1,4 @@
-package com.klewerro.mitemperaturenospyware
+package com.klewerro.temperatureSensor
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -17,6 +17,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.klewerro.mitemperaturenospyware", appContext.packageName)
+        assertEquals("com.klewerro.temperatureSensor.test", appContext.packageName)
     }
 }
