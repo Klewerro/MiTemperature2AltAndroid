@@ -62,6 +62,9 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material:material")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0-rc02")
 
     // Test dependencies
     testImplementation("junit:junit:4.13.2")
