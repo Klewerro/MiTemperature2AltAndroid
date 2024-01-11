@@ -41,4 +41,8 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    // Kotlin BLE library
+    implementation("no.nordicsemi.android.kotlin.ble:scanner:1.0.8")
+    implementation("no.nordicsemi.android.kotlin.ble:client:1.0.8")
 }
