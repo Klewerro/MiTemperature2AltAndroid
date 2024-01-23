@@ -3,13 +3,16 @@ package com.klewerro.mitemperaturenospyware.presentation.addHeater.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +23,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.klewerro.mitemperaturenospyware.R
+import com.klewerro.mitemperaturenospyware.presentation.model.ConnectionStatus
 import com.klewerro.mitemperaturenospyware.presentation.model.ThermometerUiDevice
 import com.klewerro.mitemperaturenospyware.ui.LocalSpacing
 
@@ -29,11 +33,15 @@ fun DevicesList(
     scannedDevices: List<ThermometerUiDevice>,
     onButtonClickWhenScanning: () -> Unit,
     onButtonClickWhenNotScanning: () -> Unit,
-    onDeviceClick: (ThermometerUiDevice) -> Unit
+    onDeviceClick: (ThermometerUiDevice) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Button(
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
             onClick = {
@@ -68,8 +76,13 @@ fun DevicesList(
                     Text(text = thermometerUiDevice.name)
                     Text(text = thermometerUiDevice.address)
                     Text(text = thermometerUiDevice.rssi.toString())
-                    if (thermometerUiDevice.isConnected) {
-                        Text(text = "CONNECTED")
+                    when (thermometerUiDevice.connectionStatus) {
+                        ConnectionStatus.NOT_CONNECTED -> { /*Nothing*/ }
+                        ConnectionStatus.CONNECTING -> {
+                            Spacer(modifier = Modifier.height(spacing.spaceSmall))
+                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                        }
+                        ConnectionStatus.CONNECTED -> Text(text = stringResource(id = R.string.connected))
                     }
                 }
             }

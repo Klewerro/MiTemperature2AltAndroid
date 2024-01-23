@@ -23,6 +23,9 @@ class ThermometerRepository {
     private val _connectedDevices = MutableStateFlow<List<ThermometerBleDevice>>(emptyList())
     val connectedDevices = _connectedDevices.asStateFlow()
 
+    private var _connectingToDeviceAddress = MutableStateFlow("")
+    val connectingToDeviceAddress get() = _connectingToDeviceAddress.asStateFlow()
+
     fun scanForDevices(context: Context, coroutineScope: CoroutineScope): Job =
         scanner.scanForDevices(context, coroutineScope)
 
@@ -31,7 +34,13 @@ class ThermometerRepository {
         coroutineScope: CoroutineScope,
         address: String
     ) {
+        if (_connectingToDeviceAddress.value.isNotBlank()) {
+            throw IllegalStateException("Already connecting to other device!")
+        }
+
+        _connectingToDeviceAddress.update { address }
         val connectedDeviceResult = scanner.connectToDevice(context, coroutineScope, address)
+
         deviceConnections = deviceConnections.plus(
             Pair(
                 connectedDeviceResult.thermometerBleDevice,

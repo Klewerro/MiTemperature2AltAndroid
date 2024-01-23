@@ -4,5 +4,11 @@ data class ThermometerUiDevice(
     val name: String,
     val address: String,
     val rssi: Int,
-    val isConnected: Boolean
+    val connectionStatus: ConnectionStatus
 )
+
+enum class ConnectionStatus {
+    NOT_CONNECTED,
+    CONNECTING,
+    CONNECTED
+}

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,7 +40,8 @@ import com.klewerro.mitemperaturenospyware.ui.LocalSpacing
 
 @Composable
 fun AddHeaterScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    scaffoldState: ScaffoldState
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
@@ -87,6 +89,14 @@ fun AddHeaterScreen(
                 wasAppSettingsCheckClicked = false
                 nearbyDevicesPermissionResultLauncher.launchRequestBlePermissions()
             }
+        }
+    }
+
+    LaunchedEffect(key1 = true) {
+        viewModel.uiTextError.collect { uiText ->
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = uiText.asString(context)
+            )
         }
     }
 
