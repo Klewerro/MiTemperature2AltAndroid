@@ -16,7 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.klewerro.mitemperaturenospyware.R
 import com.klewerro.mitemperaturenospyware.presentation.model.ThermometerUiDevice
 import com.klewerro.mitemperaturenospyware.ui.LocalSpacing
@@ -33,7 +35,7 @@ fun DevicesList(
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Button(
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.onPrimary),
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
             onClick = {
                 if (isScanningForDevices) {
                     onButtonClickWhenScanning()
@@ -54,6 +56,10 @@ fun DevicesList(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(spacing.spaceSmall)
+                        .shadow(
+                            4.dp,
+                            shape = RoundedCornerShape(spacing.spaceNormal)
+                        )
                         .clip(RoundedCornerShape(spacing.spaceNormal))
                         .background(MaterialTheme.colors.onPrimary)
                         .clickable { onDeviceClick(thermometerUiDevice) }

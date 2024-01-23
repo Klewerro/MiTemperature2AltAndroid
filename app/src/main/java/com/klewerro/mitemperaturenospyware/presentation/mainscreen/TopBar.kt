@@ -17,11 +17,14 @@ import androidx.compose.ui.unit.dp
 import com.klewerro.mitemperaturenospyware.ui.LocalSpacing
 
 @Composable
-fun TopBar(onButtonClick: () -> Unit) {
+fun TopBar(
+    title: String,
+    onButtonClick: () -> Unit
+) {
     val spacing = LocalSpacing.current
 
     TopAppBar(
-        title = { Text(text = "Mi Temperature No Spyware") },
+        title = { Text(text = title) },
         actions = {
             Icon(
                 imageVector = Icons.Default.AddCircle,

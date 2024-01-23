@@ -66,6 +66,9 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0-rc02")
 
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:2.7.6")
+
     // Test dependencies
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
