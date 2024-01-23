@@ -7,19 +7,35 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperaturenospyware.presentation.model.PermissionStatus
-import com.klewerro.temperatureSensor.ThermometerDevicesBleScanner
-import com.klewerro.temperatureSensor.model.ThermometerBleDevice
+import com.klewerro.mitemperaturenospyware.presentation.model.ThermometerUiDevice
+import com.klewerro.temperatureSensor.ThermometerRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class DeviceSearchViewModel : ViewModel() {
 
-    private val scanner = ThermometerDevicesBleScanner()
+    private val thermometerRepository = ThermometerRepository()
     private var scanningBleDevicesJob: Job? = null
 
-    val scannedDevices = scanner.bleDevices
-    val isScanningForDevices = scanner.isScanning
+    val isScanningForDevices = thermometerRepository.isScanningForDevices
+    val scannedDevices = thermometerRepository.scannedDevices
+    val connectedDevices = thermometerRepository.connectedDevices
+
+    val devicesCombined = scannedDevices.combine(connectedDevices) { scanned, connected ->
+        scanned.map { thermometerBleDevice ->
+            val isConnected = connected.any { it.address == thermometerBleDevice.address }
+            ThermometerUiDevice(
+                name = thermometerBleDevice.name,
+                address = thermometerBleDevice.address,
+                rssi = thermometerBleDevice.rssi,
+                isConnected = isConnected
+            )
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     var permissionGrantStatus by mutableStateOf(PermissionStatus.DECLINED)
 
@@ -28,7 +44,7 @@ class DeviceSearchViewModel : ViewModel() {
             stopScanForDevices()
         }
         viewModelScope.launch(Dispatchers.IO) {
-            scanningBleDevicesJob = scanner.scanForDevices(context, this)
+            scanningBleDevicesJob = thermometerRepository.scanForDevices(context, this)
         }
     }
 
@@ -37,9 +53,9 @@ class DeviceSearchViewModel : ViewModel() {
         scanningBleDevicesJob = null
     }
 
-    fun connectToDevice(context: Context, thermometerBleDevice: ThermometerBleDevice) {
+    fun connectToDevice(context: Context, thermometerUiDevice: ThermometerUiDevice) {
         viewModelScope.launch(Dispatchers.IO) {
-            scanner.connectToDevice(context, this, thermometerBleDevice)
+            thermometerRepository.connectToDevice(context, this, thermometerUiDevice.address)
         }
     }
 }
