@@ -42,7 +42,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     scaffoldState = scaffoldState,
                     topBar = {
-                        TopBar(title = titleState) {
+                        TopBar(
+                            title = titleState,
+                            shouldBeButtonVisible = titleState == Route.MAIN.screenName
+                        ) {
                             navController.navigate(Route.SCAN_FOR_DEVICES.name)
                         }
                     }
@@ -55,7 +58,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         NavHost(
                             navController = navController,
-                            startDestination = Route.MAIN.name,
+                            startDestination = Route.MAIN.name
                         ) {
                             // Animations: https://proandroiddev.com/screen-transition-animations-with-jetpack-navigation-17afdc714d0e
                             composable(Route.MAIN.name) {
@@ -63,7 +66,7 @@ class MainActivity : ComponentActivity() {
                                 titleState = Route.MAIN.screenName
                             }
                             composable(Route.SCAN_FOR_DEVICES.name) {
-                                AddHeaterScreen()
+                                AddHeaterScreen(scaffoldState = scaffoldState)
                                 titleState = Route.SCAN_FOR_DEVICES.screenName
                             }
                         }

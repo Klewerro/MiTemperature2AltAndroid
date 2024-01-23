@@ -19,6 +19,7 @@ import com.klewerro.mitemperaturenospyware.ui.LocalSpacing
 @Composable
 fun TopBar(
     title: String,
+    shouldBeButtonVisible: Boolean,
     onButtonClick: () -> Unit
 ) {
     val spacing = LocalSpacing.current
@@ -26,18 +27,20 @@ fun TopBar(
     TopAppBar(
         title = { Text(text = title) },
         actions = {
-            Icon(
-                imageVector = Icons.Default.AddCircle,
-                contentDescription = "Add new thermometer",
-                modifier = Modifier
-                    .size(28.dp)
-                    .clip(RoundedCornerShape(spacing.radiusCircle))
-                    .clickable {
-                        onButtonClick()
-                    }
-                    .padding(1.dp)
+            if (shouldBeButtonVisible) {
+                Icon(
+                    imageVector = Icons.Default.AddCircle,
+                    contentDescription = "Add new thermometer",
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(RoundedCornerShape(spacing.radiusCircle))
+                        .clickable {
+                            onButtonClick()
+                        }
+                        .padding(1.dp)
 
-            )
+                )
+            }
         },
         backgroundColor = MaterialTheme.colors.primary
     )
