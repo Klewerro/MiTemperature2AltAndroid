@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import com.klewerro.temperatureSensor.model.ThermometerBleDevice
+import com.klewerro.temperatureSensor.model.ThermometerDeviceConnection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +24,6 @@ import no.nordicsemi.android.kotlin.ble.scanner.aggregator.BleScanResultAggregat
 class ThermometerDevicesBleScanner {
 
     private val aggregator = BleScanResultAggregator()
-    private var gattConnection: ClientBleGatt? = null
 
     private val _bleDevices = MutableStateFlow<List<ThermometerBleDevice>>(emptyList())
     val bleDevices = _bleDevices.asStateFlow()
@@ -59,12 +59,18 @@ class ThermometerDevicesBleScanner {
             .launchIn(coroutineScope)
     }
 
-    suspend fun connectToDevice(context: Context, coroutineScope: CoroutineScope, thermometerBleDevice: ThermometerBleDevice) {
+    suspend fun connectToDevice(
+        context: Context,
+        coroutineScope: CoroutineScope,
+        bleDeviceAddress: String
+    ): ThermometerDeviceConnection {
         val foundBleDevices = aggregator.results
-        val bleDevice = foundBleDevices.first { it.device.address == thermometerBleDevice.address }.device
+        val thermometerBleDevice = bleDevices.value.first { it.address == bleDeviceAddress }
+        val bleDevice = foundBleDevices.first { it.device.address == bleDeviceAddress }.device
 
-        gattConnection = ClientBleGatt.connect(context, bleDevice, coroutineScope)
-        val isConnected = gattConnection?.isConnected == true
+        val gattConnection = ClientBleGatt.connect(context, bleDevice, coroutineScope)
+        val isConnected = gattConnection.isConnected
         Log.d("ThermometerDevicesBleScanner", "connectToDevice ${bleDevice.name} connected: $isConnected")
+        return ThermometerDeviceConnection(thermometerBleDevice, gattConnection)
     }
 }
