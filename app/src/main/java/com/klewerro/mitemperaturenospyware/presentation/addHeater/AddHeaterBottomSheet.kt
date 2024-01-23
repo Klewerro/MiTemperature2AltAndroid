@@ -1,28 +1,23 @@
-package com.klewerro.mitemperaturenospyware.presentation.mainscreen
+package com.klewerro.mitemperaturenospyware.presentation.addHeater
 
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,8 +38,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.klewerro.mitemperaturenospyware.R
-import com.klewerro.mitemperaturenospyware.presentation.getActivity
+import com.klewerro.mitemperaturenospyware.presentation.addHeater.components.DevicesList
+import com.klewerro.mitemperaturenospyware.presentation.addHeater.components.PermissionDeclinedRationale
+import com.klewerro.mitemperaturenospyware.presentation.util.getActivity
+import com.klewerro.mitemperaturenospyware.presentation.mainscreen.DeviceSearchViewModel
 import com.klewerro.mitemperaturenospyware.presentation.model.PermissionStatus
+import com.klewerro.mitemperaturenospyware.presentation.util.isAndroid12OrGreater
 import com.klewerro.mitemperaturenospyware.ui.LocalSpacing
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -60,7 +59,7 @@ fun AddHeaterBottomSheet(
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
 
-    val scannedDevices by viewModel.scannedDevices.collectAsStateWithLifecycle()
+    val scannedDevices by viewModel.devicesCombined.collectAsStateWithLifecycle()
     val isScanningForDevices by viewModel.isScanningForDevices.collectAsStateWithLifecycle()
 
     var wasAppSettingsCheckClicked by remember {
@@ -73,7 +72,11 @@ fun AddHeaterBottomSheet(
             val areAllGranted = grantedMap.all { it.value }
             val isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
                 activity,
-                Manifest.permission.BLUETOOTH_SCAN
+                if (isAndroid12OrGreater()) {
+                    Manifest.permission.BLUETOOTH_SCAN
+                } else {
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                }
             )
             viewModel.permissionGrantStatus = when {
                 areAllGranted -> PermissionStatus.GRANTED
@@ -92,12 +95,7 @@ fun AddHeaterBottomSheet(
         sheetContent = {
             LaunchedEffect(key1 = viewModel.permissionGrantStatus) {
                 if (viewModel.permissionGrantStatus == PermissionStatus.DECLINED) {
-                    nearbyDevicesPermissionResultLauncher.launch(
-                        arrayOf(
-                            Manifest.permission.BLUETOOTH_SCAN,
-                            Manifest.permission.BLUETOOTH_CONNECT
-                        )
-                    )
+                    nearbyDevicesPermissionResultLauncher.launchRequestBlePermissions()
                 }
             }
 
@@ -105,12 +103,7 @@ fun AddHeaterBottomSheet(
                 if (lifecycleState == Lifecycle.State.RESUMED) {
                     if (viewModel.permissionGrantStatus == PermissionStatus.PERMANENTLY_DECLINED && wasAppSettingsCheckClicked) {
                         wasAppSettingsCheckClicked = false
-                        nearbyDevicesPermissionResultLauncher.launch(
-                            arrayOf(
-                                Manifest.permission.BLUETOOTH_SCAN,
-                                Manifest.permission.BLUETOOTH_CONNECT
-                            )
-                        )
+                        nearbyDevicesPermissionResultLauncher.launchRequestBlePermissions()
                     }
                 }
             }
@@ -131,73 +124,34 @@ fun AddHeaterBottomSheet(
             ) {
                 when (viewModel.permissionGrantStatus) {
                     PermissionStatus.GRANTED -> {
-                        Button(
-                            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.onPrimary),
-                            onClick = {
-                                if (isScanningForDevices) {
-                                    viewModel.stopScanForDevices()
-                                } else {
-                                    viewModel.scanForDevices(context)
-                                }
+                        DevicesList(
+                            isScanningForDevices = isScanningForDevices,
+                            scannedDevices = scannedDevices,
+                            onButtonClickWhenScanning = viewModel::stopScanForDevices,
+                            onButtonClickWhenNotScanning = { viewModel.scanForDevices(context) },
+                            onDeviceClick = { thermometerUiDevice ->
+                                viewModel.connectToDevice(context, thermometerUiDevice)
                             }
-                        ) {
-                            Text(
-                                text = stringResource(
-                                    if (isScanningForDevices) R.string.stop_scan else R.string.scan_for_devices
-                                )
-                            )
-                        }
-                        LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                            items(scannedDevices) { thermometerBleDevice ->
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(8.dp)
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(MaterialTheme.colors.onPrimary)
-                                        .padding(8.dp)
-                                        .clickable {
-                                            viewModel.connectToDevice(context, thermometerBleDevice)
-                                        }
-                                ) {
-                                    Text(text = thermometerBleDevice.name)
-                                    Text(text = thermometerBleDevice.address)
-                                    Text(text = thermometerBleDevice.rssi.toString())
-                                }
-                            }
-                        }
+                        )
                     }
                     PermissionStatus.DECLINED -> {
-                        Text(
-                            text = stringResource(R.string.ble_permissions_not_granted_rationale)
+                        PermissionDeclinedRationale(
+                            rationaleAndroid12Text = stringResource(R.string.ble_permissions_not_granted_rationale),
+                            rationalePreAndroid12Text = stringResource(R.string.location_permissions_not_granted_rationale),
+                            buttonText = stringResource(R.string.ask_again),
+                            onButtonClick = nearbyDevicesPermissionResultLauncher::launchRequestBlePermissions
                         )
-                        Button(
-                            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.onPrimary),
-                            onClick = {
-                                nearbyDevicesPermissionResultLauncher.launch(
-                                    arrayOf(
-                                        Manifest.permission.BLUETOOTH_SCAN,
-                                        Manifest.permission.BLUETOOTH_CONNECT
-                                    )
-                                )
-                            }
-                        ) {
-                            Text(text = stringResource(R.string.ask_again))
-                        }
                     }
                     PermissionStatus.PERMANENTLY_DECLINED -> {
-                        Text(
-                            text = stringResource(R.string.ble_permissions_permanently_declined)
-                        )
-                        Button(
-                            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.onPrimary),
-                            onClick = {
+                        PermissionDeclinedRationale(
+                            stringResource(R.string.ble_permissions_permanently_declined),
+                            stringResource(R.string.location_permissions_permanently_declined),
+                            stringResource(R.string.open_app_settings),
+                            onButtonClick = {
                                 activity.openAppSettings()
                                 wasAppSettingsCheckClicked = true
                             }
-                        ) {
-                            Text(text = stringResource(R.string.open_app_settings))
-                        }
+                        )
                     }
                 }
             }
@@ -208,7 +162,7 @@ fun AddHeaterBottomSheet(
 }
 
 private fun calculateSheetHeight(devicesCount: Int): Dp {
-    val baseHeight = 200
+    val baseHeight = 220
     val singleItemHeight = 72
     val maxCountMultiplier = 3
     val combinedHeight = if (devicesCount <= maxCountMultiplier) {
@@ -218,6 +172,22 @@ private fun calculateSheetHeight(devicesCount: Int): Dp {
     }
 
     return combinedHeight.dp
+}
+
+private fun ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>.launchRequestBlePermissions() {
+    this.launch(
+        if (isAndroid12OrGreater()) {
+            arrayOf(
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT
+            )
+        } else {
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        }
+    )
 }
 
 private fun Activity.openAppSettings() {

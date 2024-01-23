@@ -1,4 +1,4 @@
-package com.klewerro.mitemperaturenospyware.presentation
+package com.klewerro.mitemperaturenospyware.presentation.util
 
 import android.app.Activity
 import android.content.Context
