@@ -48,4 +48,16 @@ class BleOperationsViewModel @Inject constructor(
             }
         }
     }
+
+    fun getStatusForDevice(address: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            thermometerRepository.readCurrentThermometerStatus(address)
+        }
+    }
+
+    fun subscribeForDeviceStatusUpdates(address: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            thermometerRepository.subscribeToCurrentThermometerStatus(address, this)
+        }
+    }
 }

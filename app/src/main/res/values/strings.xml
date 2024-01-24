@@ -10,4 +10,6 @@
     <string name="location_permissions_permanently_declined">Location permission permanently declined. It is necessary to connect with thermometers. In case of not accepting this permission, you will not be able to connect with your thermometers.</string>
     <string name="already_connecting_to_different_device">Already connecting to different device.</string>
     <string name="connected">Connected</string>
+    <string name="no_connected_thermometers">No connected thermometers</string>
+    <string name="no_connected_thermometers_rationale">Please click \'+\' icon on the status-bar right corner to search for devices.</string>
 </resources>

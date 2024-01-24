@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.klewerro.mitemperaturenospyware.R
 import com.klewerro.mitemperaturenospyware.presentation.model.ConnectionStatus
 import com.klewerro.mitemperaturenospyware.presentation.model.ThermometerUiDevice
@@ -65,7 +64,7 @@ fun DevicesList(
                         .fillMaxWidth()
                         .padding(spacing.spaceSmall)
                         .shadow(
-                            4.dp,
+                            spacing.elevationShadowNormal,
                             shape = RoundedCornerShape(spacing.spaceNormal)
                         )
                         .clip(RoundedCornerShape(spacing.spaceNormal))
@@ -82,7 +81,10 @@ fun DevicesList(
                             Spacer(modifier = Modifier.height(spacing.spaceSmall))
                             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                         }
-                        ConnectionStatus.CONNECTED -> Text(text = stringResource(id = R.string.connected))
+                        ConnectionStatus.CONNECTED -> Text(
+                            text = stringResource(R.string.connected),
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
                     }
                 }
             }
