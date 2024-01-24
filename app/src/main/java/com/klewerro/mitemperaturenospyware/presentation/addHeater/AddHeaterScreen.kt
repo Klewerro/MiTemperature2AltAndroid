@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.klewerro.mitemperaturenospyware.R
 import com.klewerro.mitemperaturenospyware.presentation.addHeater.components.DevicesList
 import com.klewerro.mitemperaturenospyware.presentation.addHeater.components.PermissionDeclinedRationale
+import com.klewerro.mitemperaturenospyware.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperaturenospyware.presentation.mainscreen.DeviceSearchViewModel
 import com.klewerro.mitemperaturenospyware.presentation.model.PermissionStatus
 import com.klewerro.mitemperaturenospyware.presentation.util.getActivity
@@ -41,8 +42,9 @@ import com.klewerro.mitemperaturenospyware.ui.LocalSpacing
 @Composable
 fun AddHeaterScreen(
     scaffoldState: ScaffoldState,
+    bleOperationsViewModel: BleOperationsViewModel,
     modifier: Modifier = Modifier,
-    viewModel: DeviceSearchViewModel = hiltViewModel()
+    deviceSearchViewModel: DeviceSearchViewModel = hiltViewModel()
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
@@ -50,8 +52,8 @@ fun AddHeaterScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
 
-    val scannedDevices by viewModel.devicesCombined.collectAsStateWithLifecycle()
-    val isScanningForDevices by viewModel.isScanningForDevices.collectAsStateWithLifecycle()
+    val scannedDevices by deviceSearchViewModel.devicesCombined.collectAsStateWithLifecycle()
+    val isScanningForDevices by deviceSearchViewModel.isScanningForDevices.collectAsStateWithLifecycle()
 
     var wasAppSettingsCheckClicked by remember {
         mutableStateOf(false)
@@ -69,7 +71,7 @@ fun AddHeaterScreen(
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 }
             )
-            viewModel.permissionGrantStatus = when {
+            deviceSearchViewModel.permissionGrantStatus = when {
                 areAllGranted -> PermissionStatus.GRANTED
                 !areAllGranted && !isPermanentlyDeclined -> PermissionStatus.DECLINED
                 else -> PermissionStatus.PERMANENTLY_DECLINED
@@ -77,15 +79,15 @@ fun AddHeaterScreen(
         }
     )
 
-    LaunchedEffect(key1 = viewModel.permissionGrantStatus) {
-        if (viewModel.permissionGrantStatus == PermissionStatus.DECLINED) {
+    LaunchedEffect(key1 = deviceSearchViewModel.permissionGrantStatus) {
+        if (deviceSearchViewModel.permissionGrantStatus == PermissionStatus.DECLINED) {
             nearbyDevicesPermissionResultLauncher.launchRequestBlePermissions()
         }
     }
 
     LaunchedEffect(key1 = lifecycleState) {
         if (lifecycleState == Lifecycle.State.RESUMED) {
-            if (viewModel.permissionGrantStatus == PermissionStatus.PERMANENTLY_DECLINED && wasAppSettingsCheckClicked) {
+            if (deviceSearchViewModel.permissionGrantStatus == PermissionStatus.PERMANENTLY_DECLINED && wasAppSettingsCheckClicked) {
                 wasAppSettingsCheckClicked = false
                 nearbyDevicesPermissionResultLauncher.launchRequestBlePermissions()
             }
@@ -93,7 +95,7 @@ fun AddHeaterScreen(
     }
 
     LaunchedEffect(key1 = true) {
-        viewModel.uiTextError.collect { uiText ->
+        bleOperationsViewModel.uiTextError.collect { uiText ->
             scaffoldState.snackbarHostState.showSnackbar(
                 message = uiText.asString(context)
             )
@@ -107,15 +109,15 @@ fun AddHeaterScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        when (viewModel.permissionGrantStatus) {
+        when (deviceSearchViewModel.permissionGrantStatus) {
             PermissionStatus.GRANTED -> {
                 DevicesList(
                     isScanningForDevices = isScanningForDevices,
                     scannedDevices = scannedDevices,
-                    onButtonClickWhenScanning = viewModel::stopScanForDevices,
-                    onButtonClickWhenNotScanning = { viewModel.scanForDevices() },
+                    onButtonClickWhenScanning = deviceSearchViewModel::stopScanForDevices,
+                    onButtonClickWhenNotScanning = { deviceSearchViewModel.scanForDevices() },
                     onDeviceClick = { thermometerUiDevice ->
-                        viewModel.connectToDevice(thermometerUiDevice)
+                        bleOperationsViewModel.connectToDevice(thermometerUiDevice)
                     }
                 )
             }

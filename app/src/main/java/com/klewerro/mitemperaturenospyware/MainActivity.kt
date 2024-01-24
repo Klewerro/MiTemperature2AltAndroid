@@ -17,10 +17,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.klewerro.mitemperaturenospyware.presentation.addHeater.AddHeaterScreen
+import com.klewerro.mitemperaturenospyware.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperaturenospyware.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperaturenospyware.presentation.mainscreen.TopBar
 import com.klewerro.mitemperaturenospyware.presentation.navigation.Route
@@ -35,6 +37,7 @@ class MainActivity : ComponentActivity() {
             MiTemperatureNoSpywareTheme {
                 val navController = rememberNavController()
                 val scaffoldState = rememberScaffoldState()
+                val bleOperationsViewModel: BleOperationsViewModel = hiltViewModel()
 
                 var titleState by remember {
                     mutableStateOf(Route.MAIN.screenName)
@@ -64,11 +67,14 @@ class MainActivity : ComponentActivity() {
                         ) {
                             // Animations: https://proandroiddev.com/screen-transition-animations-with-jetpack-navigation-17afdc714d0e
                             composable(Route.MAIN.name) {
-                                MainScreen()
+                                MainScreen(bleOperationsViewModel)
                                 titleState = Route.MAIN.screenName
                             }
                             composable(Route.SCAN_FOR_DEVICES.name) {
-                                AddHeaterScreen(scaffoldState = scaffoldState)
+                                AddHeaterScreen(
+                                    scaffoldState = scaffoldState,
+                                    bleOperationsViewModel = bleOperationsViewModel
+                                )
                                 titleState = Route.SCAN_FOR_DEVICES.screenName
                             }
                         }

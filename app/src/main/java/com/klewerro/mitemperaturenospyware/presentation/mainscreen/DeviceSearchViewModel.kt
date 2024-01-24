@@ -5,19 +5,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.klewerro.mitemperaturenospyware.R
 import com.klewerro.mitemperaturenospyware.presentation.model.ConnectionStatus
 import com.klewerro.mitemperaturenospyware.presentation.model.PermissionStatus
 import com.klewerro.mitemperaturenospyware.presentation.model.ThermometerUiDevice
-import com.klewerro.mitemperaturenospyware.presentation.util.UiText
 import com.klewerro.temperatureSensor.ThermometerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,7 +27,7 @@ class DeviceSearchViewModel @Inject constructor(
 
     val isScanningForDevices = thermometerRepository.isScanningForDevices
     private val scannedDevices = thermometerRepository.scannedDevices
-    private val connectedDevices = thermometerRepository.connectedDevices
+    val connectedDevices = thermometerRepository.connectedDevices
 
     val devicesCombined = combine(
         scannedDevices,
@@ -40,23 +36,21 @@ class DeviceSearchViewModel @Inject constructor(
     ) { scanned, connected, currentlyConnectingDeviceAddress ->
         val connectingUiDeviceIndex =
             scanned.indexOfFirst { it.address == currentlyConnectingDeviceAddress }
-        scanned.mapIndexed { mapIndex, thermometerBleDevice ->
-            val isConnected = connected.any { it.address == thermometerBleDevice.address }
+        scanned.mapIndexed { mapIndex, thermometerBleScanResult ->
+            val isConnected = connected.any { it.address == thermometerBleScanResult.address }
             ThermometerUiDevice(
-                name = thermometerBleDevice.name,
-                address = thermometerBleDevice.address,
-                rssi = thermometerBleDevice.rssi,
+                name = thermometerBleScanResult.name,
+                address = thermometerBleScanResult.address,
+                rssi = thermometerBleScanResult.rssi,
                 connectionStatus = when {
                     connectingUiDeviceIndex > -1 && connectingUiDeviceIndex == mapIndex -> ConnectionStatus.CONNECTING
                     isConnected -> ConnectionStatus.CONNECTED
                     else -> ConnectionStatus.NOT_CONNECTED
-                }
+                },
+                status = null
             )
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
-    private val _uiTextError = Channel<UiText>()
-    val uiTextError = _uiTextError.receiveAsFlow()
 
     var permissionGrantStatus by mutableStateOf(PermissionStatus.DECLINED)
 
@@ -72,15 +66,5 @@ class DeviceSearchViewModel @Inject constructor(
     fun stopScanForDevices() {
         scanningBleDevicesJob?.cancel()
         scanningBleDevicesJob = null
-    }
-
-    fun connectToDevice(thermometerUiDevice: ThermometerUiDevice) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                thermometerRepository.connectToDevice(this, thermometerUiDevice.address)
-            } catch (stateException: IllegalStateException) {
-                _uiTextError.send(UiText.StringResource(R.string.already_connecting_to_different_device))
-            }
-        }
     }
 }
