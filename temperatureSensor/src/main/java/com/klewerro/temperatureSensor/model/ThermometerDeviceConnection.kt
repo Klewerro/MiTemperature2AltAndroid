@@ -1,8 +1,8 @@
 package com.klewerro.temperatureSensor.model
 
-import no.nordicsemi.android.kotlin.ble.client.main.callback.ClientBleGatt
+import com.klewerro.temperatureSensor.ThermometerDeviceBleClient
 
 data class ThermometerDeviceConnection(
-    val thermometerBleDevice: ThermometerBleDevice,
-    val gattClient: ClientBleGatt
+    val thermometerScanResult: ThermometerScanResult,
+    val thermometerDeviceBleClient: ThermometerDeviceBleClient
 )

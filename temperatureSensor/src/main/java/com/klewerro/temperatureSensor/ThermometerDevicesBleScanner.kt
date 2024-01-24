@@ -3,8 +3,8 @@ package com.klewerro.temperatureSensor
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
-import com.klewerro.temperatureSensor.model.ThermometerBleDevice
 import com.klewerro.temperatureSensor.model.ThermometerDeviceConnection
+import com.klewerro.temperatureSensor.model.ThermometerScanResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +25,7 @@ class ThermometerDevicesBleScanner {
 
     private val aggregator = BleScanResultAggregator()
 
-    private val _bleDevices = MutableStateFlow<List<ThermometerBleDevice>>(emptyList())
+    private val _bleDevices = MutableStateFlow<List<ThermometerScanResult>>(emptyList())
     val bleDevices = _bleDevices.asStateFlow()
 
     private val _isScanning = MutableStateFlow(false)
@@ -41,7 +41,7 @@ class ThermometerDevicesBleScanner {
                 bleScanResultsList
                     .sortedByDescending { it.highestRssi }
                     .map { bleScanResult ->
-                        ThermometerBleDevice(
+                        ThermometerScanResult(
                             bleScanResult.device.name ?: "",
                             bleScanResult.device.address,
                             bleScanResult.scanResult.last().rssi
@@ -54,7 +54,6 @@ class ThermometerDevicesBleScanner {
             }
             .onCompletion {
                 _isScanning.update { false }
-                _bleDevices.update { emptyList() }
             }
             .launchIn(coroutineScope)
     }
@@ -70,7 +69,15 @@ class ThermometerDevicesBleScanner {
 
         val gattConnection = ClientBleGatt.connect(context, bleDevice, coroutineScope)
         val isConnected = gattConnection.isConnected
-        Log.d("ThermometerDevicesBleScanner", "connectToDevice ${bleDevice.name} connected: $isConnected")
-        return ThermometerDeviceConnection(thermometerBleDevice, gattConnection)
+        Log.d(
+            "ThermometerDevicesBleScanner",
+            "connectToDevice ${bleDevice.name} connected: $isConnected"
+        )
+
+        val client = ThermometerDeviceBleClient(gattConnection).apply {
+            discoverDeviceOperations()
+        }
+
+        return ThermometerDeviceConnection(thermometerBleDevice, client)
     }
 }

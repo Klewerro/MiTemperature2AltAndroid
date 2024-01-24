@@ -1,15 +1,18 @@
 package com.klewerro.temperatureSensor.model
 
 data class ThermometerBleDevice(
-    val name: String,
     val address: String,
-    val rssi: Int
-) {
-    override fun equals(other: Any?): Boolean {
-        return other is ThermometerBleDevice && other.address == this.address
-    }
+    val name: String,
+    val rssi: Int,
+    val status: CurrentThermometerStatus?
 
-    override fun hashCode(): Int {
-        return address.hashCode()
+) {
+    companion object {
+        fun fromScanResult(thermometerScanResult: ThermometerScanResult) = ThermometerBleDevice(
+            address = thermometerScanResult.address,
+            name = thermometerScanResult.name,
+            rssi = thermometerScanResult.rssi,
+            null
+        )
     }
 }
