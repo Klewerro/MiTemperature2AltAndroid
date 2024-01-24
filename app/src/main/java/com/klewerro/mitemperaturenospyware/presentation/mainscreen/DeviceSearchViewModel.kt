@@ -1,6 +1,5 @@
 package com.klewerro.mitemperaturenospyware.presentation.mainscreen
 
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,6 +11,7 @@ import com.klewerro.mitemperaturenospyware.presentation.model.PermissionStatus
 import com.klewerro.mitemperaturenospyware.presentation.model.ThermometerUiDevice
 import com.klewerro.mitemperaturenospyware.presentation.util.UiText
 import com.klewerro.temperatureSensor.ThermometerRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -20,16 +20,18 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.lang.IllegalStateException
+import javax.inject.Inject
 
-class DeviceSearchViewModel : ViewModel() {
+@HiltViewModel
+class DeviceSearchViewModel @Inject constructor(
+    private val thermometerRepository: ThermometerRepository
+) : ViewModel() {
 
-    private val thermometerRepository = ThermometerRepository()
     private var scanningBleDevicesJob: Job? = null
 
     val isScanningForDevices = thermometerRepository.isScanningForDevices
-    val scannedDevices = thermometerRepository.scannedDevices
-    val connectedDevices = thermometerRepository.connectedDevices
+    private val scannedDevices = thermometerRepository.scannedDevices
+    private val connectedDevices = thermometerRepository.connectedDevices
 
     val devicesCombined = combine(
         scannedDevices,
@@ -58,12 +60,12 @@ class DeviceSearchViewModel : ViewModel() {
 
     var permissionGrantStatus by mutableStateOf(PermissionStatus.DECLINED)
 
-    fun scanForDevices(context: Context) {
+    fun scanForDevices() {
         if (scanningBleDevicesJob != null) {
             stopScanForDevices()
         }
         viewModelScope.launch(Dispatchers.IO) {
-            scanningBleDevicesJob = thermometerRepository.scanForDevices(context, this)
+            scanningBleDevicesJob = thermometerRepository.scanForDevices(this)
         }
     }
 
@@ -72,10 +74,10 @@ class DeviceSearchViewModel : ViewModel() {
         scanningBleDevicesJob = null
     }
 
-    fun connectToDevice(context: Context, thermometerUiDevice: ThermometerUiDevice) {
+    fun connectToDevice(thermometerUiDevice: ThermometerUiDevice) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                thermometerRepository.connectToDevice(context, this, thermometerUiDevice.address)
+                thermometerRepository.connectToDevice(this, thermometerUiDevice.address)
             } catch (stateException: IllegalStateException) {
                 _uiTextError.send(UiText.StringResource(R.string.already_connecting_to_different_device))
             }

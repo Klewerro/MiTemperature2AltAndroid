@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class ThermometerRepository {
+class ThermometerRepository(private val context: Context) {
 
     private val scanner = ThermometerDevicesBleScanner()
     private var deviceConnections: Map<ThermometerBleDevice, ThermometerDeviceBleClient> = HashMap()
@@ -26,11 +26,10 @@ class ThermometerRepository {
     private var _connectingToDeviceAddress = MutableStateFlow("")
     val connectingToDeviceAddress get() = _connectingToDeviceAddress.asStateFlow()
 
-    fun scanForDevices(context: Context, coroutineScope: CoroutineScope): Job =
+    fun scanForDevices(coroutineScope: CoroutineScope): Job =
         scanner.scanForDevices(context, coroutineScope)
 
     suspend fun connectToDevice(
-        context: Context,
         coroutineScope: CoroutineScope,
         address: String
     ) {

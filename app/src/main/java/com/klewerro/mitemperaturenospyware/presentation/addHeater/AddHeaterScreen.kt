@@ -26,9 +26,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.klewerro.mitemperaturenospyware.R
 import com.klewerro.mitemperaturenospyware.presentation.addHeater.components.DevicesList
 import com.klewerro.mitemperaturenospyware.presentation.addHeater.components.PermissionDeclinedRationale
@@ -40,13 +40,13 @@ import com.klewerro.mitemperaturenospyware.ui.LocalSpacing
 
 @Composable
 fun AddHeaterScreen(
+    scaffoldState: ScaffoldState,
     modifier: Modifier = Modifier,
-    scaffoldState: ScaffoldState
+    viewModel: DeviceSearchViewModel = hiltViewModel()
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
     val activity = context.getActivity()
-    val viewModel = viewModel<DeviceSearchViewModel>()
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
 
@@ -113,9 +113,9 @@ fun AddHeaterScreen(
                     isScanningForDevices = isScanningForDevices,
                     scannedDevices = scannedDevices,
                     onButtonClickWhenScanning = viewModel::stopScanForDevices,
-                    onButtonClickWhenNotScanning = { viewModel.scanForDevices(context) },
+                    onButtonClickWhenNotScanning = { viewModel.scanForDevices() },
                     onDeviceClick = { thermometerUiDevice ->
-                        viewModel.connectToDevice(context, thermometerUiDevice)
+                        viewModel.connectToDevice(thermometerUiDevice)
                     }
                 )
             }

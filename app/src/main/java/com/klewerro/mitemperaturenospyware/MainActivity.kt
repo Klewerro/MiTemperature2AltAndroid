@@ -25,7 +25,9 @@ import com.klewerro.mitemperaturenospyware.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperaturenospyware.presentation.mainscreen.TopBar
 import com.klewerro.mitemperaturenospyware.presentation.navigation.Route
 import com.klewerro.mitemperaturenospyware.ui.theme.MiTemperatureNoSpywareTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
