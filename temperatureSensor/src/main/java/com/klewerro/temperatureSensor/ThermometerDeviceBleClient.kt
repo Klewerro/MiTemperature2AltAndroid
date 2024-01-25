@@ -2,8 +2,8 @@ package com.klewerro.temperatureSensor
 
 import android.annotation.SuppressLint
 import android.util.Log
+import com.klewerro.mitemperaturenospyware.domain.model.CurrentThermometerStatus
 import com.klewerro.temperatureSensor.BleConstants.toUUID
-import com.klewerro.temperatureSensor.model.CurrentThermometerStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import no.nordicsemi.android.common.core.DataByteArray

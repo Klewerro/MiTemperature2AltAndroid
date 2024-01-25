@@ -27,8 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.klewerro.mitemperaturenospyware.domain.model.CurrentThermometerStatus
 import com.klewerro.mitemperaturenospyware.ui.LocalSpacing
-import com.klewerro.temperatureSensor.model.CurrentThermometerStatus
 
 @Composable
 fun ThermometerBox(

@@ -36,15 +36,15 @@ fun MainScreen(
                 modifier
                     .fillMaxWidth()
             ) {
-                items(connectedDevices) { thermometerUiDevice ->
+                items(connectedDevices) { thermometerDevice ->
                     ThermometerBox(
-                        name = thermometerUiDevice.address,
-                        thermometerStatus = thermometerUiDevice.status,
+                        name = thermometerDevice.address,
+                        thermometerStatus = thermometerDevice.status,
                         onRefreshClick = {
-                            viewModel.getStatusForDevice(thermometerUiDevice.address)
+                            viewModel.getStatusForDevice(thermometerDevice.address)
                         },
                         onSubscribeClick = {
-                            viewModel.subscribeForDeviceStatusUpdates(thermometerUiDevice.address)
+                            viewModel.subscribeForDeviceStatusUpdates(thermometerDevice.address)
                         },
                         modifier = Modifier.padding(vertical = spacing.spaceNormal)
                     )

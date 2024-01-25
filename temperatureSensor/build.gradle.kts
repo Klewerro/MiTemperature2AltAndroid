@@ -25,15 +25,17 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 }
 
 dependencies {
+    // Module imports
+    implementation(project(":domain"))
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -43,6 +45,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
     // Kotlin BLE library
-    implementation("no.nordicsemi.android.kotlin.ble:scanner:1.0.8")
-    implementation("no.nordicsemi.android.kotlin.ble:client:1.0.8")
+    val bleKotlinLibraryVersion = rootProject.extra["ble_kotlin_library_version"]
+    implementation("no.nordicsemi.android.kotlin.ble:scanner:$bleKotlinLibraryVersion")
+    implementation("no.nordicsemi.android.kotlin.ble:client:$bleKotlinLibraryVersion")
 }

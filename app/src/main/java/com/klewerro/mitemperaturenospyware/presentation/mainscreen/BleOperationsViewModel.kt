@@ -3,10 +3,13 @@ package com.klewerro.mitemperaturenospyware.presentation.mainscreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperaturenospyware.R
-import com.klewerro.mitemperaturenospyware.presentation.model.ConnectionStatus
-import com.klewerro.mitemperaturenospyware.presentation.model.ThermometerUiDevice
+import com.klewerro.mitemperaturenospyware.domain.model.ConnectionStatus
+import com.klewerro.mitemperaturenospyware.domain.model.ThermometerDevice
+import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.connect.ConnectToDeviceUseCase
+import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.connect.ConnectedDevicesUseCase
+import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
+import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.operations.SubscribeToCurrentThermometerStatusUseCase
 import com.klewerro.mitemperaturenospyware.presentation.util.UiText
-import com.klewerro.temperatureSensor.ThermometerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -19,16 +22,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BleOperationsViewModel @Inject constructor(
-    private val thermometerRepository: ThermometerRepository
+    connectedDevicesUseCase: ConnectedDevicesUseCase,
+    private val connectToDeviceUseCase: ConnectToDeviceUseCase,
+    private val readCurrentThermometerStatusUseCase: ReadCurrentThermometerStatusUseCase,
+    private val subscribeToCurrentThermometerStatusUseCase: SubscribeToCurrentThermometerStatusUseCase
 ) : ViewModel() {
 
     private val _uiTextError = Channel<UiText>()
     val uiTextError = _uiTextError.receiveAsFlow()
 
-    val connectedDevices = thermometerRepository.connectedDevices // Todo: Convert to UiBleDevice after creating useCases
+    val connectedDevices = connectedDevicesUseCase() // Todo: Convert to UiBleDevice after creating useCases
         .map {
             it.map { thermometerBleDevice ->
-                ThermometerUiDevice(
+                ThermometerDevice(
                     name = thermometerBleDevice.name,
                     address = thermometerBleDevice.address,
                     rssi = thermometerBleDevice.rssi,
@@ -39,10 +45,10 @@ class BleOperationsViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    fun connectToDevice(thermometerUiDevice: ThermometerUiDevice) {
+    fun connectToDevice(thermometerDevice: ThermometerDevice) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                thermometerRepository.connectToDevice(this, thermometerUiDevice.address)
+                connectToDeviceUseCase(this, thermometerDevice.address)
             } catch (stateException: IllegalStateException) {
                 _uiTextError.send(UiText.StringResource(R.string.already_connecting_to_different_device))
             }
@@ -51,13 +57,13 @@ class BleOperationsViewModel @Inject constructor(
 
     fun getStatusForDevice(address: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            thermometerRepository.readCurrentThermometerStatus(address)
+            readCurrentThermometerStatusUseCase(address)
         }
     }
 
     fun subscribeForDeviceStatusUpdates(address: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            thermometerRepository.subscribeToCurrentThermometerStatus(address, this)
+            subscribeToCurrentThermometerStatusUseCase(address, this)
         }
     }
 }

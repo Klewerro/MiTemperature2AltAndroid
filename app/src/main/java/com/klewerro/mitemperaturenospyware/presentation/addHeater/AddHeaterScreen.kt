@@ -52,7 +52,7 @@ fun AddHeaterScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
 
-    val scannedDevices by deviceSearchViewModel.devicesCombined.collectAsStateWithLifecycle()
+    val scannedDevices by deviceSearchViewModel.scannerDevices.collectAsStateWithLifecycle()
     val isScanningForDevices by deviceSearchViewModel.isScanningForDevices.collectAsStateWithLifecycle()
 
     var wasAppSettingsCheckClicked by remember {
@@ -116,8 +116,8 @@ fun AddHeaterScreen(
                     scannedDevices = scannedDevices,
                     onButtonClickWhenScanning = deviceSearchViewModel::stopScanForDevices,
                     onButtonClickWhenNotScanning = { deviceSearchViewModel.scanForDevices() },
-                    onDeviceClick = { thermometerUiDevice ->
-                        bleOperationsViewModel.connectToDevice(thermometerUiDevice)
+                    onDeviceClick = { thermometerDevice ->
+                        bleOperationsViewModel.connectToDevice(thermometerDevice)
                     }
                 )
             }

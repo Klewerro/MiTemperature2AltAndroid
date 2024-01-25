@@ -3,8 +3,8 @@ package com.klewerro.temperatureSensor
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import com.klewerro.mitemperaturenospyware.domain.model.ThermometerScanResult
 import com.klewerro.temperatureSensor.model.ThermometerDeviceConnection
-import com.klewerro.temperatureSensor.model.ThermometerScanResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
