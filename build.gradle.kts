@@ -2,6 +2,7 @@
 buildscript {
     extra.apply {
         set("hilt_version", "2.50")
+        set("ble_kotlin_library_version", "1.0.8")
     }
 }
 
@@ -11,6 +12,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
     id("com.android.library") version "8.1.2" apply false
     id("com.google.dagger.hilt.android") version "2.50" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.8.10" apply false
 }
 
 subprojects {

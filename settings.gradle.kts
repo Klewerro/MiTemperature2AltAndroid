@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 rootProject.name = "MiTemperatureNoSpyware"
 include(":app")
 include(":temperatureSensor")
+include(":domain")
