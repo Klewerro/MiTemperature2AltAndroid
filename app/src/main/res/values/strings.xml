@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">MiTemperatureNoSpyware</string>
+    <string name="stop_scan">Stop scan</string>
+    <string name="scan_for_devices">Scan for devices</string>
+    <string name="ask_again">Ask again</string>
+    <string name="open_app_settings">Open app settings</string>
+    <string name="ble_permissions_not_granted_rationale">Bluetooth permission not granted. Please click button and you will be asked again about this permission.</string>
+    <string name="ble_permissions_permanently_declined">Bluetooth permission permanently declined. It is necessary to connect with thermometers. In case of not accepting this permission, you will not be able to connect with your thermometers.</string>
+    <string name="location_permissions_not_granted_rationale">Location permission not granted. It is necessary to scan and connect with Bluetooth devices. Please click button and you will be asked again about this permission.</string>
+    <string name="location_permissions_permanently_declined">Location permission permanently declined. It is necessary to connect with thermometers. In case of not accepting this permission, you will not be able to connect with your thermometers.</string>
+    <string name="already_connecting_to_different_device">Already connecting to different device.</string>
+    <string name="connected">Connected</string>
+    <string name="no_connected_thermometers">No connected thermometers</string>
+    <string name="no_connected_thermometers_rationale">Please click \'+\' icon on the status-bar right corner to search for devices.</string>
 </resources>
