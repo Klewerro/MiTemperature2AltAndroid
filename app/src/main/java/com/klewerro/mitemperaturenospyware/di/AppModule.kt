@@ -1,7 +1,8 @@
 package com.klewerro.mitemperaturenospyware.di
 
 import android.content.Context
-import com.klewerro.temperatureSensor.ThermometerRepository
+import com.klewerro.mitemperaturenospyware.domain.repository.ThermometerRepository
+import com.klewerro.temperatureSensor.NordicBleThermometerRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,6 +16,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideThermometerRepository(@ApplicationContext appContext: Context) =
-        ThermometerRepository(appContext)
+    fun provideThermometerRepository(@ApplicationContext appContext: Context): ThermometerRepository =
+        NordicBleThermometerRepository(appContext)
 }

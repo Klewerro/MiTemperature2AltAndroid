@@ -1,4 +1,4 @@
-package com.klewerro.temperatureSensor.model
+package com.klewerro.mitemperaturenospyware.domain.model
 
 data class CurrentThermometerStatus(
     val temperature: Float,

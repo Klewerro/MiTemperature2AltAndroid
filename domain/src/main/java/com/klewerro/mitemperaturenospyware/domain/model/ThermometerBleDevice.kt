@@ -1,4 +1,4 @@
-package com.klewerro.temperatureSensor.model
+package com.klewerro.mitemperaturenospyware.domain.model
 
 data class ThermometerBleDevice(
     val address: String,

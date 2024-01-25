@@ -22,17 +22,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import com.klewerro.mitemperaturenospyware.R
-import com.klewerro.mitemperaturenospyware.presentation.model.ConnectionStatus
-import com.klewerro.mitemperaturenospyware.presentation.model.ThermometerUiDevice
+import com.klewerro.mitemperaturenospyware.domain.model.ConnectionStatus
+import com.klewerro.mitemperaturenospyware.domain.model.ThermometerDevice
 import com.klewerro.mitemperaturenospyware.ui.LocalSpacing
 
 @Composable
 fun DevicesList(
     isScanningForDevices: Boolean,
-    scannedDevices: List<ThermometerUiDevice>,
+    scannedDevices: List<ThermometerDevice>,
     onButtonClickWhenScanning: () -> Unit,
     onButtonClickWhenNotScanning: () -> Unit,
-    onDeviceClick: (ThermometerUiDevice) -> Unit,
+    onDeviceClick: (ThermometerDevice) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -58,7 +58,7 @@ fun DevicesList(
             )
         }
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            items(scannedDevices) { thermometerUiDevice ->
+            items(scannedDevices) { thermometerDevice ->
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -69,13 +69,13 @@ fun DevicesList(
                         )
                         .clip(RoundedCornerShape(spacing.spaceNormal))
                         .background(MaterialTheme.colors.onPrimary)
-                        .clickable { onDeviceClick(thermometerUiDevice) }
+                        .clickable { onDeviceClick(thermometerDevice) }
                         .padding(spacing.spaceSmall)
                 ) {
-                    Text(text = thermometerUiDevice.name)
-                    Text(text = thermometerUiDevice.address)
-                    Text(text = thermometerUiDevice.rssi.toString())
-                    when (thermometerUiDevice.connectionStatus) {
+                    Text(text = thermometerDevice.name)
+                    Text(text = thermometerDevice.address)
+                    Text(text = thermometerDevice.rssi.toString())
+                    when (thermometerDevice.connectionStatus) {
                         ConnectionStatus.NOT_CONNECTED -> { /*Nothing*/ }
                         ConnectionStatus.CONNECTING -> {
                             Spacer(modifier = Modifier.height(spacing.spaceSmall))
