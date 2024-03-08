@@ -3,6 +3,7 @@ buildscript {
     extra.apply {
         set("hilt_version", "2.50")
         set("ble_kotlin_library_version", "1.0.8")
+        set("junit_5_version", "5.9.3")
     }
 }
 
