@@ -1,9 +1,10 @@
 package com.klewerro.mitemperaturenospyware.domain.model
 
 data class ThermometerDevice(
-    val name: String,
     val address: String,
-    val rssi: Int,
-    val connectionStatus: ConnectionStatus,
-    val status: CurrentThermometerStatus?
+    val name: String,
+    val temperature: Float,
+    val humidity: Int,
+    val voltage: Float,
+    val rssi: Int?
 )

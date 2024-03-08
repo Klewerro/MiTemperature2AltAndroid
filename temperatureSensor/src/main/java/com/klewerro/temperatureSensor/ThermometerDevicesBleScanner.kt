@@ -3,8 +3,8 @@ package com.klewerro.temperatureSensor
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import com.klewerro.mitemperaturenospyware.domain.model.ConnectionStatus
 import com.klewerro.mitemperaturenospyware.domain.model.ThermometerScanResult
-import com.klewerro.temperatureSensor.model.ThermometerDeviceConnection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,7 +44,8 @@ class ThermometerDevicesBleScanner {
                         ThermometerScanResult(
                             bleScanResult.device.name ?: "",
                             bleScanResult.device.address,
-                            bleScanResult.scanResult.last().rssi
+                            bleScanResult.scanResult.last().rssi,
+                            ConnectionStatus.NOT_CONNECTED
                         )
                     }
             }
@@ -62,9 +63,8 @@ class ThermometerDevicesBleScanner {
         context: Context,
         coroutineScope: CoroutineScope,
         bleDeviceAddress: String
-    ): ThermometerDeviceConnection {
+    ): ThermometerDeviceBleClient {
         val foundBleDevices = aggregator.results
-        val thermometerBleDevice = bleDevices.value.first { it.address == bleDeviceAddress }
         val bleDevice = foundBleDevices.first { it.device.address == bleDeviceAddress }.device
 
         val gattConnection = ClientBleGatt.connect(context, bleDevice, coroutineScope)
@@ -78,6 +78,6 @@ class ThermometerDevicesBleScanner {
             discoverDeviceOperations()
         }
 
-        return ThermometerDeviceConnection(thermometerBleDevice, client)
+        return client
     }
 }

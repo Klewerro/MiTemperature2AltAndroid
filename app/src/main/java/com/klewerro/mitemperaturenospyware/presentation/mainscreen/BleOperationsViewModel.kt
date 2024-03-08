@@ -3,8 +3,7 @@ package com.klewerro.mitemperaturenospyware.presentation.mainscreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperaturenospyware.R
-import com.klewerro.mitemperaturenospyware.domain.model.ConnectionStatus
-import com.klewerro.mitemperaturenospyware.domain.model.ThermometerDevice
+import com.klewerro.mitemperaturenospyware.domain.model.ThermometerScanResult
 import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.connect.ConnectToDeviceUseCase
 import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.connect.ConnectedDevicesUseCase
 import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
@@ -14,7 +13,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -31,21 +29,10 @@ class BleOperationsViewModel @Inject constructor(
     private val _uiTextError = Channel<UiText>()
     val uiTextError = _uiTextError.receiveAsFlow()
 
-    val connectedDevices = connectedDevicesUseCase() // Todo: Convert to UiBleDevice after creating useCases
-        .map {
-            it.map { thermometerBleDevice ->
-                ThermometerDevice(
-                    name = thermometerBleDevice.name,
-                    address = thermometerBleDevice.address,
-                    rssi = thermometerBleDevice.rssi,
-                    connectionStatus = ConnectionStatus.CONNECTED,
-                    status = thermometerBleDevice.status
-                )
-            }
-        }
+    val connectedDevices = connectedDevicesUseCase()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    fun connectToDevice(thermometerDevice: ThermometerDevice) {
+    fun connectToDevice(thermometerDevice: ThermometerScanResult) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 connectToDeviceUseCase(this, thermometerDevice.address)

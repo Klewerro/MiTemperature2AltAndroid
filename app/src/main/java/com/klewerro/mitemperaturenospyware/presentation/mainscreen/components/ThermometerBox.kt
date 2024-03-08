@@ -27,13 +27,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.klewerro.mitemperaturenospyware.domain.model.CurrentThermometerStatus
+import com.klewerro.mitemperaturenospyware.domain.model.ThermometerDevice
 import com.klewerro.mitemperaturenospyware.ui.LocalSpacing
 
 @Composable
 fun ThermometerBox(
-    name: String,
-    thermometerStatus: CurrentThermometerStatus?,
+    thermometerDevice: ThermometerDevice,
     onRefreshClick: () -> Unit,
     onSubscribeClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -76,10 +75,10 @@ fun ThermometerBox(
                 .background(Color.LightGray)
         ) {
             ThermometerValuesColumn(
-                name = name,
-                temperature = thermometerStatus?.temperature ?: 0.0f,
-                humidity = thermometerStatus?.humidity ?: 0,
-                voltage = thermometerStatus?.voltage ?: 0.0f,
+                name = thermometerDevice.name,
+                temperature = thermometerDevice.temperature,
+                humidity = thermometerDevice.humidity,
+                voltage = thermometerDevice.voltage,
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -125,11 +124,13 @@ private fun ThermometerValuesColumn(
 @Composable
 private fun ThermometerBoxPreview() {
     ThermometerBox(
-        name = ":: :: :: C4",
-        CurrentThermometerStatus(
+        ThermometerDevice(
+            "address",
+            "name",
             temperature = 21.1f,
             humidity = 56,
-            voltage = 1.231f
+            voltage = 1.231f,
+            -1
         ),
         onRefreshClick = {},
         onSubscribeClick = {}

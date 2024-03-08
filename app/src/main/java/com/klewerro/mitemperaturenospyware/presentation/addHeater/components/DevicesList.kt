@@ -23,16 +23,16 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import com.klewerro.mitemperaturenospyware.R
 import com.klewerro.mitemperaturenospyware.domain.model.ConnectionStatus
-import com.klewerro.mitemperaturenospyware.domain.model.ThermometerDevice
+import com.klewerro.mitemperaturenospyware.domain.model.ThermometerScanResult
 import com.klewerro.mitemperaturenospyware.ui.LocalSpacing
 
 @Composable
 fun DevicesList(
     isScanningForDevices: Boolean,
-    scannedDevices: List<ThermometerDevice>,
+    scannedDevices: List<ThermometerScanResult>,
     onButtonClickWhenScanning: () -> Unit,
     onButtonClickWhenNotScanning: () -> Unit,
-    onDeviceClick: (ThermometerDevice) -> Unit,
+    onDeviceClick: (ThermometerScanResult) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current

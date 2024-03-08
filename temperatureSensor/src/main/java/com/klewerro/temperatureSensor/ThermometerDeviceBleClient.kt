@@ -2,7 +2,7 @@ package com.klewerro.temperatureSensor
 
 import android.annotation.SuppressLint
 import android.util.Log
-import com.klewerro.mitemperaturenospyware.domain.model.CurrentThermometerStatus
+import com.klewerro.mitemperaturenospyware.domain.model.ThermometerStatus
 import com.klewerro.temperatureSensor.BleConstants.toUUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -23,20 +23,22 @@ class ThermometerDeviceBleClient(private val connection: ClientBleGatt) {
         temperatureHumidityCharacteristic = service?.findCharacteristic(BleConstants.CHARACTERISTIC_DEVICE_TEMPERATURE_HUMIDITY.toUUID())
     }
 
-    suspend fun readThermometerStatus(): CurrentThermometerStatus? {
+    suspend fun readThermometerStatus(): ThermometerStatus? {
         val readResult = temperatureHumidityCharacteristic?.read()
         return readResult?.let {
             convertTemperatureHumidityVoltageToCurrentThermometerStatus(it)
         }
     }
 
-    suspend fun subscribeToThermometerStatus(): Flow<CurrentThermometerStatus>? {
+    suspend fun subscribeToThermometerStatus(): Flow<ThermometerStatus>? {
         return temperatureHumidityCharacteristic?.getNotifications()?.map {
             convertTemperatureHumidityVoltageToCurrentThermometerStatus(it)
         }
     }
 
-    private fun convertTemperatureHumidityVoltageToCurrentThermometerStatus(dataByteArray: DataByteArray): CurrentThermometerStatus {
+    suspend fun readRssi(): Int = connection.readRssi()
+
+    private fun convertTemperatureHumidityVoltageToCurrentThermometerStatus(dataByteArray: DataByteArray): ThermometerStatus {
         val value = dataByteArray.value
         val temperatureBytes = value.take(2).toByteArray()
         val humidityByte = value[2]
@@ -54,7 +56,7 @@ class ThermometerDeviceBleClient(private val connection: ClientBleGatt) {
             "device temperature: $temperature, humidity: $humidity, battery level: $battery"
         )
 
-        return CurrentThermometerStatus(
+        return ThermometerStatus(
             temperature = temperature,
             humidity = humidity,
             voltage = battery
