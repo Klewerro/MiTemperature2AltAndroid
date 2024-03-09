@@ -1,8 +1,8 @@
 package com.klewerro.temperatureSensor
 
-import android.content.Context
 import com.klewerro.mitemperaturenospyware.domain.model.ThermometerStatus
 import com.klewerro.mitemperaturenospyware.domain.repository.ThermometerRepository
+import com.klewerro.temperatureSensor.contracts.ThermometerDevicesBleScanner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -13,9 +13,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-class NordicBleThermometerRepository(private val context: Context) : ThermometerRepository {
+class NordicBleThermometerRepository(
+    private val scanner: ThermometerDevicesBleScanner
+) : ThermometerRepository {
 
-    private val scanner = ThermometerDevicesBleScanner()
     private var connectedDevicesClients: Map<String, ThermometerDeviceBleClient> = HashMap()
 
     override val scannedDevices = scanner.bleDevices
@@ -24,7 +25,8 @@ class NordicBleThermometerRepository(private val context: Context) : Thermometer
     private var _connectingToDeviceAddress = MutableStateFlow("")
     override val connectingToDeviceAddress = _connectingToDeviceAddress.asStateFlow()
 
-    override fun scanForDevices(coroutineScope: CoroutineScope): Job = scanner.scanForDevices(context, coroutineScope)
+    override fun scanForDevices(coroutineScope: CoroutineScope): Job =
+        scanner.scanForDevices(coroutineScope)
 
     private var _connectedDevicesStatuses = MutableStateFlow<Map<String, ThermometerStatus>>(
         emptyMap()
@@ -43,7 +45,7 @@ class NordicBleThermometerRepository(private val context: Context) : Thermometer
         }
 
         _connectingToDeviceAddress.update { address }
-        val connectedDeviceClient = scanner.connectToDevice(context, coroutineScope, address)
+        val connectedDeviceClient = scanner.connectToDevice(coroutineScope, address)
         connectedDeviceClient.readThermometerStatus()?.let { thermometerStatus ->
             _connectedDevicesStatuses.update {
                 it.plus(
@@ -83,7 +85,10 @@ class NordicBleThermometerRepository(private val context: Context) : Thermometer
         }
     }
 
-    override suspend fun subscribeToCurrentThermometerStatus(deviceAddress: String, coroutineScope: CoroutineScope) {
+    override suspend fun subscribeToCurrentThermometerStatus(
+        deviceAddress: String,
+        coroutineScope: CoroutineScope
+    ) {
         connectedDevicesClients[deviceAddress]?.let { deviceClient ->
             coroutineScope.launch(Dispatchers.IO) {
                 deviceClient.subscribeToThermometerStatus()?.collect { statusUpdate ->
