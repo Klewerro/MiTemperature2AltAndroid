@@ -17,3 +17,4 @@ rootProject.name = "MiTemperatureNoSpyware"
 include(":app")
 include(":temperatureSensor")
 include(":domain")
+include(":coreTest")

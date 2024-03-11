@@ -1,13 +1,10 @@
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.junit5)
-    id("kotlin-kapt")
 }
 
 android {
-    namespace = "com.klewerro.temperatureSensor"
+    namespace = "com.klewerro.mitemperaturenospyware.coreTest"
     compileSdk = 34
 
     defaultConfig {
@@ -36,29 +33,22 @@ android {
 }
 
 dependencies {
-    // Module imports
+
     implementation(project(":domain"))
-    testImplementation(project(":coreTest"))
+    implementation(project(":temperatureSensor"))
 
-    // Hilt
-    implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation)
-    kapt(libs.hilt.android.compiler)
-
-    implementation(libs.kotlin.ble.scanner)
-    implementation(libs.kotlin.ble.client)
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.appcompat)
 
     // Test
-    testImplementation(libs.junit)
-    testImplementation(libs.junit5.api)
-    testRuntimeOnly(libs.junit5.engine)
-    testImplementation(libs.junit5.params)
-    testImplementation(libs.assertK)
-    testImplementation(libs.mockk)
-    testImplementation(libs.coroutines.test)
-    testImplementation(libs.turbine)
+    implementation(libs.junit)
+    implementation(libs.junit5.api)
+    runtimeOnly(libs.junit5.engine)
+    implementation(libs.junit5.params)
+    implementation(libs.assertK)
+    implementation(libs.coroutines.test)
+    implementation(libs.mockk)
 
-    // UI Test
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
 }
