@@ -1,10 +1,10 @@
-package com.klewerro.temperatureSensor.di
+package com.klewerro.mitemperaturenospyware.temperatureSensor.di
 
 import android.content.Context
 import com.klewerro.mitemperaturenospyware.domain.repository.ThermometerRepository
-import com.klewerro.temperatureSensor.NordicBleThermometerRepository
-import com.klewerro.temperatureSensor.NordicThermometerDevicesBleScanner
-import com.klewerro.temperatureSensor.contracts.ThermometerDevicesBleScanner
+import com.klewerro.mitemperaturenospyware.temperatureSensor.NordicBleThermometerRepository
+import com.klewerro.mitemperaturenospyware.temperatureSensor.NordicThermometerDevicesBleScanner
+import com.klewerro.mitemperaturenospyware.temperatureSensor.contracts.ThermometerDevicesBleScanner
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

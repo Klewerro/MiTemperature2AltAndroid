@@ -1,4 +1,4 @@
-package com.klewerro.temperatureSensor
+package com.klewerro.mitemperaturenospyware.temperatureSensor
 
 import android.util.Log
 import com.klewerro.mitemperaturenospyware.domain.model.ThermometerStatus

@@ -1,8 +1,8 @@
-package com.klewerro.temperatureSensor
+package com.klewerro.mitemperaturenospyware.temperatureSensor
 
 import com.klewerro.mitemperaturenospyware.domain.model.ThermometerStatus
 import com.klewerro.mitemperaturenospyware.domain.repository.ThermometerRepository
-import com.klewerro.temperatureSensor.contracts.ThermometerDevicesBleScanner
+import com.klewerro.mitemperaturenospyware.temperatureSensor.contracts.ThermometerDevicesBleScanner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

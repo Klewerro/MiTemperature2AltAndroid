@@ -1,11 +1,11 @@
-package com.klewerro.temperatureSensor
+package com.klewerro.mitemperaturenospyware.temperatureSensor
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import com.klewerro.mitemperaturenospyware.domain.model.ConnectionStatus
 import com.klewerro.mitemperaturenospyware.domain.model.ThermometerScanResult
-import com.klewerro.temperatureSensor.contracts.ThermometerDevicesBleScanner
+import com.klewerro.mitemperaturenospyware.temperatureSensor.contracts.ThermometerDevicesBleScanner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow

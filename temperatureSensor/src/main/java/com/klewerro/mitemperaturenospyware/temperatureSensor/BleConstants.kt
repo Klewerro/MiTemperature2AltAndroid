@@ -1,4 +1,4 @@
-package com.klewerro.temperatureSensor
+package com.klewerro.mitemperaturenospyware.temperatureSensor
 
 import java.util.UUID
 

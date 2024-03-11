@@ -1,8 +1,8 @@
-package com.klewerro.temperatureSensor
+package com.klewerro.mitemperaturenospyware.temperatureSensor
 
 import android.annotation.SuppressLint
 import com.klewerro.mitemperaturenospyware.domain.model.ThermometerStatus
-import com.klewerro.temperatureSensor.BleConstants.toUUID
+import com.klewerro.mitemperaturenospyware.temperatureSensor.BleConstants.toUUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import no.nordicsemi.android.kotlin.ble.client.main.callback.ClientBleGatt
