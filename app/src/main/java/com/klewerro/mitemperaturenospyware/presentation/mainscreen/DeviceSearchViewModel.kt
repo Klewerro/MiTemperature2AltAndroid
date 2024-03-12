@@ -8,9 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.scan.IsScanningForDevicesUseCase
 import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.scan.ScanForDevicesUseCase
 import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.scan.SearchedDevicesUseCase
+import com.klewerro.mitemperaturenospyware.domain.util.DispatcherProvider
 import com.klewerro.mitemperaturenospyware.presentation.model.PermissionStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -21,13 +21,15 @@ import javax.inject.Inject
 class DeviceSearchViewModel @Inject constructor(
     searchedDevicesUseCase: SearchedDevicesUseCase,
     isScanningForDevicesUseCase: IsScanningForDevicesUseCase,
-    private val scanForDevicesUseCase: ScanForDevicesUseCase
+    private val scanForDevicesUseCase: ScanForDevicesUseCase,
+    private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
     private var scanningBleDevicesJob: Job? = null
 
     val isScanningForDevices = isScanningForDevicesUseCase()
-    val scannerDevices = searchedDevicesUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    val scannerDevices = searchedDevicesUseCase()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     var permissionGrantStatus by mutableStateOf(PermissionStatus.DECLINED)
 
@@ -35,7 +37,7 @@ class DeviceSearchViewModel @Inject constructor(
         if (scanningBleDevicesJob != null) {
             stopScanForDevices()
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io) {
             scanningBleDevicesJob = scanForDevicesUseCase(this)
         }
     }

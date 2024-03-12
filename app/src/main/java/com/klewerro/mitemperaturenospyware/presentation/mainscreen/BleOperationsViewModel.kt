@@ -8,9 +8,9 @@ import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.connect.Co
 import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.connect.ConnectedDevicesUseCase
 import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
 import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.operations.SubscribeToCurrentThermometerStatusUseCase
+import com.klewerro.mitemperaturenospyware.domain.util.DispatcherProvider
 import com.klewerro.mitemperaturenospyware.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -23,7 +23,9 @@ class BleOperationsViewModel @Inject constructor(
     connectedDevicesUseCase: ConnectedDevicesUseCase,
     private val connectToDeviceUseCase: ConnectToDeviceUseCase,
     private val readCurrentThermometerStatusUseCase: ReadCurrentThermometerStatusUseCase,
-    private val subscribeToCurrentThermometerStatusUseCase: SubscribeToCurrentThermometerStatusUseCase
+    private val subscribeToCurrentThermometerStatusUseCase:
+        SubscribeToCurrentThermometerStatusUseCase,
+    private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
     private val _uiTextError = Channel<UiText>()
@@ -33,23 +35,25 @@ class BleOperationsViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     fun connectToDevice(thermometerDevice: ThermometerScanResult) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io) {
             try {
                 connectToDeviceUseCase(this, thermometerDevice.address)
             } catch (stateException: IllegalStateException) {
-                _uiTextError.send(UiText.StringResource(R.string.already_connecting_to_different_device))
+                _uiTextError.send(
+                    UiText.StringResource(R.string.already_connecting_to_different_device)
+                )
             }
         }
     }
 
     fun getStatusForDevice(address: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io) {
             readCurrentThermometerStatusUseCase(address)
         }
     }
 
     fun subscribeForDeviceStatusUpdates(address: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io) {
             subscribeToCurrentThermometerStatusUseCase(address, this)
         }
     }

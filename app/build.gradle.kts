@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.junit5)
     id("kotlin-kapt")
 }
 
@@ -56,6 +57,7 @@ dependencies {
     // Module imports
     implementation(project(":temperatureSensor"))
     implementation(project(":domain"))
+    testImplementation(project(":coreTest"))
 
     implementation(libs.bundles.androidX)
     implementation(libs.bundles.compose)
@@ -66,7 +68,17 @@ dependencies {
     kapt(libs.hilt.android.compiler)
 
     // Test dependencies
+    // Test
     testImplementation(libs.junit)
+    testImplementation(libs.junit5.api)
+    testRuntimeOnly(libs.junit5.engine)
+    testImplementation(libs.junit5.params)
+    testImplementation(libs.assertK)
+    testImplementation(libs.mockk)
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.turbine)
+
+    // UI test
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
     androidTestImplementation(platform(libs.compose.bom))
