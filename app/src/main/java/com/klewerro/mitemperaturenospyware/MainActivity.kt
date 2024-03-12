@@ -21,7 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.klewerro.mitemperaturenospyware.presentation.addHeater.AddHeaterScreen
+import com.klewerro.mitemperaturenospyware.presentation.addHeater.AddThermometerScreen
 import com.klewerro.mitemperaturenospyware.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperaturenospyware.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperaturenospyware.presentation.mainscreen.TopBar
@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
                                 titleState = Route.MAIN.screenName
                             }
                             composable(Route.SCAN_FOR_DEVICES.name) {
-                                AddHeaterScreen(
+                                AddThermometerScreen(
                                     scaffoldState = scaffoldState,
                                     bleOperationsViewModel = bleOperationsViewModel
                                 )

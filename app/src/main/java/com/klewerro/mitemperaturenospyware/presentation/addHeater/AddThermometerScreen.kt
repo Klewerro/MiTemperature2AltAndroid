@@ -40,7 +40,7 @@ import com.klewerro.mitemperaturenospyware.presentation.util.isAndroid12OrGreate
 import com.klewerro.mitemperaturenospyware.ui.LocalSpacing
 
 @Composable
-fun AddHeaterScreen(
+fun AddThermometerScreen(
     scaffoldState: ScaffoldState,
     bleOperationsViewModel: BleOperationsViewModel,
     modifier: Modifier = Modifier,
@@ -87,7 +87,9 @@ fun AddHeaterScreen(
 
     LaunchedEffect(key1 = lifecycleState) {
         if (lifecycleState == Lifecycle.State.RESUMED) {
-            if (deviceSearchViewModel.permissionGrantStatus == PermissionStatus.PERMANENTLY_DECLINED && wasAppSettingsCheckClicked) {
+            if (deviceSearchViewModel.permissionGrantStatus == PermissionStatus.PERMANENTLY_DECLINED &&
+                wasAppSettingsCheckClicked
+            ) {
                 wasAppSettingsCheckClicked = false
                 nearbyDevicesPermissionResultLauncher.launchRequestBlePermissions()
             }
@@ -121,14 +123,20 @@ fun AddHeaterScreen(
                     }
                 )
             }
+
             PermissionStatus.DECLINED -> {
                 PermissionDeclinedRationale(
-                    rationaleAndroid12Text = stringResource(R.string.ble_permissions_not_granted_rationale),
-                    rationalePreAndroid12Text = stringResource(R.string.location_permissions_not_granted_rationale),
+                    rationaleAndroid12Text = stringResource(
+                        R.string.ble_permissions_not_granted_rationale
+                    ),
+                    rationalePreAndroid12Text = stringResource(
+                        R.string.location_permissions_not_granted_rationale
+                    ),
                     buttonText = stringResource(R.string.ask_again),
                     onButtonClick = nearbyDevicesPermissionResultLauncher::launchRequestBlePermissions
                 )
             }
+
             PermissionStatus.PERMANENTLY_DECLINED -> {
                 PermissionDeclinedRationale(
                     stringResource(R.string.ble_permissions_permanently_declined),
