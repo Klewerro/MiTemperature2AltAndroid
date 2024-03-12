@@ -4,6 +4,8 @@ import com.klewerro.mitemperaturenospyware.domain.repository.ThermometerReposito
 import kotlinx.coroutines.CoroutineScope
 
 class SubscribeToCurrentThermometerStatusUseCase(private val thermometerRepository: ThermometerRepository) {
-    suspend operator fun invoke(deviceAddress: String, viewModelScope: CoroutineScope) =
+    suspend operator fun invoke(deviceAddress: String, viewModelScope: CoroutineScope) {
         thermometerRepository.subscribeToCurrentThermometerStatus(deviceAddress, viewModelScope)
+        thermometerRepository.subscribeToRssi(deviceAddress, viewModelScope)
+    }
 }

@@ -38,8 +38,7 @@ fun MainScreen(
             ) {
                 items(connectedDevices) { thermometerDevice ->
                     ThermometerBox(
-                        name = thermometerDevice.address,
-                        thermometerStatus = thermometerDevice.status,
+                        thermometerDevice = thermometerDevice,
                         onRefreshClick = {
                             viewModel.getStatusForDevice(thermometerDevice.address)
                         },
