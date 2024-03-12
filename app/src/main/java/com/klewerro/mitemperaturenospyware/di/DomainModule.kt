@@ -8,11 +8,15 @@ import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.operations
 import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.scan.IsScanningForDevicesUseCase
 import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.scan.ScanForDevicesUseCase
 import com.klewerro.mitemperaturenospyware.domain.usecase.thermometer.scan.SearchedDevicesUseCase
+import com.klewerro.mitemperaturenospyware.domain.util.DispatcherProvider
+import com.klewerro.mitemperaturenospyware.domain.util.StandardDispatchers
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -50,6 +54,15 @@ object DomainModule {
 
     @Provides
     @ViewModelScoped
-    fun provideSubscribeToCurrentThermometerStatusUseCase(thermometerRepository: ThermometerRepository) =
-        SubscribeToCurrentThermometerStatusUseCase(thermometerRepository)
+    fun provideSubscribeToCurrentThermometerStatusUseCase(
+        thermometerRepository: ThermometerRepository
+    ) = SubscribeToCurrentThermometerStatusUseCase(thermometerRepository)
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object DomainModuleSingleton {
+    @Provides
+    @Singleton
+    fun provideDispatchers(): DispatcherProvider = StandardDispatchers()
 }
