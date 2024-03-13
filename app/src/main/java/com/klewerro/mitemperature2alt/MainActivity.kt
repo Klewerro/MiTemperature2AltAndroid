@@ -26,7 +26,7 @@ import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewM
 import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
 import com.klewerro.mitemperature2alt.presentation.navigation.Route
-import com.klewerro.mitemperature2alt.ui.theme.MiTemperatureNoSpywareTheme
+import com.klewerro.mitemperature2alt.ui.theme.MiTemperature2AltTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MiTemperatureNoSpywareTheme {
+            MiTemperature2AltTheme {
                 val navController = rememberNavController()
                 val scaffoldState = rememberScaffoldState()
                 val bleOperationsViewModel: BleOperationsViewModel = hiltViewModel()
@@ -96,7 +96,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    MiTemperatureNoSpywareTheme {
+    MiTemperature2AltTheme {
         Greeting("Android")
     }
 }

@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.klewerro.mitemperaturenospyware"
+    namespace = "com.klewerro.mitemperature2alt"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.klewerro.mitemperaturenospyware"
+        applicationId = "com.klewerro.mitemperature2alt"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -28,7 +28,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }

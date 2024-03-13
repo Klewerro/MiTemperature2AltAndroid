@@ -17,6 +17,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.klewerro.mitemperaturenospyware", appContext.packageName)
+        assertEquals("com.klewerro.mitemperature2alt", appContext.packageName)
     }
 }

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.klewerro.mitemperaturenospyware.coreTest"
+    namespace = "com.klewerro.mitemperature2alt.coreTest"
     compileSdk = 34
 
     defaultConfig {
@@ -19,7 +19,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }

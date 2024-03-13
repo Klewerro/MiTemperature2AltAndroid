@@ -35,7 +35,7 @@ private val LightColorScheme = lightColors(
 )
 
 @Composable
-fun MiTemperatureNoSpywareTheme(
+fun MiTemperature2AltTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
