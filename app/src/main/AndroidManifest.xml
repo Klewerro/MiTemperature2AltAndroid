@@ -14,7 +14,7 @@
         android:theme="@style/Theme.MiTemperatureNoSpyware"
         tools:targetApi="31" >
         <activity
-            android:name="com.klewerro.mitemperaturenospyware.MainActivity"
+            android:name="com.klewerro.mitemperature2alt.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.MiTemperatureNoSpyware" >
