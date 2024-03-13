@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.klewerro.mitemperature2alt"
-    compileSdk = 34
+    compileSdk = libs.versions.sdk.compile.get().toInt()
 
     defaultConfig {
         applicationId = "com.klewerro.mitemperature2alt"
-        minSdk = 26
-        targetSdk = 34
+        minSdk = libs.versions.sdk.min.get().toInt()
+        targetSdk = libs.versions.sdk.target.get().toInt()
         versionCode = 1
         versionName = "1.0"
 
@@ -28,7 +28,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
+                "proguard-rules.pro"
             )
         }
     }

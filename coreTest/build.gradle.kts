@@ -5,10 +5,10 @@ plugins {
 
 android {
     namespace = "com.klewerro.mitemperature2alt.coreTest"
-    compileSdk = 34
+    compileSdk = libs.versions.sdk.compile.get().toInt()
 
     defaultConfig {
-        minSdk = 26
+        minSdk = libs.versions.sdk.min.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -19,7 +19,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
+                "proguard-rules.pro"
             )
         }
     }
