@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.klewerro.mitemperaturenospyware.coreTest"
-    compileSdk = 34
+    namespace = "com.klewerro.mitemperature2alt.coreTest"
+    compileSdk = libs.versions.sdk.compile.get().toInt()
 
     defaultConfig {
-        minSdk = 26
+        minSdk = libs.versions.sdk.min.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")

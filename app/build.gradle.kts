@@ -7,13 +7,13 @@ plugins {
 }
 
 android {
-    namespace = "com.klewerro.mitemperaturenospyware"
-    compileSdk = 34
+    namespace = "com.klewerro.mitemperature2alt"
+    compileSdk = libs.versions.sdk.compile.get().toInt()
 
     defaultConfig {
-        applicationId = "com.klewerro.mitemperaturenospyware"
-        minSdk = 26
-        targetSdk = 34
+        applicationId = "com.klewerro.mitemperature2alt"
+        minSdk = libs.versions.sdk.min.get().toInt()
+        targetSdk = libs.versions.sdk.target.get().toInt()
         versionCode = 1
         versionName = "1.0"
 

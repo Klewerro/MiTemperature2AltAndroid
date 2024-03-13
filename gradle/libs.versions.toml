@@ -1,4 +1,7 @@
 [versions]
+sdk-compile = "34"
+sdk-min = "26"
+sdk-target = "34"
 agp = "8.1.2"
 kotlin = "1.8.10"
 hilt = "2.50"

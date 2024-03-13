@@ -11,13 +11,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MiTemperatureNoSpyware"
+        android:theme="@style/Theme.MiTemperature2Alt"
         tools:targetApi="31" >
         <activity
-            android:name="com.klewerro.mitemperaturenospyware.MainActivity"
+            android:name="com.klewerro.mitemperature2alt.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.MiTemperatureNoSpyware" >
+            android:theme="@style/Theme.MiTemperature2Alt" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
