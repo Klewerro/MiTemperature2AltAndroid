@@ -13,5 +13,8 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MiTemperatureNoSpyware"
+rootProject.name = "MiTemperature2Alt"
 include(":app")
+include(":temperatureSensor")
+include(":domain")
+include(":coreTest")

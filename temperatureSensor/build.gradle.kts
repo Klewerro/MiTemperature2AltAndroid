@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.hilt)
     alias(libs.plugins.junit5)
@@ -7,20 +7,14 @@ plugins {
 }
 
 android {
-    namespace = "com.klewerro.mitemperature2alt"
+    namespace = "com.klewerro.temperatureSensor"
     compileSdk = libs.versions.sdk.compile.get().toInt()
 
     defaultConfig {
-        applicationId = "com.klewerro.mitemperature2alt"
         minSdk = libs.versions.sdk.min.get().toInt()
-        targetSdk = libs.versions.sdk.target.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -39,35 +33,21 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.3"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
 }
 
 dependencies {
-
     // Module imports
-    implementation(project(":temperatureSensor"))
     implementation(project(":domain"))
     testImplementation(project(":coreTest"))
-
-    implementation(libs.bundles.androidX)
-    implementation(libs.bundles.compose)
 
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation)
     kapt(libs.hilt.android.compiler)
 
-    // Test dependencies
+    implementation(libs.kotlin.ble.scanner)
+    implementation(libs.kotlin.ble.client)
+
     // Test
     testImplementation(libs.junit)
     testImplementation(libs.junit5.api)
@@ -78,13 +58,7 @@ dependencies {
     testImplementation(libs.coroutines.test)
     testImplementation(libs.turbine)
 
-    // UI test
+    // UI Test
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
-    androidTestImplementation(platform(libs.compose.bom))
-    androidTestImplementation(libs.androidx.test.compose.junit)
-
-    // Debug dependencies
-    debugImplementation(libs.compose.ui.tooling)
-    debugImplementation(libs.compose.ui.manifest)
 }
