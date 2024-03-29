@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.mainscreen
+package com.klewerro.mitemperature2alt.presentation.addHeater
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

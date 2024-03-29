@@ -18,6 +18,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +36,7 @@ fun ThermometerBox(
     thermometerDevice: ThermometerDevice,
     onRefreshClick: () -> Unit,
     onSubscribeClick: () -> Unit,
+    onSaveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -66,6 +68,15 @@ fun ThermometerBox(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .clickable { onSubscribeClick() }
+                .padding(2.dp)
+        )
+        Icon(
+            Icons.Default.Save,
+            "Refresh thermometer temperature",
+            tint = MaterialTheme.colors.onBackground,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .clickable { onSaveClick() }
                 .padding(2.dp)
         )
         Box(
@@ -133,6 +144,7 @@ private fun ThermometerBoxPreview() {
             -1
         ),
         onRefreshClick = {},
-        onSubscribeClick = {}
+        onSubscribeClick = {},
+        onSaveClick = {}
     )
 }

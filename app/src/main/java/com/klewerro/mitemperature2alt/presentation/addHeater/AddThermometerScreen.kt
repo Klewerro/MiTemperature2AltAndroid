@@ -33,7 +33,6 @@ import com.klewerro.mitemperature2alt.R
 import com.klewerro.mitemperature2alt.presentation.addHeater.components.DevicesList
 import com.klewerro.mitemperature2alt.presentation.addHeater.components.PermissionDeclinedRationale
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewModel
-import com.klewerro.mitemperature2alt.presentation.mainscreen.DeviceSearchViewModel
 import com.klewerro.mitemperature2alt.presentation.model.PermissionStatus
 import com.klewerro.mitemperature2alt.presentation.util.getActivity
 import com.klewerro.mitemperature2alt.presentation.util.isAndroid12OrGreater

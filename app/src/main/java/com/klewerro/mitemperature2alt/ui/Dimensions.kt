@@ -9,6 +9,7 @@ data class Dimensions(
     val spaceExtraSmall: Dp = 4.dp,
     val spaceSmall: Dp = 8.dp,
     val spaceNormal: Dp = 16.dp,
+    val spaceScreen: Dp = 16.dp,
     val spaceLarge: Dp = 32.dp,
     val spaceExtraLarge: Dp = 64.dp,
     val radiusNormal: Dp = 16.dp,
