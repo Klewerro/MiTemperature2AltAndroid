@@ -15,17 +15,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.klewerro.mitemperature2alt.presentation.mainscreen.components.NoConnectedThermometersInformation
 import com.klewerro.mitemperature2alt.presentation.mainscreen.components.SavedThermometerBox
 import com.klewerro.mitemperature2alt.presentation.mainscreen.components.ThermometerBox
 import com.klewerro.mitemperature2alt.ui.LocalSpacing
 
 @Composable
-fun MainScreen(viewModel: BleOperationsViewModel, modifier: Modifier = Modifier) {
+fun MainScreen(
+    state: BleOperationsState,
+    onEvent: (BleOperationsEvent) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val spacing = LocalSpacing.current
-    val connectedDevices by viewModel.connectedDevices.collectAsStateWithLifecycle()
-    val savedThermometers by viewModel.savedThermometers.collectAsStateWithLifecycle()
 
     // Todo: TEMP!
     var isShowingDialog by rememberSaveable {
@@ -38,14 +39,14 @@ fun MainScreen(viewModel: BleOperationsViewModel, modifier: Modifier = Modifier)
             .padding(horizontal = spacing.spaceExtraLarge),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (connectedDevices.isEmpty() && savedThermometers.isEmpty()) {
+        if (state.connectedDevices.isEmpty() && state.savedThermometers.isEmpty()) {
             NoConnectedThermometersInformation()
         } else {
             LazyColumn(
                 modifier
                     .fillMaxWidth()
             ) {
-                items(savedThermometers) { savedThermometer ->
+                items(state.savedThermometers) { savedThermometer ->
                     SavedThermometerBox(
                         savedThermometer = savedThermometer,
                         modifier = Modifier
@@ -55,18 +56,24 @@ fun MainScreen(viewModel: BleOperationsViewModel, modifier: Modifier = Modifier)
                     )
                 }
 
-                items(connectedDevices) { thermometerDevice ->
+                items(state.connectedDevices) { thermometerDevice ->
                     ThermometerBox(
                         thermometerDevice = thermometerDevice,
                         onRefreshClick = {
-                            viewModel.getStatusForDevice(thermometerDevice.address)
+                            onEvent(
+                                BleOperationsEvent.GetStatusForDevice(thermometerDevice.address)
+                            )
                         },
                         onSubscribeClick = {
-                            viewModel.subscribeForDeviceStatusUpdates(thermometerDevice.address)
+                            onEvent(
+                                BleOperationsEvent.SubscribeForDeviceStatusUpdates(
+                                    thermometerDevice.address
+                                )
+                            )
                         },
                         onSaveClick = {
                             isShowingDialog = true
-                            viewModel.saveThermometer(thermometerDevice.address)
+                            onEvent(BleOperationsEvent.SaveThermometer(thermometerDevice.address))
                         },
                         modifier = Modifier.padding(vertical = spacing.spaceNormal)
                     )

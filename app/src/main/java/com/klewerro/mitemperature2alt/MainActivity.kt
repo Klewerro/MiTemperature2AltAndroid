@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -38,6 +39,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val scaffoldState = rememberScaffoldState()
                 val bleOperationsViewModel: BleOperationsViewModel = hiltViewModel()
+                val bleOperationsSate by bleOperationsViewModel.state.collectAsStateWithLifecycle()
 
                 var titleState by remember {
                     mutableStateOf(Route.MAIN.screenName)
@@ -67,7 +69,12 @@ class MainActivity : ComponentActivity() {
                         ) {
                             // Animations: https://proandroiddev.com/screen-transition-animations-with-jetpack-navigation-17afdc714d0e
                             composable(Route.MAIN.name) {
-                                MainScreen(bleOperationsViewModel)
+                                MainScreen(
+                                    bleOperationsSate,
+                                    onEvent = { event ->
+                                        bleOperationsViewModel.onEvent(event)
+                                    }
+                                )
                                 titleState = Route.MAIN.screenName
                             }
                             composable(Route.SCAN_FOR_DEVICES.name) {

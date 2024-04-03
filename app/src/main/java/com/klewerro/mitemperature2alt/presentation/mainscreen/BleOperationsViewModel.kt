@@ -14,10 +14,11 @@ import com.klewerro.mitemperature2alt.domain.usecase.thermometer.persistence.Sav
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import com.klewerro.mitemperature2alt.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,19 +34,38 @@ class BleOperationsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
-    // Todo: Create viewState class
-    //  MVI events
+    private val _state = MutableStateFlow(BleOperationsState())
+    val state = combine(
+        _state,
+        connectedDevicesUseCase(),
+        savedThermometersUseCase()
+    ) { stateValue, connectedDevices, savedThermometers ->
+        stateValue.copy(
+            connectedDevices = connectedDevices,
+            savedThermometers = savedThermometers
+        )
+    }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, BleOperationsState())
 
-    private val _uiTextError = Channel<UiText>()
-    val uiTextError = _uiTextError.receiveAsFlow()
+    fun onEvent(event: BleOperationsEvent) {
+        when (event) {
+            is BleOperationsEvent.ConnectToDevice -> handleConnectToDevice(event.thermometerDevice)
+            is BleOperationsEvent.GetStatusForDevice -> handleGetStatusForDevice(event.address)
+            is BleOperationsEvent.SubscribeForDeviceStatusUpdates ->
+                handleSubscribeForDeviceStatusUpdates(event.address)
+            is BleOperationsEvent.SaveThermometer ->
+                handleSaveThermometer(event.address)
+            BleOperationsEvent.ErrorDismissed -> {
+                _state.update {
+                    it.copy(
+                        error = null
+                    )
+                }
+            }
+        }
+    }
 
-    val connectedDevices = connectedDevicesUseCase()
-        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
-    val savedThermometers = savedThermometersUseCase()
-        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
-    fun connectToDevice(thermometerDevice: ThermometerScanResult) {
+    private fun handleConnectToDevice(thermometerDevice: ThermometerScanResult) {
         viewModelScope.launch(dispatchers.io) {
             try {
                 connectToDeviceUseCase(this, thermometerDevice.address)
@@ -55,26 +75,30 @@ class BleOperationsViewModel @Inject constructor(
                     "connectToDevice exception: ${stateException.message}"
                 )
                 stateException.printStackTrace()
-                _uiTextError.send(
-                    UiText.StringResource(R.string.already_connecting_to_different_device)
-                )
+                _state.update {
+                    it.copy(
+                        error = UiText.StringResource(
+                            R.string.already_connecting_to_different_device
+                        )
+                    )
+                }
             }
         }
     }
 
-    fun getStatusForDevice(address: String) {
+    private fun handleGetStatusForDevice(address: String) {
         viewModelScope.launch(dispatchers.io) {
             readCurrentThermometerStatusUseCase(address)
         }
     }
 
-    fun subscribeForDeviceStatusUpdates(address: String) {
+    private fun handleSubscribeForDeviceStatusUpdates(address: String) {
         viewModelScope.launch(dispatchers.io) {
             subscribeToCurrentThermometerStatusUseCase(address, this)
         }
     }
 
-    fun saveThermometer(address: String) {
+    private fun handleSaveThermometer(address: String) {
         viewModelScope.launch(dispatchers.io) {
             saveThermometerUseCase(address, "Thermometer name 1")
         }
