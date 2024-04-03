@@ -1,7 +1,6 @@
 package com.klewerro.mitemperature2alt.presentation.addHeater
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,38 +11,66 @@ import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import com.klewerro.mitemperature2alt.presentation.model.PermissionStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class DeviceSearchViewModel @Inject constructor(
-    searchedDevicesUseCase: SearchedDevicesUseCase,
-    isScanningForDevicesUseCase: IsScanningForDevicesUseCase,
+    val searchedDevicesUseCase: SearchedDevicesUseCase,
+    val isScanningForDevicesUseCase: IsScanningForDevicesUseCase,
     private val scanForDevicesUseCase: ScanForDevicesUseCase,
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
     private var scanningBleDevicesJob: Job? = null
 
-    val isScanningForDevices = isScanningForDevicesUseCase()
-    val scannerDevices = searchedDevicesUseCase()
-        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    private val _state = MutableStateFlow(DeviceSearchState())
+    val state = combine(
+        _state,
+        isScanningForDevicesUseCase(),
+        searchedDevicesUseCase()
+    ) { stateValue, isScanning, searchedDevices ->
+        stateValue.copy(
+            isScanningForDevices = isScanning,
+            scannedDevices = searchedDevices
+        )
+    }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, DeviceSearchState())
 
-    var permissionGrantStatus by mutableStateOf(PermissionStatus.DECLINED)
+    fun onEvent(event: DeviceSearchEvent) {
+        when (event) {
+            DeviceSearchEvent.ScanForDevices -> handleScanForDevices()
+            DeviceSearchEvent.StopScanForDevices -> handleStopScanForDevices()
+            is DeviceSearchEvent.UpdatePermissionStatus -> handlePermissionChange(
+                event.permissionStatus
+            )
+        }
+    }
 
-    fun scanForDevices() {
+    private fun handleScanForDevices() {
         if (scanningBleDevicesJob != null) {
-            stopScanForDevices()
+            handleStopScanForDevices()
         }
         viewModelScope.launch(dispatchers.io) {
             scanningBleDevicesJob = scanForDevicesUseCase(this)
         }
     }
 
-    fun stopScanForDevices() {
+    private fun handleStopScanForDevices() {
         scanningBleDevicesJob?.cancel()
         scanningBleDevicesJob = null
+    }
+
+    private fun handlePermissionChange(permissionStatus: PermissionStatus) {
+        _state.update {
+            it.copy(
+                permissionGrantStatus = permissionStatus
+            )
+        }
     }
 }

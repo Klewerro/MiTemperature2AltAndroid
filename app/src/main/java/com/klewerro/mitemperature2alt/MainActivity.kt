@@ -23,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.klewerro.mitemperature2alt.presentation.addHeater.AddThermometerScreen
+import com.klewerro.mitemperature2alt.presentation.addHeater.DeviceSearchViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
@@ -78,9 +79,19 @@ class MainActivity : ComponentActivity() {
                                 titleState = Route.MAIN.screenName
                             }
                             composable(Route.SCAN_FOR_DEVICES.name) {
+                                val deviceSearchViewModel = hiltViewModel<DeviceSearchViewModel>()
+                                val deviceSearchState by deviceSearchViewModel.state
+                                    .collectAsStateWithLifecycle()
                                 AddThermometerScreen(
-                                    scaffoldState = scaffoldState,
-                                    bleOperationsViewModel = bleOperationsViewModel
+                                    bleOperationsState = bleOperationsSate,
+                                    onBleOperationsEvent = { bleOperationsEvent ->
+                                        bleOperationsViewModel.onEvent(bleOperationsEvent)
+                                    },
+                                    deviceSearchState = deviceSearchState,
+                                    onDeviceSearchEvent = { deviceSearchEvent ->
+                                        deviceSearchViewModel.onEvent(deviceSearchEvent)
+                                    },
+                                    scaffoldState = scaffoldState
                                 )
                                 titleState = Route.SCAN_FOR_DEVICES.screenName
                             }
