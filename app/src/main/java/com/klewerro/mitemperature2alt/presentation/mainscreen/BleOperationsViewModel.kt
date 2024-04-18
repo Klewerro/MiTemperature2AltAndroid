@@ -34,6 +34,8 @@ class BleOperationsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
+    private var saveThermometerAddress: String? = null
+
     private val _state = MutableStateFlow(BleOperationsState())
     val state = combine(
         _state,
@@ -53,8 +55,19 @@ class BleOperationsViewModel @Inject constructor(
             is BleOperationsEvent.GetStatusForDevice -> handleGetStatusForDevice(event.address)
             is BleOperationsEvent.SubscribeForDeviceStatusUpdates ->
                 handleSubscribeForDeviceStatusUpdates(event.address)
-            is BleOperationsEvent.SaveThermometer ->
-                handleSaveThermometer(event.address)
+            is BleOperationsEvent.SaveThermometer -> handleSaveThermometer(event.name)
+            is BleOperationsEvent.OpenSaveThermometer -> _state.update {
+                saveThermometerAddress = event.address
+                it.copy(
+                    isShowingSaveDialog = true
+                )
+            }
+            BleOperationsEvent.CloseSaveThermometer -> _state.update {
+                saveThermometerAddress = null
+                it.copy(
+                    isShowingSaveDialog = false
+                )
+            }
             BleOperationsEvent.ErrorDismissed -> {
                 _state.update {
                     it.copy(
@@ -98,9 +111,22 @@ class BleOperationsViewModel @Inject constructor(
         }
     }
 
-    private fun handleSaveThermometer(address: String) {
-        viewModelScope.launch(dispatchers.io) {
-            saveThermometerUseCase(address, "Thermometer name 1")
+    private fun handleSaveThermometer(thermometerName: String) {
+        saveThermometerAddress?.let { addressValue ->
+            viewModelScope.launch(dispatchers.io) {
+                saveThermometerUseCase(addressValue, thermometerName)
+            }
+        } ?: let {
+            _state.update {
+                it.copy(
+                    error = UiText.StringResource(R.string.unexpected_error_occurred_try_again)
+                )
+            }
+        }
+        _state.update {
+            it.copy(
+                isShowingSaveDialog = false
+            )
         }
     }
 }

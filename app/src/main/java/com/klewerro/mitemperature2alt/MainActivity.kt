@@ -71,10 +71,11 @@ class MainActivity : ComponentActivity() {
                             // Animations: https://proandroiddev.com/screen-transition-animations-with-jetpack-navigation-17afdc714d0e
                             composable(Route.MAIN.name) {
                                 MainScreen(
-                                    bleOperationsSate,
+                                    state = bleOperationsSate,
                                     onEvent = { event ->
                                         bleOperationsViewModel.onEvent(event)
-                                    }
+                                    },
+                                    scaffoldState = scaffoldState
                                 )
                                 titleState = Route.MAIN.screenName
                             }
