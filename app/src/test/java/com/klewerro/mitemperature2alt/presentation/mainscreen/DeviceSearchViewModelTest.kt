@@ -10,6 +10,7 @@ import com.klewerro.mitemperature2alt.coreTest.util.TestDispatchers
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.IsScanningForDevicesUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.ScanForDevicesUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.SearchedDevicesUseCase
+import com.klewerro.mitemperature2alt.presentation.addHeater.DeviceSearchEvent
 import com.klewerro.mitemperature2alt.presentation.addHeater.DeviceSearchViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -56,7 +57,7 @@ class DeviceSearchViewModelTest {
             isScanningForDevicesUseCase().test {
                 assertThat(awaitItem()).isFalse()
                 val testJob = launch {
-                    deviceSearchViewModel.scanForDevices()
+                    deviceSearchViewModel.onEvent(DeviceSearchEvent.ScanForDevices)
                     val scanStartedItem = awaitItem()
                     assertThat(scanStartedItem).isTrue()
                 }
@@ -64,7 +65,7 @@ class DeviceSearchViewModelTest {
                 val testJob2 = launch {
                     val resultItem = awaitItem()
                     assertThat(resultItem).isFalse()
-                    deviceSearchViewModel.scanForDevices()
+                    deviceSearchViewModel.onEvent(DeviceSearchEvent.ScanForDevices)
                     val scanStartedItem = awaitItem()
                     assertThat(scanStartedItem).isTrue()
                 }
