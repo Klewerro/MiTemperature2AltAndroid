@@ -47,6 +47,7 @@ dependencies {
 
     implementation(libs.kotlin.ble.scanner)
     implementation(libs.kotlin.ble.client)
+    implementation(libs.timber)
 
     // Test
     testImplementation(libs.junit)

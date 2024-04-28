@@ -2,7 +2,6 @@ package com.klewerro.mitemperature2alt.temperatureSensor
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import com.klewerro.mitemperature2alt.domain.model.ConnectionStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.temperatureSensor.contracts.ThermometerDevicesBleScanner
@@ -20,6 +19,7 @@ import kotlinx.coroutines.flow.update
 import no.nordicsemi.android.kotlin.ble.client.main.callback.ClientBleGatt
 import no.nordicsemi.android.kotlin.ble.scanner.BleScanner
 import no.nordicsemi.android.kotlin.ble.scanner.aggregator.BleScanResultAggregator
+import timber.log.Timber
 
 @SuppressLint("MissingPermission")
 class NordicThermometerDevicesBleScanner(
@@ -71,10 +71,7 @@ class NordicThermometerDevicesBleScanner(
 
         val gattConnection = ClientBleGatt.connect(context, bleDevice, coroutineScope)
         val isConnected = gattConnection.isConnected
-        Log.d(
-            "ThermometerDevicesBleScanner",
-            "connectToDevice ${bleDevice.name} connected: $isConnected"
-        )
+        Timber.d("connectToDevice ${bleDevice.name} connected: $isConnected")
 
         val client = ThermometerDeviceBleClient(gattConnection).apply {
             discoverDeviceOperations()

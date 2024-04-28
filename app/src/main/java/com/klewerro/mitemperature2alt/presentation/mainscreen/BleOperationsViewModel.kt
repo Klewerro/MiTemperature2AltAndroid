@@ -1,6 +1,5 @@
 package com.klewerro.mitemperature2alt.presentation.mainscreen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperature2alt.R
@@ -20,6 +19,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -83,10 +83,7 @@ class BleOperationsViewModel @Inject constructor(
             try {
                 connectToDeviceUseCase(this, thermometerDevice.address)
             } catch (stateException: IllegalStateException) {
-                Log.d(
-                    "BleOperationsViewModel",
-                    "connectToDevice exception: ${stateException.message}"
-                )
+                Timber.d("connectToDevice exception: ${stateException.message}")
                 stateException.printStackTrace()
                 _state.update {
                     it.copy(

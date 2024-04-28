@@ -29,6 +29,7 @@ compose-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-com
 compose-navigation = { module = "androidx.navigation:navigation-compose", version = "2.7.7" }
 compose-icons = { module = "androidx.compose.material:material-icons-extended" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+timber = { module = "com.jakewharton.timber:timber", version = "5.0.1"}
 # hilt
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }

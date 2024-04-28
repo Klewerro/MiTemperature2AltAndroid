@@ -73,6 +73,7 @@ class BleOperationsViewModelTest {
             -100,
             ConnectionStatus.NOT_CONNECTED
         )
+
         bleOperationsViewModel.state.test {
             awaitItem()
             fakeThermometerRepository.connectingToDeviceAddressInternal.update { "00:00:00:01" }
