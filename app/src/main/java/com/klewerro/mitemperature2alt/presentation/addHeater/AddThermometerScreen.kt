@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Lifecycle
 import com.klewerro.mitemperature2alt.R
+import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.presentation.addHeater.components.DevicesList
 import com.klewerro.mitemperature2alt.presentation.addHeater.components.PermissionDeclinedRationale
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsEvent
@@ -43,6 +44,7 @@ fun AddThermometerScreen(
     onBleOperationsEvent: (BleOperationsEvent) -> Unit,
     deviceSearchState: DeviceSearchState,
     onDeviceSearchEvent: (DeviceSearchEvent) -> Unit,
+    onDeviceListItemClick: (ThermometerScanResult) -> Unit,
     scaffoldState: ScaffoldState,
     modifier: Modifier = Modifier
 ) {
@@ -126,7 +128,8 @@ fun AddThermometerScreen(
                         onDeviceSearchEvent(DeviceSearchEvent.ScanForDevices)
                     },
                     onDeviceClick = { thermometerDevice ->
-                        onBleOperationsEvent(BleOperationsEvent.ConnectToDevice(thermometerDevice))
+//                        onBleOperationsEvent(BleOperationsEvent.ConnectToDevice(thermometerDevice))
+                        onDeviceListItemClick(thermometerDevice)
                     }
                 )
             }

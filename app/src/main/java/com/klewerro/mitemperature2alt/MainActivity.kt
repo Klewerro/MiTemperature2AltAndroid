@@ -19,11 +19,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.klewerro.mitemperature2alt.presentation.addHeater.AddThermometerScreen
 import com.klewerro.mitemperature2alt.presentation.addHeater.DeviceSearchViewModel
+import com.klewerro.mitemperature2alt.presentation.addHeater.connecting.ConnectThermometerScreen
+import com.klewerro.mitemperature2alt.presentation.addHeater.connecting.ConnectThermometerViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
@@ -92,13 +99,48 @@ class MainActivity : ComponentActivity() {
                                     onDeviceSearchEvent = { deviceSearchEvent ->
                                         deviceSearchViewModel.onEvent(deviceSearchEvent)
                                     },
+                                    onDeviceListItemClick = {
+                                        navController.navigate(
+                                            route = "connect/${it.address}"
+                                        )
+                                    },
                                     scaffoldState = scaffoldState
                                 )
                                 titleState = Route.SCAN_FOR_DEVICES.screenName
                             }
+
+                            connectThermometerGraph(navController)
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun NavGraphBuilder.connectThermometerGraph(navController: NavController) {
+        navigation(
+            route = "connect/{address}",
+            startDestination = "connect_connecting",
+            arguments = listOf(
+                navArgument("address") {
+                    type = NavType.StringType
+                }
+            )
+
+        ) {
+            composable(
+                route = "connect_connecting"
+            ) {
+                val parentEntry = remember(it) {
+                    navController.getBackStackEntry(
+                        "connect/{address}"
+                    )
+                }
+                val address = parentEntry.arguments?.getString("address")
+                val connectThermometerViewModel: ConnectThermometerViewModel =
+                    hiltViewModel(parentEntry)
+                connectThermometerViewModel.saveThermometerAddress = address
+                ConnectThermometerScreen(connectThermometerViewModel)
             }
         }
     }
