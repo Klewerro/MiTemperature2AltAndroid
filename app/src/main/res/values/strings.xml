@@ -17,4 +17,7 @@
     <string name="save">Save</string>
     <string name="thermometer_name_must_not_be_empty">Thermometer name must not be empty!</string>
     <string name="content_description_error_indicator">Error indicator</string>
+    <string name="title_mi_temperature_2_alt">Mi Temperature 2 Alt</string>
+    <string name="connect">Connect</string>
+    <string name="connecting_to_thermometer">Connecting to thermometer</string>
 </resources>

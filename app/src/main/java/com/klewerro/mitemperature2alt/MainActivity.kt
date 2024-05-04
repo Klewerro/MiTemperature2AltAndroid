@@ -12,10 +12,11 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,8 +50,8 @@ class MainActivity : ComponentActivity() {
                 val bleOperationsViewModel: BleOperationsViewModel = hiltViewModel()
                 val bleOperationsSate by bleOperationsViewModel.state.collectAsStateWithLifecycle()
 
-                var titleState by remember {
-                    mutableStateOf(Route.MAIN.screenName)
+                var titleResourceIdState by remember {
+                    mutableIntStateOf(Route.MainRoutes.Main.screenName)
                 }
 
                 Scaffold(
@@ -58,10 +59,10 @@ class MainActivity : ComponentActivity() {
                     scaffoldState = scaffoldState,
                     topBar = {
                         TopBar(
-                            title = titleState,
-                            shouldBeButtonVisible = titleState == Route.MAIN.screenName
+                            title = stringResource(titleResourceIdState),
+                            shouldBeButtonVisible = titleResourceIdState == Route.MainRoutes.Main.screenName
                         ) {
-                            navController.navigate(Route.SCAN_FOR_DEVICES.name)
+                            Route.MainRoutes.ScanForDevices.navigate(navController)
                         }
                     }
                 ) { scaffoldPadding ->
@@ -73,10 +74,10 @@ class MainActivity : ComponentActivity() {
                     ) {
                         NavHost(
                             navController = navController,
-                            startDestination = Route.MAIN.name
+                            startDestination = Route.MainRoutes.Main.fullRoute
                         ) {
                             // Animations: https://proandroiddev.com/screen-transition-animations-with-jetpack-navigation-17afdc714d0e
-                            composable(Route.MAIN.name) {
+                            composable(Route.MainRoutes.Main.fullRoute) {
                                 MainScreen(
                                     state = bleOperationsSate,
                                     onEvent = { event ->
@@ -84,9 +85,9 @@ class MainActivity : ComponentActivity() {
                                     },
                                     scaffoldState = scaffoldState
                                 )
-                                titleState = Route.MAIN.screenName
+                                titleResourceIdState = Route.MainRoutes.Main.screenName
                             }
-                            composable(Route.SCAN_FOR_DEVICES.name) {
+                            composable(Route.MainRoutes.ScanForDevices.fullRoute) {
                                 val deviceSearchViewModel = hiltViewModel<DeviceSearchViewModel>()
                                 val deviceSearchState by deviceSearchViewModel.state
                                     .collectAsStateWithLifecycle()
@@ -100,13 +101,14 @@ class MainActivity : ComponentActivity() {
                                         deviceSearchViewModel.onEvent(deviceSearchEvent)
                                     },
                                     onDeviceListItemClick = {
-                                        navController.navigate(
-                                            route = "connect/${it.address}"
+                                        Route.ConnectDeviceRoutes.ConnectDeviceGraph.navigate(
+                                            navController,
+                                            it.address
                                         )
                                     },
                                     scaffoldState = scaffoldState
                                 )
-                                titleState = Route.SCAN_FOR_DEVICES.screenName
+                                titleResourceIdState = Route.MainRoutes.ScanForDevices.screenName
                             }
 
                             connectThermometerGraph(navController)
@@ -119,21 +121,21 @@ class MainActivity : ComponentActivity() {
 
     private fun NavGraphBuilder.connectThermometerGraph(navController: NavController) {
         navigation(
-            route = "connect/{address}",
-            startDestination = "connect_connecting",
+            route = Route.ConnectDeviceRoutes.ConnectDeviceGraph.fullRoute,
+            startDestination = Route.ConnectDeviceRoutes.Connecting.fullRoute,
             arguments = listOf(
-                navArgument("address") {
+                navArgument(Route.ConnectDeviceRoutes.PARAM_ADDRESS) {
                     type = NavType.StringType
                 }
             )
 
         ) {
             composable(
-                route = "connect_connecting"
+                route = Route.ConnectDeviceRoutes.Connecting.fullRoute
             ) {
                 val parentEntry = remember(it) {
                     navController.getBackStackEntry(
-                        "connect/{address}"
+                        Route.ConnectDeviceRoutes.ConnectDeviceGraph.fullRoute
                     )
                 }
                 val address = parentEntry.arguments?.getString("address")

@@ -1,6 +1,42 @@
 package com.klewerro.mitemperature2alt.presentation.navigation
 
-enum class Route(val screenName: String) {
-    MAIN("Mi Temperature 2 Alt"),
-    SCAN_FOR_DEVICES("Scan for devices")
+import androidx.annotation.StringRes
+import androidx.navigation.NavController
+import com.klewerro.mitemperature2alt.R
+
+sealed class Route(
+    @StringRes val screenName: Int,
+    private val route: String,
+    vararg params: String
+) {
+    val fullRoute: String = if (params.isEmpty()) {
+        route
+    } else {
+        val builder = StringBuilder(route)
+        params.forEach { builder.append("/{$it}") }
+        builder.toString()
+    }
+
+    fun navigate(navController: NavController, vararg params: Any) {
+        val address = if (params.isEmpty()) {
+            route
+        } else {
+            route + "/" + params.joinToString("/")
+        }
+        navController.navigate(address)
+    }
+
+    sealed class MainRoutes {
+        data object Main : Route(R.string.title_mi_temperature_2_alt, "main_screen")
+        data object ScanForDevices : Route(R.string.scan_for_devices, "device_scan")
+    }
+
+    sealed class ConnectDeviceRoutes {
+        data object ConnectDeviceGraph : Route(R.string.connect, "connect", PARAM_ADDRESS)
+        data object Connecting : Route(R.string.connecting_to_thermometer, "connect_connecting")
+
+        companion object NavigationParameters {
+            const val PARAM_ADDRESS = "address"
+        }
+    }
 }
