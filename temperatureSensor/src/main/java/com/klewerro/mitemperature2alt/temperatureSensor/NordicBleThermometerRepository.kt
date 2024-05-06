@@ -22,9 +22,6 @@ class NordicBleThermometerRepository(
     override val scannedDevices = scanner.bleDevices
     override val isScanningForDevices = scanner.isScanning
 
-    private var _connectingToDeviceAddress = MutableStateFlow("")
-    override val connectingToDeviceAddress = _connectingToDeviceAddress.asStateFlow()
-
     override fun scanForDevices(coroutineScope: CoroutineScope): Job =
         scanner.scanForDevices(coroutineScope)
 
@@ -37,14 +34,6 @@ class NordicBleThermometerRepository(
     override val rssiStrengths = _rssiStrengths.asStateFlow()
 
     override suspend fun connectToDevice(coroutineScope: CoroutineScope, address: String) {
-        if (_connectingToDeviceAddress.value.isNotBlank()) {
-            throw IllegalStateException("Already connecting to other device!")
-        }
-        if (_connectingToDeviceAddress.value == address) {
-            return
-        }
-
-        _connectingToDeviceAddress.update { address }
         val connectedDeviceClient = scanner.connectToDevice(coroutineScope, address)
         connectedDeviceClient.readThermometerStatus()?.let { thermometerStatus ->
             _connectedDevicesStatuses.update {
@@ -63,7 +52,6 @@ class NordicBleThermometerRepository(
                 connectedDeviceClient
             )
         )
-        _connectingToDeviceAddress.update { "" }
     }
 
     override suspend fun readCurrentThermometerStatus(deviceAddress: String): ThermometerStatus? {

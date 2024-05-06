@@ -11,11 +11,8 @@ class SearchedDevicesUseCase(private val thermometerRepository: ThermometerRepos
     operator fun invoke(): Flow<List<ThermometerScanResult>> = combine(
         thermometerRepository.scannedDevices,
         thermometerRepository.connectedDevicesStatuses,
-        thermometerRepository.connectingToDeviceAddress,
         thermometerRepository.rssiStrengths
-    ) { scanned, connected, currentlyConnectingDeviceAddress, rssi ->
-        val connectingUiDeviceIndex =
-            scanned.indexOfFirst { it.address == currentlyConnectingDeviceAddress }
+    ) { scanned, connected, rssi ->
 
         scanned.mapIndexed { mapIndex, thermometerBleScanResult ->
             val isConnected = connected.any { it.key == thermometerBleScanResult.address }
@@ -28,7 +25,6 @@ class SearchedDevicesUseCase(private val thermometerRepository: ThermometerRepos
                     thermometerBleScanResult.rssi
                 },
                 connectionStatus = when {
-                    connectingUiDeviceIndex > -1 && connectingUiDeviceIndex == mapIndex -> ConnectionStatus.CONNECTING
                     isConnected -> ConnectionStatus.CONNECTED
                     else -> ConnectionStatus.NOT_CONNECTED
                 }

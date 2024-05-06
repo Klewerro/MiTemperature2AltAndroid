@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.StateFlow
 interface ThermometerRepository {
     val isScanningForDevices: StateFlow<Boolean>
     val scannedDevices: StateFlow<List<ThermometerScanResult>>
-    val connectingToDeviceAddress: StateFlow<String>
     val connectedDevicesStatuses: StateFlow<Map<String, ThermometerStatus>>
     val rssiStrengths: StateFlow<Map<String, Int>>
 

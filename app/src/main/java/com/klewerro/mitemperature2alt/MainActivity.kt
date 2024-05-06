@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
@@ -111,7 +112,7 @@ class MainActivity : ComponentActivity() {
                                 titleResourceIdState = Route.MainRoutes.ScanForDevices.screenName
                             }
 
-                            connectThermometerGraph(navController)
+                            connectThermometerGraph(navController, scaffoldState)
                         }
                     }
                 }
@@ -119,7 +120,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun NavGraphBuilder.connectThermometerGraph(navController: NavController) {
+    private fun NavGraphBuilder.connectThermometerGraph(
+        navController: NavController,
+        scaffoldState: ScaffoldState
+    ) {
         navigation(
             route = Route.ConnectDeviceRoutes.ConnectDeviceGraph.fullRoute,
             startDestination = Route.ConnectDeviceRoutes.Connecting.fullRoute,
@@ -138,11 +142,15 @@ class MainActivity : ComponentActivity() {
                         Route.ConnectDeviceRoutes.ConnectDeviceGraph.fullRoute
                     )
                 }
-                val address = parentEntry.arguments?.getString("address")
                 val connectThermometerViewModel: ConnectThermometerViewModel =
                     hiltViewModel(parentEntry)
-                connectThermometerViewModel.saveThermometerAddress = address
-                ConnectThermometerScreen(connectThermometerViewModel)
+                ConnectThermometerScreen(
+                    connectThermometerViewModel,
+                    scaffoldState,
+                    onCriticalError = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }

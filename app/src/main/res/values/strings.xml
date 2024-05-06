@@ -13,6 +13,7 @@
     <string name="no_connected_thermometers">No connected thermometers</string>
     <string name="no_connected_thermometers_rationale">Please click \'+\' icon on the status-bar right corner to search for devices.</string>
     <string name="unexpected_error_occurred_try_again">Unexpected error occurred, please try again.</string>
+    <string name="unexpected_error_during_connecting_to_device">Unexpected error occurred during connecting to the device. Please restart application and try again.</string>
     <string name="name">Name</string>
     <string name="save">Save</string>
     <string name="thermometer_name_must_not_be_empty">Thermometer name must not be empty!</string>

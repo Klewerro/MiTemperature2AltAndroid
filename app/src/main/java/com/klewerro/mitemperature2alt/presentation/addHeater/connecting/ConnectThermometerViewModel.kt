@@ -1,56 +1,71 @@
 package com.klewerro.mitemperature2alt.presentation.addHeater.connecting
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.klewerro.mitemperature2alt.domain.model.ConnectionStatus
+import com.klewerro.mitemperature2alt.R
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.connect.ConnectToDeviceUseCase
+import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
+import com.klewerro.mitemperature2alt.presentation.navigation.Route
+import com.klewerro.mitemperature2alt.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel
 class ConnectThermometerViewModel @Inject constructor(
-    private val connectToDeviceUseCase: ConnectToDeviceUseCase
+    savedState: SavedStateHandle,
+    private val connectToDeviceUseCase: ConnectToDeviceUseCase,
+    private val readCurrentThermometerStatusUseCase: ReadCurrentThermometerStatusUseCase
 ) : ViewModel() {
-    var saveThermometerAddress: String? = null
-
     private val _state = MutableStateFlow(ConnectThermometerState())
-    val state = _state.asStateFlow()
+    val state = combine(
+        _state,
+        savedState.getStateFlow(Route.ConnectDeviceRoutes.PARAM_ADDRESS, "")
+    ) { stateValue, address ->
+        stateValue.copy(
+            thermometerAddress = address
+        )
+    }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ConnectThermometerState())
 
     fun connectToDevice() {
-        saveThermometerAddress?.let { saveThermometerAddressValue ->
-            _state.update {
-                it.copy(
-                    connectionStatus = ConnectionStatus.CONNECTING // Todo: Temporary - later fetch repository status using useCase
-                )
-            }
-            viewModelScope.launch(Dispatchers.IO) {
-                try {
-                    connectToDeviceUseCase(this, saveThermometerAddressValue)
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _state.update {
+                    it.copy(
+                        isConnecting = true
+                    )
+                }
+                with(state.value.thermometerAddress) {
+                    connectToDeviceUseCase(this@launch, this)
+                    val currentStatus = readCurrentThermometerStatusUseCase(this)
                     _state.update {
                         it.copy(
-                            connectionStatus = ConnectionStatus.CONNECTED // Todo: Temporary - later fetch repository status using useCase
+                            isConnecting = false,
+                            isConnected = true,
+                            connectThermometerStatus = currentStatus
                         )
                     }
-                } catch (stateException: IllegalStateException) {
-                    Timber.d("connectToDevice exception: ${stateException.message}")
-                    stateException.printStackTrace()
-//                _state.update {
-//                    it.copy(
-//                        error = UiText.StringResource(
-//                            R.string.already_connecting_to_different_device
-//                        )
-//                    )
-//                }
+                }
+            } catch (stateException: IllegalStateException) {
+                Timber.e(stateException, "connectToDevice exception: ${stateException.message}")
+                _state.update {
+                    it.copy(
+                        isConnecting = false,
+                        error = UiText.StringResource(
+                            R.string.unexpected_error_during_connecting_to_device
+                        )
+                    )
                 }
             }
-        } ?: run {
-            // Todo: Error catching
         }
     }
 }

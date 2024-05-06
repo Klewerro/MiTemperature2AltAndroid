@@ -3,9 +3,7 @@ package com.klewerro.mitemperature2alt.presentation.mainscreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperature2alt.R
-import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.connect.ConnectToDeviceUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.connect.ConnectedDevicesUseCase
+import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ConnectedDevicesUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.SubscribeToCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.persistence.SaveThermometerUseCase
@@ -19,14 +17,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class BleOperationsViewModel @Inject constructor(
     connectedDevicesUseCase: ConnectedDevicesUseCase,
     savedThermometersUseCase: SavedThermometersUseCase,
-    private val connectToDeviceUseCase: ConnectToDeviceUseCase,
     private val readCurrentThermometerStatusUseCase: ReadCurrentThermometerStatusUseCase,
     private val subscribeToCurrentThermometerStatusUseCase:
         SubscribeToCurrentThermometerStatusUseCase,
@@ -51,7 +47,6 @@ class BleOperationsViewModel @Inject constructor(
 
     fun onEvent(event: BleOperationsEvent) {
         when (event) {
-            is BleOperationsEvent.ConnectToDevice -> handleConnectToDevice(event.thermometerDevice)
             is BleOperationsEvent.GetStatusForDevice -> handleGetStatusForDevice(event.address)
             is BleOperationsEvent.SubscribeForDeviceStatusUpdates ->
                 handleSubscribeForDeviceStatusUpdates(event.address)
@@ -72,24 +67,6 @@ class BleOperationsViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         error = null
-                    )
-                }
-            }
-        }
-    }
-
-    private fun handleConnectToDevice(thermometerDevice: ThermometerScanResult) {
-        viewModelScope.launch(dispatchers.io) {
-            try {
-                connectToDeviceUseCase(this, thermometerDevice.address)
-            } catch (stateException: IllegalStateException) {
-                Timber.d("connectToDevice exception: ${stateException.message}")
-                stateException.printStackTrace()
-                _state.update {
-                    it.copy(
-                        error = UiText.StringResource(
-                            R.string.already_connecting_to_different_device
-                        )
                     )
                 }
             }
