@@ -50,7 +50,11 @@ class BleOperationsViewModel @Inject constructor(
             is BleOperationsEvent.GetStatusForDevice -> handleGetStatusForDevice(event.address)
             is BleOperationsEvent.SubscribeForDeviceStatusUpdates ->
                 handleSubscribeForDeviceStatusUpdates(event.address)
-            is BleOperationsEvent.SaveThermometer -> handleSaveThermometer(event.name)
+            is BleOperationsEvent.ErrorConnectingToSavedThermometer -> _state.update {
+                it.copy(
+                    error = UiText.StringResource(R.string.thermometer_is_already_saved)
+                )
+            }
             BleOperationsEvent.ErrorDismissed -> {
                 _state.update {
                     it.copy(
@@ -70,25 +74,6 @@ class BleOperationsViewModel @Inject constructor(
     private fun handleSubscribeForDeviceStatusUpdates(address: String) {
         viewModelScope.launch(dispatchers.io) {
             subscribeToCurrentThermometerStatusUseCase(address, this)
-        }
-    }
-
-    private fun handleSaveThermometer(thermometerName: String) {
-        saveThermometerAddress?.let { addressValue ->
-            viewModelScope.launch(dispatchers.io) {
-                saveThermometerUseCase(addressValue, thermometerName)
-            }
-        } ?: let {
-            _state.update {
-                it.copy(
-                    error = UiText.StringResource(R.string.unexpected_error_occurred_try_again)
-                )
-            }
-        }
-        _state.update {
-            it.copy(
-                isShowingSaveDialog = false
-            )
         }
     }
 }

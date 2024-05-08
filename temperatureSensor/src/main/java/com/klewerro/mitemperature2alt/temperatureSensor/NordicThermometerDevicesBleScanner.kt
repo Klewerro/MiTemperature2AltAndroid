@@ -2,7 +2,7 @@ package com.klewerro.mitemperature2alt.temperatureSensor
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.klewerro.mitemperature2alt.domain.model.ConnectionStatus
+import com.klewerro.mitemperature2alt.domain.model.ScannedDeviceStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.temperatureSensor.contracts.ThermometerDevicesBleScanner
 import kotlinx.coroutines.CoroutineScope
@@ -48,7 +48,7 @@ class NordicThermometerDevicesBleScanner(
                             bleScanResult.device.name ?: "",
                             bleScanResult.device.address,
                             bleScanResult.scanResult.last().rssi,
-                            ConnectionStatus.NOT_CONNECTED
+                            ScannedDeviceStatus.NOT_CONNECTED
                         )
                     }
             }

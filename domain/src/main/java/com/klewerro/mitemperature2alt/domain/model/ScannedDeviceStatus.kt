@@ -1,6 +1,7 @@
 package com.klewerro.mitemperature2alt.domain.model
 
-enum class ConnectionStatus {
+enum class ScannedDeviceStatus {
     NOT_CONNECTED,
-    CONNECTED
+    CONNECTED,
+    SAVED
 }

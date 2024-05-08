@@ -19,7 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import com.klewerro.mitemperature2alt.R
-import com.klewerro.mitemperature2alt.domain.model.ConnectionStatus
+import com.klewerro.mitemperature2alt.domain.model.ScannedDeviceStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.ui.LocalSpacing
 
@@ -72,10 +72,15 @@ fun DevicesList(
                     Text(text = thermometerDevice.name)
                     Text(text = thermometerDevice.address)
                     Text(text = thermometerDevice.rssi.toString())
-                    when (thermometerDevice.connectionStatus) {
-                        ConnectionStatus.NOT_CONNECTED -> { /*Nothing*/ }
-                        ConnectionStatus.CONNECTED -> Text(
+                    when (thermometerDevice.scannedDeviceStatus) {
+                        ScannedDeviceStatus.NOT_CONNECTED -> { /*Nothing*/ }
+                        ScannedDeviceStatus.CONNECTED -> Text(
                             text = stringResource(R.string.connected),
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+
+                        ScannedDeviceStatus.SAVED -> Text(
+                            text = stringResource(R.string.saved),
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }

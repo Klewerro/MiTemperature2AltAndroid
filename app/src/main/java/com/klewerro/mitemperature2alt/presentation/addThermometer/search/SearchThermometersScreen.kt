@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Lifecycle
 import com.klewerro.mitemperature2alt.R
+import com.klewerro.mitemperature2alt.domain.model.ScannedDeviceStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.presentation.addThermometer.search.components.DevicesList
 import com.klewerro.mitemperature2alt.presentation.addThermometer.search.components.PermissionDeclinedRationale
@@ -136,8 +137,15 @@ fun SearchThermometersScreen(
                         onDeviceSearchEvent(DeviceSearchEvent.ScanForDevices())
                     },
                     onDeviceClick = { thermometerDevice ->
-//                        onBleOperationsEvent(BleOperationsEvent.ConnectToDevice(thermometerDevice))
-                        onDeviceListItemClick(thermometerDevice)
+                        if (thermometerDevice.scannedDeviceStatus == ScannedDeviceStatus.SAVED) {
+                            onBleOperationsEvent(
+                                BleOperationsEvent.ErrorConnectingToSavedThermometer(
+                                    thermometerDevice.name
+                                )
+                            )
+                        } else {
+                            onDeviceListItemClick(thermometerDevice)
+                        }
                     }
                 )
             }

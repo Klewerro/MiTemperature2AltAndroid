@@ -37,8 +37,10 @@ object DomainModule {
 
     @Provides
     @ViewModelScoped
-    fun provideSearchedDevicesUseCase(thermometerRepository: ThermometerRepository) =
-        SearchedDevicesUseCase(thermometerRepository)
+    fun provideSearchedDevicesUseCase(
+        thermometerRepository: ThermometerRepository,
+        persistenceRepository: PersistenceRepository
+    ) = SearchedDevicesUseCase(thermometerRepository, persistenceRepository)
 
     @Provides
     @ViewModelScoped
