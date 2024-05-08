@@ -8,7 +8,8 @@ data class ConnectThermometerState(
     val connectingStatus: ConnectingStatus = ConnectingStatus.NOT_CONNECTING,
     val error: UiText? = null,
     val connectThermometerStatus: ThermometerStatus? = null,
-    val thermometerName: String = ""
+    val thermometerName: String = "",
+    val thermometerSaved: Boolean = false
 )
 
 enum class ConnectingStatus {

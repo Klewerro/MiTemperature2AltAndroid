@@ -23,7 +23,8 @@ fun EnterNameThermometerBox(
     text: String,
     onTextChange: (String) -> Unit,
     onDone: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isError: Boolean = false
 ) {
     val spacing = LocalSpacing.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -39,6 +40,7 @@ fun EnterNameThermometerBox(
             onValueChange = onTextChange,
             label = { Text(text = "Thermometer name") },
             maxLines = 2,
+            isError = isError,
             modifier = Modifier
                 .padding(horizontal = spacing.spaceSmall)
                 .onFocusChanged {

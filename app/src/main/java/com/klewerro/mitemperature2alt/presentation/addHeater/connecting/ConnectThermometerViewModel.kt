@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperature2alt.R
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.connect.ConnectToDeviceUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
+import com.klewerro.mitemperature2alt.domain.usecase.thermometer.persistence.SaveThermometerUseCase
 import com.klewerro.mitemperature2alt.presentation.navigation.Route
 import com.klewerro.mitemperature2alt.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +24,8 @@ import javax.inject.Inject
 class ConnectThermometerViewModel @Inject constructor(
     savedState: SavedStateHandle,
     private val connectToDeviceUseCase: ConnectToDeviceUseCase,
-    private val readCurrentThermometerStatusUseCase: ReadCurrentThermometerStatusUseCase
+    private val readCurrentThermometerStatusUseCase: ReadCurrentThermometerStatusUseCase,
+    private val saveThermometerUseCase: SaveThermometerUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(ConnectThermometerState())
     val state = combine(
@@ -71,11 +73,30 @@ class ConnectThermometerViewModel @Inject constructor(
     fun changeThermometerName(name: String) {
         _state.update {
             it.copy(
+                error = if (name.isNotBlank()) null else it.error,
                 thermometerName = name
             )
         }
     }
 
     fun saveThermometer() {
+        val thermometerName = state.value.thermometerName
+        if (thermometerName.isBlank()) {
+            _state.update {
+                it.copy(
+                    error = UiText.StringResource(R.string.thermometer_name_must_not_be_empty)
+                )
+            }
+            return
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            saveThermometerUseCase(state.value.thermometerAddress, thermometerName)
+            _state.update {
+                it.copy(
+                    thermometerSaved = true
+                )
+            }
+        }
     }
 }

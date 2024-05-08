@@ -170,7 +170,15 @@ class MainActivity : ComponentActivity() {
                 }
                 val connectThermometerViewModel: ConnectThermometerViewModel =
                     hiltViewModel(parentEntry)
-                ConnectThermometerNameScreen(connectThermometerViewModel)
+                ConnectThermometerNameScreen(
+                    viewModel = connectThermometerViewModel,
+                    onThermometerSaved = {
+                        navController.popBackStack(
+                            Route.MainRoutes.Main.fullRoute,
+                            false
+                        )
+                    }
+                )
             }
         }
     }
