@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.addHeater.name
+package com.klewerro.mitemperature2alt.presentation.addThermometer.name
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions

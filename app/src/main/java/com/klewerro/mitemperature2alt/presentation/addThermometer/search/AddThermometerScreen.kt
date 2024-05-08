@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.addHeater
+package com.klewerro.mitemperature2alt.presentation.addThermometer.search
 
 import android.Manifest
 import android.app.Activity
@@ -29,8 +29,8 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Lifecycle
 import com.klewerro.mitemperature2alt.R
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
-import com.klewerro.mitemperature2alt.presentation.addHeater.components.DevicesList
-import com.klewerro.mitemperature2alt.presentation.addHeater.components.PermissionDeclinedRationale
+import com.klewerro.mitemperature2alt.presentation.addThermometer.search.components.DevicesList
+import com.klewerro.mitemperature2alt.presentation.addThermometer.search.components.PermissionDeclinedRationale
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsEvent
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsState
 import com.klewerro.mitemperature2alt.presentation.model.PermissionStatus

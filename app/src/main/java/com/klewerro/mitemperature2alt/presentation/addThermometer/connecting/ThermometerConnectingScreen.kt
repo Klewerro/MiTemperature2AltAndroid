@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.addHeater.connecting
+package com.klewerro.mitemperature2alt.presentation.addThermometer.connecting
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -34,6 +34,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.klewerro.mitemperature2alt.R
+import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerEvent
+import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerState
+import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerViewModel
+import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectingStatus
 import com.klewerro.mitemperature2alt.ui.LocalSpacing
 import com.klewerro.mitemperature2alt.ui.theme.MiTemperature2AltTheme
 import kotlinx.coroutines.delay
@@ -41,7 +45,7 @@ import kotlinx.coroutines.delay
 private const val SCREEN_CHANGE_DELAY = 1_500L
 
 @Composable
-fun ConnectThermometerScreen(
+fun ThermometerConnectingScreen(
     viewModel: ConnectThermometerViewModel,
     onError: () -> Unit,
     onDeviceConnected: () -> Unit,
@@ -51,7 +55,7 @@ fun ConnectThermometerScreen(
 
     LaunchedEffect(key1 = state.thermometerAddress) {
         if (state.thermometerAddress.isNotEmpty()) {
-            viewModel.connectToDevice()
+            viewModel.onEvent(ConnectThermometerEvent.ConnectToDevice)
         }
     }
     LaunchedEffect(key1 = state.connectingStatus) {
@@ -63,11 +67,11 @@ fun ConnectThermometerScreen(
         }
     }
 
-    ConnectThermometerScreenContent(state, onError, modifier)
+    ThermometerConnectingScreenContent(state, onError, modifier)
 }
 
 @Composable
-private fun ConnectThermometerScreenContent(
+private fun ThermometerConnectingScreenContent(
     state: ConnectThermometerState,
     onErrorClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -178,37 +182,37 @@ private fun ProgressImage(modifier: Modifier = Modifier) {
 // region previews
 @Preview(showBackground = true)
 @Composable
-private fun ConnectThermometerScreenContentConnectingPreview() {
+private fun ThermometerConnectingScreenContentConnectingPreview() {
     MiTemperature2AltTheme {
         val state = ConnectThermometerState(
             thermometerAddress = "00:00:00:00",
             connectingStatus = ConnectingStatus.CONNECTING
         )
-        ConnectThermometerScreenContent(state, {})
+        ThermometerConnectingScreenContent(state, {})
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun ConnectThermometerScreenContentConnectedPreview() {
+private fun ThermometerConnectingScreenContentConnectedPreview() {
     MiTemperature2AltTheme {
         val state = ConnectThermometerState(
             thermometerAddress = "00:00:00:00",
             connectingStatus = ConnectingStatus.CONNECTED
         )
-        ConnectThermometerScreenContent(state, {})
+        ThermometerConnectingScreenContent(state, {})
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun ConnectThermometerScreenContentErrorPreview() {
+private fun ThermometerConnectingScreenContentErrorPreview() {
     MiTemperature2AltTheme {
         val state = ConnectThermometerState(
             thermometerAddress = "00:00:00:00",
             connectingStatus = ConnectingStatus.ERROR
         )
-        ConnectThermometerScreenContent(state, {})
+        ThermometerConnectingScreenContent(state, {})
     }
 }
 // endregion

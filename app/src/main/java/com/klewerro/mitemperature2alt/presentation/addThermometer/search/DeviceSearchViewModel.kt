@@ -1,7 +1,5 @@
-package com.klewerro.mitemperature2alt.presentation.addHeater
+package com.klewerro.mitemperature2alt.presentation.addThermometer.search
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.IsScanningForDevicesUseCase

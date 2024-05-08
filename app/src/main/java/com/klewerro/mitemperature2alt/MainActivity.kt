@@ -29,11 +29,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.klewerro.mitemperature2alt.presentation.addHeater.AddThermometerScreen
-import com.klewerro.mitemperature2alt.presentation.addHeater.DeviceSearchViewModel
-import com.klewerro.mitemperature2alt.presentation.addHeater.connecting.ConnectThermometerScreen
-import com.klewerro.mitemperature2alt.presentation.addHeater.connecting.ConnectThermometerViewModel
-import com.klewerro.mitemperature2alt.presentation.addHeater.name.ConnectThermometerNameScreen
+import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerViewModel
+import com.klewerro.mitemperature2alt.presentation.addThermometer.connecting.ThermometerConnectingScreen
+import com.klewerro.mitemperature2alt.presentation.addThermometer.name.ConnectThermometerNameScreen
+import com.klewerro.mitemperature2alt.presentation.addThermometer.search.AddThermometerScreen
+import com.klewerro.mitemperature2alt.presentation.addThermometer.search.DeviceSearchViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
@@ -145,7 +145,7 @@ class MainActivity : ComponentActivity() {
                 }
                 val connectThermometerViewModel: ConnectThermometerViewModel =
                     hiltViewModel(parentEntry)
-                ConnectThermometerScreen(
+                ThermometerConnectingScreen(
                     connectThermometerViewModel,
                     onError = {
                         navController.popBackStack()

@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.addHeater.name
+package com.klewerro.mitemperature2alt.presentation.addThermometer.name
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -26,8 +25,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.klewerro.mitemperature2alt.R
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
-import com.klewerro.mitemperature2alt.presentation.addHeater.connecting.ConnectThermometerState
-import com.klewerro.mitemperature2alt.presentation.addHeater.connecting.ConnectThermometerViewModel
+import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerEvent
+import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerState
+import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerViewModel
 import com.klewerro.mitemperature2alt.presentation.util.UiText
 import com.klewerro.mitemperature2alt.presentation.util.clearFocusOnClick
 import com.klewerro.mitemperature2alt.ui.LocalSpacing
@@ -50,10 +50,10 @@ fun ConnectThermometerNameScreen(
     ConnectThermometerNameScreenContent(
         state = state,
         onNameChanged = {
-            viewModel.changeThermometerName(it)
+            viewModel.onEvent(ConnectThermometerEvent.ChangeThermometerName(it))
         },
         onSaveClick = {
-            viewModel.saveThermometer()
+            viewModel.onEvent(ConnectThermometerEvent.SaveThermometer)
         },
         modifier = modifier
     )

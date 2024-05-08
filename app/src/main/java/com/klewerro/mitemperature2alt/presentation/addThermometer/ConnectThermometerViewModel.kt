@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.addHeater.connecting
+package com.klewerro.mitemperature2alt.presentation.addThermometer
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -38,7 +38,16 @@ class ConnectThermometerViewModel @Inject constructor(
     }
         .stateIn(viewModelScope, SharingStarted.Eagerly, ConnectThermometerState())
 
-    fun connectToDevice() {
+    fun onEvent(event: ConnectThermometerEvent) {
+        when (event) {
+            ConnectThermometerEvent.ConnectToDevice -> handleConnectToDevice()
+            is ConnectThermometerEvent.ChangeThermometerName ->
+                handleChangeThermometerName(event.name)
+            ConnectThermometerEvent.SaveThermometer -> handleSaveThermometer()
+        }
+    }
+
+    private fun handleConnectToDevice() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _state.update {
@@ -70,7 +79,7 @@ class ConnectThermometerViewModel @Inject constructor(
         }
     }
 
-    fun changeThermometerName(name: String) {
+    private fun handleChangeThermometerName(name: String) {
         _state.update {
             it.copy(
                 error = if (name.isNotBlank()) null else it.error,
@@ -79,7 +88,7 @@ class ConnectThermometerViewModel @Inject constructor(
         }
     }
 
-    fun saveThermometer() {
+    private fun handleSaveThermometer() {
         val thermometerName = state.value.thermometerName
         if (thermometerName.isBlank()) {
             _state.update {
