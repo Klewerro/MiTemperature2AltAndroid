@@ -33,6 +33,7 @@ import com.klewerro.mitemperature2alt.presentation.addHeater.AddThermometerScree
 import com.klewerro.mitemperature2alt.presentation.addHeater.DeviceSearchViewModel
 import com.klewerro.mitemperature2alt.presentation.addHeater.connecting.ConnectThermometerScreen
 import com.klewerro.mitemperature2alt.presentation.addHeater.connecting.ConnectThermometerViewModel
+import com.klewerro.mitemperature2alt.presentation.addHeater.name.ConnectThermometerNameScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
@@ -146,11 +147,30 @@ class MainActivity : ComponentActivity() {
                     hiltViewModel(parentEntry)
                 ConnectThermometerScreen(
                     connectThermometerViewModel,
-                    scaffoldState,
-                    onCriticalError = {
+                    onError = {
                         navController.popBackStack()
+                    },
+                    onDeviceConnected = {
+                        navController.navigate(
+                            Route.ConnectDeviceRoutes.SetName.fullRoute
+                        ) {
+                            // Removes ConnectThermometerScreen backstack
+                            popUpTo(Route.ConnectDeviceRoutes.Connecting.fullRoute) {
+                                inclusive = true
+                            }
+                        }
                     }
                 )
+            }
+            composable(Route.ConnectDeviceRoutes.SetName.fullRoute) {
+                val parentEntry = remember(it) {
+                    navController.getBackStackEntry(
+                        Route.ConnectDeviceRoutes.ConnectDeviceGraph.fullRoute
+                    )
+                }
+                val connectThermometerViewModel: ConnectThermometerViewModel =
+                    hiltViewModel(parentEntry)
+                ConnectThermometerNameScreen(connectThermometerViewModel)
             }
         }
     }

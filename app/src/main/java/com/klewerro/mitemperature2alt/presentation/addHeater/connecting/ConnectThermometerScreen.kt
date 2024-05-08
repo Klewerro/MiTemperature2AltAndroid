@@ -1,6 +1,12 @@
 package com.klewerro.mitemperature2alt.presentation.addHeater.connecting
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,31 +14,37 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ScaffoldState
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.klewerro.mitemperature2alt.R
+import com.klewerro.mitemperature2alt.ui.LocalSpacing
 import com.klewerro.mitemperature2alt.ui.theme.MiTemperature2AltTheme
+import kotlinx.coroutines.delay
+
+private const val SCREEN_CHANGE_DELAY = 1_500L
 
 @Composable
 fun ConnectThermometerScreen(
     viewModel: ConnectThermometerViewModel,
-    scaffoldState: ScaffoldState,
-    onCriticalError: () -> Unit,
+    onError: () -> Unit,
+    onDeviceConnected: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -42,84 +54,161 @@ fun ConnectThermometerScreen(
             viewModel.connectToDevice()
         }
     }
-
-    val context = LocalContext.current
-    LaunchedEffect(key1 = state.error) {
-        state.error?.let {
-            scaffoldState.snackbarHostState.showSnackbar(it.asString(context))
-            onCriticalError()
+    LaunchedEffect(key1 = state.connectingStatus) {
+        with(state.connectingStatus) {
+            if (this == ConnectingStatus.CONNECTED) {
+                delay(SCREEN_CHANGE_DELAY)
+                onDeviceConnected()
+            }
         }
     }
 
-    ConnectThermometerScreenContent(state, modifier)
+    ConnectThermometerScreenContent(state, onError, modifier)
 }
 
 @Composable
 private fun ConnectThermometerScreenContent(
     state: ConnectThermometerState,
+    onErrorClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val spacing = LocalSpacing.current
+
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        AnimatedVisibility(visible = state.isConnecting) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = modifier
-                    .fillMaxWidth(0.5f)
-                    .aspectRatio(1f)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.thermometer_image),
-                    contentDescription = "Humidity sensor",
-                    modifier = modifier.fillMaxSize(0.8f)
-
+        AnimatedContent(
+            targetState = state.connectingStatus,
+            modifier = modifier
+                .fillMaxWidth(0.5f)
+                .aspectRatio(1f),
+            transitionSpec = {
+                slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy
+                    )
+                ).togetherWith(
+                    fadeOut()
                 )
-                CircularProgressIndicator(
-                    modifier = Modifier.fillMaxSize(),
-                    strokeWidth = 6.dp
-                )
-            }
-        }
-        Text(
-            text = state.error?.let {
-                "Connecting error."
-            } ?: run {
-                if (state.isConnecting) {
-                    "Connecting to ${state.thermometerAddress} thermometer."
-                } else {
-                    "Connected to ${state.thermometerAddress} thermometer."
+            },
+            content = { connectingStatus ->
+                when (connectingStatus) {
+                    ConnectingStatus.NOT_CONNECTING -> {
+                        Box(modifier = Modifier.fillMaxSize())
+                    }
+                    ConnectingStatus.CONNECTING -> {
+                        ProgressImage()
+                    }
+                    ConnectingStatus.CONNECTED, ConnectingStatus.ERROR -> {
+                        Image(
+                            painter = painterResource(
+                                id = if (connectingStatus == ConnectingStatus.CONNECTED) {
+                                    R.drawable.ic_check_circle_24
+                                } else {
+                                    R.drawable.ic_round_error_24
+                                }
+                            ),
+                            contentDescription = "",
+                            colorFilter = ColorFilter.tint(
+                                if (connectingStatus == ConnectingStatus.CONNECTED) {
+                                    Color.Green
+                                } else {
+                                    Color.Red
+                                }
+                            ),
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
+            }
+        )
+
+        Text(
+            text = when (state.connectingStatus) {
+                ConnectingStatus.NOT_CONNECTING -> ""
+                ConnectingStatus.CONNECTING -> stringResource(
+                    id = R.string.connecting_to_ADDRESS_thermometer,
+                    state.thermometerAddress
+                )
+                ConnectingStatus.CONNECTED -> stringResource(
+                    id = R.string.connected_to_ADDRESS_thermometer,
+                    state.thermometerAddress
+                )
+                ConnectingStatus.ERROR -> state.error?.asString(
+                    context
+                ) ?: stringResource(id = R.string.unexpected_error_occurred_try_again)
             },
             style = MaterialTheme.typography.h3,
-            modifier = Modifier.width(182.dp),
+            modifier = Modifier.padding(spacing.spaceScreen),
             textAlign = TextAlign.Center
+        )
+        AnimatedVisibility(visible = state.connectingStatus == ConnectingStatus.ERROR) {
+            OutlinedButton(onClick = onErrorClick) {
+                Text(text = stringResource(id = android.R.string.ok))
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProgressImage(modifier: Modifier = Modifier) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .fillMaxWidth(0.5f)
+            .aspectRatio(1f)
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.thermometer_image),
+            contentDescription = "Humidity sensor",
+            modifier = modifier.fillMaxSize(0.8f)
+
+        )
+        CircularProgressIndicator(
+            modifier = Modifier.fillMaxSize(),
+            strokeWidth = 6.dp
         )
     }
 }
 
+// region previews
 @Preview(showBackground = true)
 @Composable
 private fun ConnectThermometerScreenContentConnectingPreview() {
     MiTemperature2AltTheme {
         val state = ConnectThermometerState(
             thermometerAddress = "00:00:00:00",
-            isConnecting = true
+            connectingStatus = ConnectingStatus.CONNECTING
         )
-        ConnectThermometerScreenContent(state)
+        ConnectThermometerScreenContent(state, {})
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun ConnectThermometerScreenContentPreview() {
+private fun ConnectThermometerScreenContentConnectedPreview() {
     MiTemperature2AltTheme {
         val state = ConnectThermometerState(
             thermometerAddress = "00:00:00:00",
-            isConnecting = false
+            connectingStatus = ConnectingStatus.CONNECTED
         )
-        ConnectThermometerScreenContent(state)
+        ConnectThermometerScreenContent(state, {})
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+private fun ConnectThermometerScreenContentErrorPreview() {
+    MiTemperature2AltTheme {
+        val state = ConnectThermometerState(
+            thermometerAddress = "00:00:00:00",
+            connectingStatus = ConnectingStatus.ERROR
+        )
+        ConnectThermometerScreenContent(state, {})
+    }
+}
+// endregion

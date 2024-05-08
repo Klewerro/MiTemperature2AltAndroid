@@ -13,9 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import com.klewerro.mitemperature2alt.presentation.mainscreen.components.MainScreenThermometerBox
 import com.klewerro.mitemperature2alt.presentation.mainscreen.components.NoConnectedThermometersInformation
 import com.klewerro.mitemperature2alt.presentation.mainscreen.components.SavedThermometerBox
-import com.klewerro.mitemperature2alt.presentation.mainscreen.components.ThermometerBox
 import com.klewerro.mitemperature2alt.ui.LocalSpacing
 
 @Composable
@@ -61,7 +61,7 @@ fun MainScreen(
                 }
 
                 items(state.connectedDevices) { thermometerDevice ->
-                    ThermometerBox(
+                    MainScreenThermometerBox(
                         thermometerDevice = thermometerDevice,
                         onRefreshClick = {
                             onEvent(
@@ -75,25 +75,10 @@ fun MainScreen(
                                 )
                             )
                         },
-                        onSaveClick = {
-                            onEvent(
-                                BleOperationsEvent.OpenSaveThermometer(thermometerDevice.address)
-                            )
-                        },
                         modifier = Modifier.padding(vertical = spacing.spaceNormal)
                     )
                 }
             }
         }
-
-        SaveThermometerDialog(
-            isVisible = state.isShowingSaveDialog,
-            onDismiss = {
-                onEvent(BleOperationsEvent.CloseSaveThermometer)
-            },
-            onSave = { thermometerName ->
-                onEvent(BleOperationsEvent.SaveThermometer(thermometerName))
-            }
-        )
     }
 }

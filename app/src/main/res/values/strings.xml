@@ -21,4 +21,7 @@
     <string name="title_mi_temperature_2_alt">Mi Temperature 2 Alt</string>
     <string name="connect">Connect</string>
     <string name="connecting_to_thermometer">Connecting to thermometer</string>
+    <string name="connecting_to_ADDRESS_thermometer">Connecting to %1$s thermometer</string>
+    <string name="connected_to_ADDRESS_thermometer">Connected to %1$s thermometer</string>
+    <string name="set_thermometer_name">Set thermometer name</string>
 </resources>

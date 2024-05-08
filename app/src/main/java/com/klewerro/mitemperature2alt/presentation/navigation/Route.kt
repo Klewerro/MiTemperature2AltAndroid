@@ -34,6 +34,7 @@ sealed class Route(
     sealed class ConnectDeviceRoutes {
         data object ConnectDeviceGraph : Route(R.string.connect, "connect", PARAM_ADDRESS)
         data object Connecting : Route(R.string.connecting_to_thermometer, "connect_connecting")
+        data object SetName : Route(R.string.set_thermometer_name, "connect_name")
 
         companion object NavigationParameters {
             const val PARAM_ADDRESS = "address"

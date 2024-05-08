@@ -41,7 +41,7 @@ class ConnectThermometerViewModel @Inject constructor(
             try {
                 _state.update {
                     it.copy(
-                        isConnecting = true
+                        connectingStatus = ConnectingStatus.CONNECTING
                     )
                 }
                 with(state.value.thermometerAddress) {
@@ -49,8 +49,7 @@ class ConnectThermometerViewModel @Inject constructor(
                     val currentStatus = readCurrentThermometerStatusUseCase(this)
                     _state.update {
                         it.copy(
-                            isConnecting = false,
-                            isConnected = true,
+                            connectingStatus = ConnectingStatus.CONNECTED,
                             connectThermometerStatus = currentStatus
                         )
                     }
@@ -59,7 +58,7 @@ class ConnectThermometerViewModel @Inject constructor(
                 Timber.e(stateException, "connectToDevice exception: ${stateException.message}")
                 _state.update {
                     it.copy(
-                        isConnecting = false,
+                        connectingStatus = ConnectingStatus.ERROR,
                         error = UiText.StringResource(
                             R.string.unexpected_error_during_connecting_to_device
                         )
@@ -67,5 +66,16 @@ class ConnectThermometerViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun changeThermometerName(name: String) {
+        _state.update {
+            it.copy(
+                thermometerName = name
+            )
+        }
+    }
+
+    fun saveThermometer() {
     }
 }

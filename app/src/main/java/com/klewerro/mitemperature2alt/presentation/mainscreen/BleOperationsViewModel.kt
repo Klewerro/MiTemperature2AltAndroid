@@ -51,18 +51,6 @@ class BleOperationsViewModel @Inject constructor(
             is BleOperationsEvent.SubscribeForDeviceStatusUpdates ->
                 handleSubscribeForDeviceStatusUpdates(event.address)
             is BleOperationsEvent.SaveThermometer -> handleSaveThermometer(event.name)
-            is BleOperationsEvent.OpenSaveThermometer -> _state.update {
-                saveThermometerAddress = event.address
-                it.copy(
-                    isShowingSaveDialog = true
-                )
-            }
-            BleOperationsEvent.CloseSaveThermometer -> _state.update {
-                saveThermometerAddress = null
-                it.copy(
-                    isShowingSaveDialog = false
-                )
-            }
             BleOperationsEvent.ErrorDismissed -> {
                 _state.update {
                     it.copy(
