@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,7 +40,7 @@ import com.klewerro.mitemperature2alt.presentation.util.isAndroid12OrGreater
 import com.klewerro.mitemperature2alt.ui.LocalSpacing
 
 @Composable
-fun AddThermometerScreen(
+fun SearchThermometersScreen(
     bleOperationsState: BleOperationsState,
     onBleOperationsEvent: (BleOperationsEvent) -> Unit,
     deviceSearchState: DeviceSearchState,
@@ -109,6 +110,13 @@ fun AddThermometerScreen(
         }
     }
 
+    DisposableEffect(key1 = Unit) {
+        onDeviceSearchEvent(DeviceSearchEvent.ScanForDevices(byUser = false))
+        onDispose {
+            onDeviceSearchEvent(DeviceSearchEvent.StopScanForDevices(byUser = false))
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -122,10 +130,10 @@ fun AddThermometerScreen(
                     isScanningForDevices = deviceSearchState.isScanningForDevices,
                     scannedDevices = deviceSearchState.scannedDevices,
                     onButtonClickWhenScanning = {
-                        onDeviceSearchEvent(DeviceSearchEvent.StopScanForDevices)
+                        onDeviceSearchEvent(DeviceSearchEvent.StopScanForDevices())
                     },
                     onButtonClickWhenNotScanning = {
-                        onDeviceSearchEvent(DeviceSearchEvent.ScanForDevices)
+                        onDeviceSearchEvent(DeviceSearchEvent.ScanForDevices())
                     },
                     onDeviceClick = { thermometerDevice ->
 //                        onBleOperationsEvent(BleOperationsEvent.ConnectToDevice(thermometerDevice))

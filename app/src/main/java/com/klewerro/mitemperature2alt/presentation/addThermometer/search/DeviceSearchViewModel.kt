@@ -26,6 +26,7 @@ class DeviceSearchViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var scanningBleDevicesJob: Job? = null
+    private var isScanStoppedByUser: Boolean = false
 
     private val _state = MutableStateFlow(DeviceSearchState())
     val state = combine(
@@ -42,24 +43,32 @@ class DeviceSearchViewModel @Inject constructor(
 
     fun onEvent(event: DeviceSearchEvent) {
         when (event) {
-            DeviceSearchEvent.ScanForDevices -> handleScanForDevices()
-            DeviceSearchEvent.StopScanForDevices -> handleStopScanForDevices()
+            is DeviceSearchEvent.ScanForDevices -> handleScanForDevices(event.byUser)
+            is DeviceSearchEvent.StopScanForDevices -> handleStopScanForDevices(event.byUser)
             is DeviceSearchEvent.UpdatePermissionStatus -> handlePermissionChange(
                 event.permissionStatus
             )
         }
     }
 
-    private fun handleScanForDevices() {
+    private fun handleScanForDevices(startedByUser: Boolean) {
         if (scanningBleDevicesJob != null) {
-            handleStopScanForDevices()
+            handleStopScanForDevices(startedByUser)
         }
-        viewModelScope.launch(dispatchers.io) {
-            scanningBleDevicesJob = scanForDevicesUseCase(this)
+        if (startedByUser) {
+            this.isScanStoppedByUser = false
+        }
+        if (!isScanStoppedByUser) {
+            viewModelScope.launch(dispatchers.io) {
+                scanningBleDevicesJob = scanForDevicesUseCase(this)
+            }
         }
     }
 
-    private fun handleStopScanForDevices() {
+    private fun handleStopScanForDevices(stoppedByUser: Boolean) {
+        if (stoppedByUser) {
+            this.isScanStoppedByUser = true
+        }
         scanningBleDevicesJob?.cancel()
         scanningBleDevicesJob = null
     }

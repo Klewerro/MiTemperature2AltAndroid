@@ -32,8 +32,8 @@ import androidx.navigation.navArgument
 import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerViewModel
 import com.klewerro.mitemperature2alt.presentation.addThermometer.connecting.ThermometerConnectingScreen
 import com.klewerro.mitemperature2alt.presentation.addThermometer.name.ConnectThermometerNameScreen
-import com.klewerro.mitemperature2alt.presentation.addThermometer.search.AddThermometerScreen
 import com.klewerro.mitemperature2alt.presentation.addThermometer.search.DeviceSearchViewModel
+import com.klewerro.mitemperature2alt.presentation.addThermometer.search.SearchThermometersScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
@@ -93,7 +93,7 @@ class MainActivity : ComponentActivity() {
                                 val deviceSearchViewModel = hiltViewModel<DeviceSearchViewModel>()
                                 val deviceSearchState by deviceSearchViewModel.state
                                     .collectAsStateWithLifecycle()
-                                AddThermometerScreen(
+                                SearchThermometersScreen(
                                     bleOperationsState = bleOperationsSate,
                                     onBleOperationsEvent = { bleOperationsEvent ->
                                         bleOperationsViewModel.onEvent(bleOperationsEvent)
