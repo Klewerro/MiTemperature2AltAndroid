@@ -6,7 +6,6 @@ import com.klewerro.mitemperature2alt.R
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ConnectedDevicesUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.SubscribeToCurrentThermometerStatusUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.persistence.SaveThermometerUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.persistence.SavedThermometersUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import com.klewerro.mitemperature2alt.presentation.util.UiText
@@ -26,11 +25,8 @@ class BleOperationsViewModel @Inject constructor(
     private val readCurrentThermometerStatusUseCase: ReadCurrentThermometerStatusUseCase,
     private val subscribeToCurrentThermometerStatusUseCase:
         SubscribeToCurrentThermometerStatusUseCase,
-    private val saveThermometerUseCase: SaveThermometerUseCase,
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
-
-    private var saveThermometerAddress: String? = null
 
     private val _state = MutableStateFlow(BleOperationsState())
     val state = combine(

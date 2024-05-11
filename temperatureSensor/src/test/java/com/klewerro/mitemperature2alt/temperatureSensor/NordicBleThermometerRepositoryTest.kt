@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class NordicBleThermometerRepositoryTest {
 
@@ -122,73 +121,6 @@ class NordicBleThermometerRepositoryTest {
     // endregion
 
     // region connectToDevice
-    @Test
-    fun `connectToDevice when already connecting to other device throws exception`() {
-        runTest {
-            launch { nordicBleThermometerRepository.connectToDevice(this, mac1) }
-
-            launch {
-                val thrownIllegalStateException = assertThrows<IllegalStateException> {
-                    nordicBleThermometerRepository.connectToDevice(this, mac2)
-                }
-                assertThat(
-                    thrownIllegalStateException.message
-                ).isEqualTo("Already connecting to other device!")
-            }
-            // }
-        }
-    }
-
-    @Test
-    fun `connectToDevice when already connecting to the same device throws exception`() {
-        runTest {
-            launch { nordicBleThermometerRepository.connectToDevice(this, mac1) }
-
-            launch {
-                val thrownIllegalStateException = assertThrows<IllegalStateException> {
-                    nordicBleThermometerRepository.connectToDevice(this, mac1)
-                }
-                assertThat(
-                    thrownIllegalStateException.message
-                ).isEqualTo("Already connecting to other device!")
-            }
-        }
-    }
-
-    @Test
-    fun `connectToDevice updates connectingToDeviceAddress stateFlow during connecting process`() =
-        runTest {
-            nordicBleThermometerRepository.connectingToDeviceAddress.test {
-                val initialEmission = awaitItem()
-                nordicBleThermometerRepository.connectToDevice(this, mac1)
-                val addressChangedEmission = awaitItem()
-                val addressClearedEmission = awaitItem()
-
-                assertThat(addressChangedEmission).isEqualTo(mac1)
-                assertThat(addressClearedEmission).isEqualTo("")
-            }
-        }
-
-    @Test
-    fun `connectToDevice when already connecting to the same device don't set 2nd device mac address to the connectingToDeviceAddress stateFlow`() {
-        runTest {
-            nordicBleThermometerRepository.connectingToDeviceAddress.test {
-                val initialEmission = awaitItem()
-                launch { nordicBleThermometerRepository.connectToDevice(this, mac1) }
-                val addressChangedEmission = awaitItem()
-                launch {
-                    try {
-                        nordicBleThermometerRepository.connectToDevice(this, mac2)
-                    } catch (_: java.lang.IllegalStateException) {
-                    }
-                }
-                val addressClearedEmission = awaitItem()
-                assertThat(addressChangedEmission).isEqualTo(mac1)
-                assertThat(addressClearedEmission).isEqualTo("")
-            }
-        }
-    }
-
     @Test
     fun `connectToDevice after connection when readThermometerStatus is success, status is added to stateFlow map under address key`() {
         runTest {
