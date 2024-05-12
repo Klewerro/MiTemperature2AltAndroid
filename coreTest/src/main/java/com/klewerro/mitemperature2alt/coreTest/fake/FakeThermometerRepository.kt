@@ -21,6 +21,7 @@ class FakeThermometerRepository : ThermometerRepository {
         51,
         1.23f
     )
+    var isConnectToDeviceThrowingError = false
 
     val isScanningForDevicesInternal = MutableStateFlow(false)
     override val isScanningForDevices: StateFlow<Boolean> = isScanningForDevicesInternal
@@ -51,6 +52,9 @@ class FakeThermometerRepository : ThermometerRepository {
 
     override suspend fun connectToDevice(coroutineScope: CoroutineScope, address: String) {
         delay(operationDelay)
+        if (isConnectToDeviceThrowingError) {
+            throw IllegalStateException("STUB exception!")
+        }
     }
 
     override suspend fun readCurrentThermometerStatus(deviceAddress: String): ThermometerStatus? {

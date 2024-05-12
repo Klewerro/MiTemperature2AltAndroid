@@ -7,10 +7,10 @@ import com.klewerro.mitemperature2alt.R
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.connect.ConnectToDeviceUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.persistence.SaveThermometerUseCase
+import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import com.klewerro.mitemperature2alt.presentation.navigation.Route
 import com.klewerro.mitemperature2alt.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -25,7 +25,8 @@ class ConnectThermometerViewModel @Inject constructor(
     savedState: SavedStateHandle,
     private val connectToDeviceUseCase: ConnectToDeviceUseCase,
     private val readCurrentThermometerStatusUseCase: ReadCurrentThermometerStatusUseCase,
-    private val saveThermometerUseCase: SaveThermometerUseCase
+    private val saveThermometerUseCase: SaveThermometerUseCase,
+    private val dispatchers: DispatcherProvider
 ) : ViewModel() {
     private val _state = MutableStateFlow(ConnectThermometerState())
     val state = combine(
@@ -48,7 +49,7 @@ class ConnectThermometerViewModel @Inject constructor(
     }
 
     private fun handleConnectToDevice() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io) {
             try {
                 _state.update {
                     it.copy(
@@ -99,7 +100,7 @@ class ConnectThermometerViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io) {
             saveThermometerUseCase(state.value.thermometerAddress, thermometerName)
             _state.update {
                 it.copy(
