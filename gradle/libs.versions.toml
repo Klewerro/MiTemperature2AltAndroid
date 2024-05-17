@@ -11,6 +11,8 @@ lifecycle = "2.7.0"
 coroutines = "1.8.0"
 junit5 = "5.9.3"
 room = "2.6.1"
+mockk = "1.13.10"
+rules = "1.5.0"
 
 [libraries]
 androidx-core = { module = "androidx.core:core-ktx", version = "1.12.0" }
@@ -34,6 +36,7 @@ timber = { module = "com.jakewharton.timber:timber", version = "5.0.1"}
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version = "1.2.0" }
+hilt-android-testing = {module = "com.google.dagger:hilt-android-testing", version.ref = "hilt"}
 # ble library
 kotlin-ble-scanner = { module = "no.nordicsemi.android.kotlin.ble:scanner", version.ref = "ble-kotlin-library" }
 kotlin-ble-client = { module = "no.nordicsemi.android.kotlin.ble:client", version.ref = "ble-kotlin-library" }
@@ -48,13 +51,15 @@ junit5-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "ju
 junit5-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
 junit5-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit5"}
 assertK = { module = "com.willowtreeapps.assertk:assertk", version = "0.26.1"}
-mockk = { module = "io.mockk:mockk", version = "1.13.10" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 turbine = { module = "app.cash.turbine:turbine", version = "1.0.0"}
 # UI test dependencies
 androidx-test-junit = { module = "androidx.test.ext:junit", version = "1.1.5"}
 androidx-test-espresso = { module = "androidx.test.espresso:espresso-core", version = "3.5.1"}
 androidx-test-compose-junit = { module = "androidx.compose.ui:ui-test-junit4"}
+androidx-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
