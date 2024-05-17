@@ -1,5 +1,6 @@
 package com.klewerro.mitemperature2alt.coreTest.fake
 
+import com.klewerro.mitemperature2alt.coreTest.generators.ThermometerScanResultsGenerator
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
@@ -40,6 +41,12 @@ class FakeThermometerRepository : ThermometerRepository {
     override fun scanForDevices(coroutineScope: CoroutineScope): Job {
         return coroutineScope.launch {
             isScanningForDevicesInternal.update { true }
+            delay(100)
+            scannedDevicesInternal.update {
+                it.toMutableList().apply {
+                    add(ThermometerScanResultsGenerator.scanResult1)
+                }
+            }
             while (isActive) {
                 delay(100)
             }
@@ -57,7 +64,7 @@ class FakeThermometerRepository : ThermometerRepository {
         }
     }
 
-    override suspend fun readCurrentThermometerStatus(deviceAddress: String): ThermometerStatus? {
+    override suspend fun readCurrentThermometerStatus(deviceAddress: String): ThermometerStatus {
         return thermometerStatus
     }
 

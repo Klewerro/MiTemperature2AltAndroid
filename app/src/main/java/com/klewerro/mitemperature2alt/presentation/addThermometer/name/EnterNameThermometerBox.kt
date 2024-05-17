@@ -9,8 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import com.klewerro.mitemperature2alt.R
 import com.klewerro.mitemperature2alt.presentation.components.ThermometerBox
 import com.klewerro.mitemperature2alt.ui.LocalSpacing
 import com.klewerro.mitemperature2alt.ui.theme.MiTemperature2AltTheme
@@ -38,7 +40,7 @@ fun EnterNameThermometerBox(
         OutlinedTextField(
             value = text,
             onValueChange = onTextChange,
-            label = { Text(text = "Thermometer name") },
+            label = { Text(text = stringResource(R.string.thermometer_name)) },
             maxLines = 2,
             isError = isError,
             modifier = Modifier

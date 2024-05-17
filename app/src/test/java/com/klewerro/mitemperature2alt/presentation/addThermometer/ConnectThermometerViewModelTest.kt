@@ -51,7 +51,9 @@ class ConnectThermometerViewModelTest {
             )
         )
         connectToDeviceUseCase = ConnectToDeviceUseCase(fakeThermometerRepository)
-        readCurrentThermometerStatusUseCase = ReadCurrentThermometerStatusUseCase(fakeThermometerRepository)
+        readCurrentThermometerStatusUseCase = ReadCurrentThermometerStatusUseCase(
+            fakeThermometerRepository
+        )
         saveThermometerUseCase = SaveThermometerUseCase(fakePersistenceRepository)
 
         connectThermometerViewModel = ConnectThermometerViewModel(
@@ -82,9 +84,15 @@ class ConnectThermometerViewModelTest {
                 assertThat(initialState.connectingStatus).isEqualTo(ConnectingStatus.NOT_CONNECTING)
                 assertThat(initialState.thermometerAddress).isEqualTo("")
                 assertThat(addressState.thermometerAddress).isEqualTo(deviceAddress)
-                assertThat(statusConnectingState.connectingStatus).isEqualTo(ConnectingStatus.CONNECTING)
-                assertThat(stateAfterSuccessConnection.connectingStatus).isEqualTo(ConnectingStatus.CONNECTED)
-                assertThat(stateAfterSuccessConnection.connectThermometerStatus).isEqualTo(resultThermometerStatus)
+                assertThat(
+                    statusConnectingState.connectingStatus
+                ).isEqualTo(ConnectingStatus.CONNECTING)
+                assertThat(
+                    stateAfterSuccessConnection.connectingStatus
+                ).isEqualTo(ConnectingStatus.CONNECTED)
+                assertThat(
+                    stateAfterSuccessConnection.connectThermometerStatus
+                ).isEqualTo(resultThermometerStatus)
             }
         }
     }
@@ -103,29 +111,36 @@ class ConnectThermometerViewModelTest {
 
                 assertThat(addressState.connectingStatus).isEqualTo(ConnectingStatus.NOT_CONNECTING)
                 assertThat(addressState.error).isNull()
-                assertThat(statusConnectingState.connectingStatus).isEqualTo(ConnectingStatus.CONNECTING)
-                assertThat(stateAfterConnectingError.connectingStatus).isEqualTo(ConnectingStatus.ERROR)
+                assertThat(
+                    statusConnectingState.connectingStatus
+                ).isEqualTo(ConnectingStatus.CONNECTING)
+                assertThat(
+                    stateAfterConnectingError.connectingStatus
+                ).isEqualTo(ConnectingStatus.ERROR)
                 assertThat(stateAfterConnectingError.error).isNotNull()
             }
         }
     }
 
     @Test
-    fun `SaveThermometer event when name is not blank set state thermometerSaved to true`() = runTest {
-        val name = "test"
-        connectThermometerViewModel.state.test {
-            val initialState = awaitItem()
-            connectThermometerViewModel.onEvent(ConnectThermometerEvent.ChangeThermometerName(name))
-            val nameUpdatedState = awaitItem()
+    fun `SaveThermometer event when name is not blank set state thermometerSaved to true`() =
+        runTest {
+            val name = "test"
+            connectThermometerViewModel.state.test {
+                val initialState = awaitItem()
+                connectThermometerViewModel.onEvent(
+                    ConnectThermometerEvent.ChangeThermometerName(name)
+                )
+                val nameUpdatedState = awaitItem()
 
-            connectThermometerViewModel.onEvent(ConnectThermometerEvent.SaveThermometer)
-            val saveResultState = awaitItem()
+                connectThermometerViewModel.onEvent(ConnectThermometerEvent.SaveThermometer)
+                val saveResultState = awaitItem()
 
-            assertThat(initialState.thermometerSaved).isFalse()
-            assertThat(nameUpdatedState.thermometerName).isEqualTo(name)
-            assertThat(saveResultState.thermometerSaved).isTrue()
+                assertThat(initialState.thermometerSaved).isFalse()
+                assertThat(nameUpdatedState.thermometerName).isEqualTo(name)
+                assertThat(saveResultState.thermometerSaved).isTrue()
+            }
         }
-    }
 
     @Test
     fun `SaveThermometer event when name is blank set error state`() = runTest {
@@ -151,7 +166,9 @@ class ConnectThermometerViewModelTest {
                 connectThermometerViewModel.onEvent(ConnectThermometerEvent.SaveThermometer)
                 val saveErrorState = awaitItem()
 
-                connectThermometerViewModel.onEvent(ConnectThermometerEvent.ChangeThermometerName(newName))
+                connectThermometerViewModel.onEvent(
+                    ConnectThermometerEvent.ChangeThermometerName(newName)
+                )
                 val nameUpdatedState = awaitItem()
 
                 assertThat(initialState.thermometerName).isEqualTo("")
@@ -168,12 +185,14 @@ class ConnectThermometerViewModelTest {
     fun `SaveThermometer and then ChangeThermometerName event name is empty and changeThermometerName is whitespace, set state error and after name change keeps it`() {
         val newName = " "
         runTest {
-            connectThermometerViewModel.state.test() {
+            connectThermometerViewModel.state.test {
                 val initialState = awaitItem()
                 connectThermometerViewModel.onEvent(ConnectThermometerEvent.SaveThermometer)
                 val saveErrorState = awaitItem()
 
-                connectThermometerViewModel.onEvent(ConnectThermometerEvent.ChangeThermometerName(newName))
+                connectThermometerViewModel.onEvent(
+                    ConnectThermometerEvent.ChangeThermometerName(newName)
+                )
                 val nameChangedEvent = awaitItem()
 
                 assertThat(initialState.thermometerName).isEqualTo("")

@@ -98,8 +98,8 @@ class DeviceSearchViewModelTest {
 
             delay(2_000)
             deviceSearchViewModel.onEvent(DeviceSearchEvent.StopScanForDevices(byUser = true))
+            awaitItem() // scanResult item added to state
             val scanningEndState = awaitItem()
-            scanningEndState.toString()
             assertThat(scanningEndState.isScanningForDevices).isFalse()
         }
     }

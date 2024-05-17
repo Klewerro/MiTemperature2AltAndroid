@@ -26,4 +26,9 @@
     <string name="connected_to_ADDRESS_thermometer">Connected to %1$s thermometer</string>
     <string name="set_thermometer_name">Set thermometer name</string>
     <string name="thermometer_is_already_saved">Thermometer is already saved</string>
+    <string name="thermometer_name">Thermometer name</string>
+    <string name="add_new_thermometer">Add new thermometer</string>
+    <string name="humidity_sensor">Humidity sensor</string>
+    <string name="thermometer_connected">Thermometer connected</string>
+    <string name="connecting_thermometer_error">Connecting thermometer error</string>
 </resources>

@@ -17,7 +17,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.klewerro.mitemperature2alt.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -65,6 +65,7 @@ dependencies {
     implementation(project(":persistence"))
     implementation(project(":domain"))
     testImplementation(project(":coreTest"))
+    androidTestImplementation(project(":coreTest"))
 
     implementation(libs.bundles.androidX)
     implementation(libs.bundles.compose)
@@ -91,6 +92,10 @@ dependencies {
     androidTestImplementation(libs.androidx.test.espresso)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.androidx.test.compose.junit)
+    androidTestImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.assertK)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.androidx.rules)
 
     // Debug dependencies
     debugImplementation(libs.compose.ui.tooling)

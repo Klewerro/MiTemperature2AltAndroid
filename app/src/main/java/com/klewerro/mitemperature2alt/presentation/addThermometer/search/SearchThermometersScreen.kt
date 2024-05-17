@@ -87,6 +87,8 @@ fun SearchThermometersScreen(
     LaunchedEffect(key1 = deviceSearchState.permissionGrantStatus) {
         if (deviceSearchState.permissionGrantStatus == PermissionStatus.DECLINED) {
             nearbyDevicesPermissionResultLauncher.launchRequestBlePermissions()
+        } else if (deviceSearchState.permissionGrantStatus == PermissionStatus.GRANTED) {
+            onDeviceSearchEvent(DeviceSearchEvent.ScanForDevices(byUser = false))
         }
     }
 
@@ -112,7 +114,6 @@ fun SearchThermometersScreen(
     }
 
     DisposableEffect(key1 = Unit) {
-        onDeviceSearchEvent(DeviceSearchEvent.ScanForDevices(byUser = false))
         onDispose {
             onDeviceSearchEvent(DeviceSearchEvent.StopScanForDevices(byUser = false))
         }

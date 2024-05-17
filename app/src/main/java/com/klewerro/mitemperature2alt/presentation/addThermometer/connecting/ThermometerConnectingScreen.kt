@@ -116,7 +116,13 @@ private fun ThermometerConnectingScreenContent(
                                     R.drawable.ic_round_error_24
                                 }
                             ),
-                            contentDescription = "",
+                            contentDescription = stringResource(
+                                if (connectingStatus == ConnectingStatus.CONNECTED) {
+                                    R.string.thermometer_connected
+                                } else {
+                                    R.string.connecting_thermometer_error
+                                }
+                            ),
                             colorFilter = ColorFilter.tint(
                                 if (connectingStatus == ConnectingStatus.CONNECTED) {
                                     Color.Green
@@ -168,7 +174,7 @@ private fun ProgressImage(modifier: Modifier = Modifier) {
     ) {
         Image(
             painter = painterResource(id = R.drawable.thermometer_image),
-            contentDescription = "Humidity sensor",
+            contentDescription = stringResource(R.string.humidity_sensor),
             modifier = modifier.fillMaxSize(0.8f)
 
         )
