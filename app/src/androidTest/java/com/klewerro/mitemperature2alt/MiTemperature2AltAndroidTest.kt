@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.klewerro.mitemperature2alt.persistence.ThermometerDatabase
 import dagger.hilt.android.testing.HiltAndroidRule
-import javax.inject.Inject
 import org.junit.Before
 import org.junit.Rule
+import javax.inject.Inject
 
 abstract class MiTemperature2AltAndroidTest {
 

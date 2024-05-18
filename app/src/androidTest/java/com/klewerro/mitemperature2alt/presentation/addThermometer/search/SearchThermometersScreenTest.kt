@@ -3,18 +3,10 @@ package com.klewerro.mitemperature2alt.presentation.addThermometer.search
 import android.Manifest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.hasClickAction
-import androidx.compose.ui.test.hasContentDescription
-import androidx.compose.ui.test.hasParent
-import androidx.compose.ui.test.hasScrollAction
-import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import androidx.test.rule.GrantPermissionRule
 import com.klewerro.mitemperature2alt.MainActivity
 import com.klewerro.mitemperature2alt.MiTemperature2AltAndroidTest
@@ -62,146 +54,44 @@ class SearchThermometersScreenTest : MiTemperature2AltAndroidTest() {
     fun afterThermometerListItemClick_whenThermometerNameEnteredByUser_SavedThermometerIsVisibleOnMainScreen() =
         runBlocking<Unit> {
             val address = ThermometerScanResultsGenerator.scanResult1.address
-
-            composeRule
-                .onNodeWithContentDescription(context.getString(R.string.add_new_thermometer))
-                .performClick()
-
-            composeRule.waitUntilAtLeastOneExists(
-                hasClickAction() and hasParent(hasScrollAction()),
-                10_000
-            )
-
-            composeRule
-                .onNodeWithText(address)
-                .performClick()
-
-            composeRule
-                .onNodeWithContentDescription(context.resources.getString(R.string.humidity_sensor))
-                .assertIsDisplayed()
-            composeRule.onNodeWithText(
-                context.resources.getString(R.string.connecting_to_ADDRESS_thermometer, address)
-            ).assertIsDisplayed()
-
-            composeRule.waitUntilAtLeastOneExists(
-                hasContentDescription(context.resources.getString(R.string.thermometer_connected)),
-                10_000
-            )
-            composeRule.onNodeWithText(
-                context.resources.getString(R.string.connected_to_ADDRESS_thermometer, address)
-            ).assertIsDisplayed()
-
-            composeRule.waitUntilAtLeastOneExists(
-                hasClickAction() and hasText(context.resources.getString(R.string.save)),
-                1_500
-            )
-
-            composeRule
-                .onNodeWithText(context.resources.getString(R.string.thermometer_name))
-                .assertIsDisplayed()
-            composeRule
-                .onNodeWithTag("thermometerBox")
-                .assertIsDisplayed()
-
-            // Entering text
             val thermometerName = "new thermometer name"
-            composeRule
-                .onNodeWithText(context.resources.getString(R.string.thermometer_name))
-                .performTextInput(thermometerName)
 
-            composeRule
-                .onNodeWithText(context.resources.getString(R.string.save))
-                .performClick()
-
-            composeRule
-                .onNodeWithText(context.resources.getString(R.string.title_mi_temperature_2_alt))
-                .assertIsDisplayed()
-
-            composeRule
-                .onNodeWithText(thermometerName)
-                .assertIsDisplayed()
+            SearchThermometersRobot(context, composeRule)
+                .navigateToAddNewThermometerScreen()
+                .waitUntilFirstThermometerAppearAndPerformClickOnIt()
+                .assertThermometerProgressImageIsDisplayed()
+                .assertConnectingTextIsDisplayed(address)
+                .waitUntilThermometerConnectedCheckIsDisplayed()
+                .assertConnectedToThermometerTextIsDisplayed(address)
+                .waitUntilThermometerNameScreenAppear()
+                .assertThermometerBoxIsDisplayed()
+                .performThermometerNameInput(thermometerName)
+                .performClickOnSaveThermometerButton()
+                .assertMainScreenIsDisplayed()
+                .assertThermometerBoxWithThermometerNameIsDisplayedOnMainScreen(thermometerName)
         }
 
     @Test
     fun afterThermometerListItemClick_whenThermometerNameIsNotEntered_presentErrorAfterSaveClick_andAfterEntering1LetterHideItAndSaveThermometer() =
         runBlocking<Unit> {
             val address = ThermometerScanResultsGenerator.scanResult1.address
+            val oneLetterName = "a"
 
-            composeRule
-                .onNodeWithContentDescription(context.getString(R.string.add_new_thermometer))
-                .performClick()
-
-            composeRule.waitUntilAtLeastOneExists(
-                hasClickAction() and hasParent(hasScrollAction()),
-                10_000
-            )
-
-            composeRule
-                .onNodeWithText(address)
-                .performClick()
-
-            composeRule
-                .onNodeWithContentDescription(context.resources.getString(R.string.humidity_sensor))
-                .assertIsDisplayed()
-            composeRule.onNodeWithText(
-                context.resources.getString(R.string.connecting_to_ADDRESS_thermometer, address)
-            ).assertIsDisplayed()
-
-            composeRule.waitUntilAtLeastOneExists(
-                hasContentDescription(context.resources.getString(R.string.thermometer_connected)),
-                10_000
-            )
-            composeRule.onNodeWithText(
-                context.resources.getString(R.string.connected_to_ADDRESS_thermometer, address)
-            ).assertIsDisplayed()
-
-            composeRule.waitUntilAtLeastOneExists(
-                hasClickAction() and hasText(context.resources.getString(R.string.save)),
-                1_500
-            )
-
-            composeRule
-                .onNodeWithText(context.resources.getString(R.string.thermometer_name))
-                .assertIsDisplayed()
-            composeRule
-                .onNodeWithTag("thermometerBox")
-                .assertIsDisplayed()
-
-            // Saving thermometer with empty name
-            composeRule
-                .onNodeWithText(context.resources.getString(R.string.save))
-                .performClick()
-
-            // Check if error is presented on the screen
-            composeRule
-                .onNodeWithText(
-                    context.resources.getString(R.string.thermometer_name_must_not_be_empty)
-                )
-                .assertIsDisplayed()
-
-            composeRule
-                .onNodeWithText(context.resources.getString(R.string.thermometer_name))
-                .performTextInput("a")
-
-            // Check if error is hidden when 1 letter entered
-            composeRule
-                .onNodeWithText(
-                    context.resources.getString(R.string.thermometer_name_must_not_be_empty)
-                )
-                .assertIsNotDisplayed()
-
-            // Saving thermometer with 1 letter name
-            composeRule
-                .onNodeWithText(context.resources.getString(R.string.save))
-                .performClick()
-
-            // Test if correct name is saved and displayed
-            composeRule
-                .onNodeWithText(context.resources.getString(R.string.title_mi_temperature_2_alt))
-                .assertIsDisplayed()
-
-            composeRule
-                .onNodeWithText("a")
-                .assertIsDisplayed()
+            SearchThermometersRobot(context, composeRule)
+                .navigateToAddNewThermometerScreen()
+                .waitUntilFirstThermometerAppearAndPerformClickOnIt()
+                .assertThermometerProgressImageIsDisplayed()
+                .assertConnectingTextIsDisplayed(address)
+                .waitUntilThermometerConnectedCheckIsDisplayed()
+                .assertConnectedToThermometerTextIsDisplayed(address)
+                .waitUntilThermometerNameScreenAppear()
+                .assertThermometerBoxIsDisplayed()
+                .performClickOnSaveThermometerButton()
+                .assertErrorTextVisibility(isDisplayed = true)
+                .performThermometerNameInput(oneLetterName)
+                .assertErrorTextVisibility(isDisplayed = false)
+                .performClickOnSaveThermometerButton()
+                .assertMainScreenIsDisplayed()
+                .assertThermometerBoxWithThermometerNameIsDisplayedOnMainScreen(oneLetterName)
         }
 }
