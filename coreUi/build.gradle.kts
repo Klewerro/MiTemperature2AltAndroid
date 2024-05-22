@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.klewerro.mitemperature2alt.addThermometerPresentation"
+    namespace = "com.klewerro.mitemperature2alt.coreUi"
     compileSdk = libs.versions.sdk.compile.get().toInt()
 
     defaultConfig {
@@ -36,6 +36,7 @@ dependencies {
 
     implementation(libs.androidx.core)
     implementation(libs.androidx.appcompat)
+    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
