@@ -11,7 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.klewerro.mitemperature2alt.R
-import com.klewerro.mitemperature2alt.ui.LocalSpacing
+import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
 
 @Composable
 fun NoConnectedThermometersInformation(modifier: Modifier = Modifier) {

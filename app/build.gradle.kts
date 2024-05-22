@@ -64,6 +64,7 @@ dependencies {
     implementation(project(":temperatureSensor"))
     implementation(project(":persistence"))
     implementation(project(":domain"))
+    implementation(project(":coreUi"))
     testImplementation(project(":coreTest"))
     androidTestImplementation(project(":coreTest"))
 
@@ -90,7 +91,6 @@ dependencies {
     // UI test
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
-    androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.androidx.test.compose.junit)
     androidTestImplementation(libs.hilt.android.testing)
     androidTestImplementation(libs.assertK)

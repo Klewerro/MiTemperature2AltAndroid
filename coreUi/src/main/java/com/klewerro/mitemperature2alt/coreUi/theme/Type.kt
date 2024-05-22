@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.ui.theme
+package com.klewerro.mitemperature2alt.coreUi.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

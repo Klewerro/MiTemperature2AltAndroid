@@ -29,6 +29,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
 import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerViewModel
 import com.klewerro.mitemperature2alt.presentation.addThermometer.connecting.ThermometerConnectingScreen
 import com.klewerro.mitemperature2alt.presentation.addThermometer.name.ConnectThermometerNameScreen
@@ -38,7 +39,6 @@ import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewM
 import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
 import com.klewerro.mitemperature2alt.presentation.navigation.Route
-import com.klewerro.mitemperature2alt.ui.theme.MiTemperature2AltTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

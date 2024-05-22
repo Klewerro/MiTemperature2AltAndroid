@@ -10,8 +10,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
 import com.klewerro.mitemperature2alt.presentation.util.isAndroid12OrGreater
-import com.klewerro.mitemperature2alt.ui.LocalSpacing
 
 @Composable
 fun PermissionDeclinedRationale(

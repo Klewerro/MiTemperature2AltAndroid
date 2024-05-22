@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Lifecycle
 import com.klewerro.mitemperature2alt.R
+import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
 import com.klewerro.mitemperature2alt.domain.model.ScannedDeviceStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.presentation.addThermometer.search.components.DevicesList
@@ -38,7 +39,6 @@ import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsState
 import com.klewerro.mitemperature2alt.presentation.model.PermissionStatus
 import com.klewerro.mitemperature2alt.presentation.util.getActivity
 import com.klewerro.mitemperature2alt.presentation.util.isAndroid12OrGreater
-import com.klewerro.mitemperature2alt.ui.LocalSpacing
 
 @Composable
 fun SearchThermometersScreen(

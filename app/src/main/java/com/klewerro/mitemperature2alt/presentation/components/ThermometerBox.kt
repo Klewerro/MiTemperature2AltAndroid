@@ -22,8 +22,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.klewerro.mitemperature2alt.ui.LocalSpacing
-import com.klewerro.mitemperature2alt.ui.theme.MiTemperature2AltTheme
+import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
+import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
 
 @Composable
 fun ThermometerBox(

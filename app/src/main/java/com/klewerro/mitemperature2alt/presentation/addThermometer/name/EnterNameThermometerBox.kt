@@ -13,9 +13,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import com.klewerro.mitemperature2alt.R
+import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
+import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
 import com.klewerro.mitemperature2alt.presentation.components.ThermometerBox
-import com.klewerro.mitemperature2alt.ui.LocalSpacing
-import com.klewerro.mitemperature2alt.ui.theme.MiTemperature2AltTheme
 
 @Composable
 fun EnterNameThermometerBox(

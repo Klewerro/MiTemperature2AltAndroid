@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.ui
+package com.klewerro.mitemperature2alt.coreUi
 
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.Dp
