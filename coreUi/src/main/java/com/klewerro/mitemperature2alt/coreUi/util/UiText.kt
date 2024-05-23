@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.util
+package com.klewerro.mitemperature2alt.coreUi.util
 
 import android.content.Context
 import androidx.annotation.StringRes

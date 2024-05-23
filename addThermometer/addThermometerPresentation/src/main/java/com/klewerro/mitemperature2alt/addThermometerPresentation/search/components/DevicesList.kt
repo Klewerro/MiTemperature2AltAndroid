@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.addThermometer.search.components
+package com.klewerro.mitemperature2alt.addThermometerPresentation.search.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

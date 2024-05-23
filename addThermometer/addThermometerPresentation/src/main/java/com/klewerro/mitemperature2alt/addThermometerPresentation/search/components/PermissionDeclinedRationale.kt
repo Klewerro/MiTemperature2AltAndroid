@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.addThermometer.search.components
+package com.klewerro.mitemperature2alt.addThermometerPresentation.search.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
-import com.klewerro.mitemperature2alt.presentation.util.isAndroid12OrGreater
+import com.klewerro.mitemperature2alt.coreUi.util.isAndroid12OrGreater
 
 @Composable
 fun PermissionDeclinedRationale(

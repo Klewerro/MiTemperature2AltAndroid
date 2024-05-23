@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.model
+package com.klewerro.mitemperature2alt.addThermometerPresentation.search
 
 enum class PermissionStatus {
     GRANTED,

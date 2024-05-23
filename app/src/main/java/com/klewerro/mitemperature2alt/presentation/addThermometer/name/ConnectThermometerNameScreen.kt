@@ -26,12 +26,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
 import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
+import com.klewerro.mitemperature2alt.coreUi.util.UiText
+import com.klewerro.mitemperature2alt.coreUi.util.clearFocusOnClick
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
 import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerEvent
 import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerState
 import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerViewModel
-import com.klewerro.mitemperature2alt.presentation.util.UiText
-import com.klewerro.mitemperature2alt.presentation.util.clearFocusOnClick
 
 @Composable
 fun ConnectThermometerNameScreen(

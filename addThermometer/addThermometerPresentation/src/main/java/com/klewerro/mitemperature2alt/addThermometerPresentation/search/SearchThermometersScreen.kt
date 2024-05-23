@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.addThermometer.search
+package com.klewerro.mitemperature2alt.addThermometerPresentation.search
 
 import android.Manifest
 import android.app.Activity
@@ -27,23 +27,40 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.klewerro.mitemperature2alt.addThermometerPresentation.search.components.DevicesList
+import com.klewerro.mitemperature2alt.addThermometerPresentation.search.components.PermissionDeclinedRationale
 import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
 import com.klewerro.mitemperature2alt.coreUi.R
+import com.klewerro.mitemperature2alt.coreUi.util.getActivity
+import com.klewerro.mitemperature2alt.coreUi.util.isAndroid12OrGreater
 import com.klewerro.mitemperature2alt.domain.model.ScannedDeviceStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
-import com.klewerro.mitemperature2alt.presentation.addThermometer.search.components.DevicesList
-import com.klewerro.mitemperature2alt.presentation.addThermometer.search.components.PermissionDeclinedRationale
-import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsEvent
-import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsState
-import com.klewerro.mitemperature2alt.presentation.model.PermissionStatus
-import com.klewerro.mitemperature2alt.presentation.util.getActivity
-import com.klewerro.mitemperature2alt.presentation.util.isAndroid12OrGreater
 
 @Composable
 fun SearchThermometersScreen(
-    bleOperationsState: BleOperationsState,
-    onBleOperationsEvent: (BleOperationsEvent) -> Unit,
+    scaffoldState: ScaffoldState,
+    modifier: Modifier = Modifier,
+    deviceSearchViewModel: DeviceSearchViewModel = hiltViewModel(),
+    onDeviceListItemClick: (String) -> Unit
+) {
+    val deviceSearchState by deviceSearchViewModel.state
+        .collectAsStateWithLifecycle()
+    SearchThermometersScreenContent(
+        deviceSearchState,
+        onDeviceSearchEvent = deviceSearchViewModel::onEvent,
+        onDeviceListItemClick = {
+            onDeviceListItemClick(it.address)
+        },
+        scaffoldState,
+        modifier
+    )
+}
+
+@Composable
+private fun SearchThermometersScreenContent(
     deviceSearchState: DeviceSearchState,
     onDeviceSearchEvent: (DeviceSearchEvent) -> Unit,
     onDeviceListItemClick: (ThermometerScanResult) -> Unit,
@@ -103,13 +120,13 @@ fun SearchThermometersScreen(
         }
     }
 
-    LaunchedEffect(key1 = bleOperationsState.error) {
-        bleOperationsState.error?.let { errorUiText ->
+    LaunchedEffect(key1 = deviceSearchState.error) {
+        deviceSearchState.error?.let { errorUiText ->
             scaffoldState.snackbarHostState
             scaffoldState.snackbarHostState.showSnackbar(
                 message = errorUiText.asString(context)
             )
-            onBleOperationsEvent(BleOperationsEvent.ErrorDismissed)
+            onDeviceSearchEvent(DeviceSearchEvent.ErrorDismissed)
         }
     }
 
@@ -139,8 +156,8 @@ fun SearchThermometersScreen(
                     },
                     onDeviceClick = { thermometerDevice ->
                         if (thermometerDevice.scannedDeviceStatus == ScannedDeviceStatus.SAVED) {
-                            onBleOperationsEvent(
-                                BleOperationsEvent.ErrorConnectingToSavedThermometer(
+                            onDeviceSearchEvent(
+                                DeviceSearchEvent.ErrorConnectingToSavedThermometer(
                                     thermometerDevice.name
                                 )
                             )

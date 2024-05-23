@@ -1,12 +1,13 @@
-package com.klewerro.mitemperature2alt.presentation.addThermometer.search
+package com.klewerro.mitemperature2alt.addThermometerPresentation.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.klewerro.mitemperature2alt.coreUi.R
+import com.klewerro.mitemperature2alt.coreUi.util.UiText
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.IsScanningForDevicesUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.ScanForDevicesUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.SearchedDevicesUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
-import com.klewerro.mitemperature2alt.presentation.model.PermissionStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +49,17 @@ class DeviceSearchViewModel @Inject constructor(
             is DeviceSearchEvent.UpdatePermissionStatus -> handlePermissionChange(
                 event.permissionStatus
             )
+
+            is DeviceSearchEvent.ErrorConnectingToSavedThermometer -> _state.update {
+                it.copy(
+                    error = UiText.StringResource(R.string.thermometer_is_already_saved)
+                )
+            }
+            DeviceSearchEvent.ErrorDismissed -> _state.update {
+                it.copy(
+                    error = null
+                )
+            }
         }
     }
 
