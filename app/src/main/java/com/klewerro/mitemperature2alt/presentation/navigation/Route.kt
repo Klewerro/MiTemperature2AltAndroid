@@ -2,7 +2,7 @@ package com.klewerro.mitemperature2alt.presentation.navigation
 
 import androidx.annotation.StringRes
 import androidx.navigation.NavController
-import com.klewerro.mitemperature2alt.R
+import com.klewerro.mitemperature2alt.coreUi.R
 
 sealed class Route(
     @StringRes val screenName: Int,

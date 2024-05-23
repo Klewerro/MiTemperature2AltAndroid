@@ -28,8 +28,8 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Lifecycle
-import com.klewerro.mitemperature2alt.R
 import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
+import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.domain.model.ScannedDeviceStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.presentation.addThermometer.search.components.DevicesList

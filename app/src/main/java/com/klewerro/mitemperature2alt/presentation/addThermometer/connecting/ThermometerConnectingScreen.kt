@@ -41,6 +41,7 @@ import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermom
 import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerViewModel
 import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectingStatus
 import kotlinx.coroutines.delay
+import com.klewerro.mitemperature2alt.coreUi.R as RCore
 
 private const val SCREEN_CHANGE_DELAY = 1_500L
 
@@ -118,9 +119,9 @@ private fun ThermometerConnectingScreenContent(
                             ),
                             contentDescription = stringResource(
                                 if (connectingStatus == ConnectingStatus.CONNECTED) {
-                                    R.string.thermometer_connected
+                                    RCore.string.thermometer_connected
                                 } else {
-                                    R.string.connecting_thermometer_error
+                                    RCore.string.connecting_thermometer_error
                                 }
                             ),
                             colorFilter = ColorFilter.tint(
@@ -141,16 +142,16 @@ private fun ThermometerConnectingScreenContent(
             text = when (state.connectingStatus) {
                 ConnectingStatus.NOT_CONNECTING -> ""
                 ConnectingStatus.CONNECTING -> stringResource(
-                    id = R.string.connecting_to_ADDRESS_thermometer,
+                    id = RCore.string.connecting_to_ADDRESS_thermometer,
                     state.thermometerAddress
                 )
                 ConnectingStatus.CONNECTED -> stringResource(
-                    id = R.string.connected_to_ADDRESS_thermometer,
+                    id = RCore.string.connected_to_ADDRESS_thermometer,
                     state.thermometerAddress
                 )
                 ConnectingStatus.ERROR -> state.error?.asString(
                     context
-                ) ?: stringResource(id = R.string.unexpected_error_occurred_try_again)
+                ) ?: stringResource(id = RCore.string.unexpected_error_occurred_try_again)
             },
             style = MaterialTheme.typography.h3,
             modifier = Modifier.padding(spacing.spaceScreen),
@@ -174,7 +175,7 @@ private fun ProgressImage(modifier: Modifier = Modifier) {
     ) {
         Image(
             painter = painterResource(id = R.drawable.thermometer_image),
-            contentDescription = stringResource(R.string.humidity_sensor),
+            contentDescription = stringResource(RCore.string.humidity_sensor),
             modifier = modifier.fillMaxSize(0.8f)
 
         )

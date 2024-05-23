@@ -10,8 +10,8 @@ import androidx.compose.ui.test.performClick
 import androidx.test.rule.GrantPermissionRule
 import com.klewerro.mitemperature2alt.MainActivity
 import com.klewerro.mitemperature2alt.MiTemperature2AltAndroidTest
-import com.klewerro.mitemperature2alt.R
 import com.klewerro.mitemperature2alt.coreTest.generators.ThermometerScanResultsGenerator
+import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.presentation.util.isAndroid12OrGreater
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking

@@ -23,8 +23,8 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.klewerro.mitemperature2alt.R
 import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
+import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
 import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerEvent

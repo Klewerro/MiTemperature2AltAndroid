@@ -2,7 +2,7 @@ package com.klewerro.mitemperature2alt.presentation.mainscreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.klewerro.mitemperature2alt.R
+import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ConnectedDevicesUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.SubscribeToCurrentThermometerStatusUseCase
