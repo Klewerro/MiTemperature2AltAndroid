@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.components
+package com.klewerro.mitemperature2alt.coreUi.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

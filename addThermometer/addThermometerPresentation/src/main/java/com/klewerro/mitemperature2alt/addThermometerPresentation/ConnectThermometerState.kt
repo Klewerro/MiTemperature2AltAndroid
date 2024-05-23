@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.addThermometer
+package com.klewerro.mitemperature2alt.addThermometerPresentation
 
 import com.klewerro.mitemperature2alt.coreUi.util.UiText
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus

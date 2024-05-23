@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.addThermometer.name
+package com.klewerro.mitemperature2alt.addThermometerPresentation.name
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -14,8 +14,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
 import com.klewerro.mitemperature2alt.coreUi.R
+import com.klewerro.mitemperature2alt.coreUi.components.ThermometerBox
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
-import com.klewerro.mitemperature2alt.presentation.components.ThermometerBox
 
 @Composable
 fun EnterNameThermometerBox(

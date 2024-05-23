@@ -8,6 +8,9 @@ import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
+import com.klewerro.mitemperature2alt.addThermometerPresentation.ConnectThermometerEvent
+import com.klewerro.mitemperature2alt.addThermometerPresentation.ConnectThermometerViewModel
+import com.klewerro.mitemperature2alt.addThermometerPresentation.ConnectingStatus
 import com.klewerro.mitemperature2alt.coreTest.fake.FakePersistenceRepository
 import com.klewerro.mitemperature2alt.coreTest.fake.FakeThermometerRepository
 import com.klewerro.mitemperature2alt.coreTest.util.MainCoroutineExtension

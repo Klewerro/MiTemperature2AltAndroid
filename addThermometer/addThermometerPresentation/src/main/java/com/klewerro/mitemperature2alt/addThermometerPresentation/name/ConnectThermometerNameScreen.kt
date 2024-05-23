@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.addThermometer.name
+package com.klewerro.mitemperature2alt.addThermometerPresentation.name
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
@@ -23,15 +23,15 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.klewerro.mitemperature2alt.addThermometerPresentation.ConnectThermometerEvent
+import com.klewerro.mitemperature2alt.addThermometerPresentation.ConnectThermometerState
+import com.klewerro.mitemperature2alt.addThermometerPresentation.ConnectThermometerViewModel
 import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
 import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
 import com.klewerro.mitemperature2alt.coreUi.util.UiText
 import com.klewerro.mitemperature2alt.coreUi.util.clearFocusOnClick
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
-import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerEvent
-import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerState
-import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerViewModel
 
 @Composable
 fun ConnectThermometerNameScreen(

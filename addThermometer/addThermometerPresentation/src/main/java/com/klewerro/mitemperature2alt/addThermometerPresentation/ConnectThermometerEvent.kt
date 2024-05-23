@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.addThermometer
+package com.klewerro.mitemperature2alt.addThermometerPresentation
 
 sealed class ConnectThermometerEvent {
     data object ConnectToDevice : ConnectThermometerEvent()

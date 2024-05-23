@@ -45,13 +45,15 @@ android {
 dependencies {
     implementation(project(":coreUi"))
     implementation(project(":domain")) // Todo: Temporary! After move UI, move domain related code
+
+    implementation(libs.bundles.androidX)
+    implementation(libs.bundles.compose)
+    implementation(libs.timber)
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation)
     ksp(libs.hilt.android.compiler)
 
-    implementation(libs.bundles.androidX)
-    implementation(libs.bundles.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
