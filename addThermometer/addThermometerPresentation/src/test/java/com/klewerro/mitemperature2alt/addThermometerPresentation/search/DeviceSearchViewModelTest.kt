@@ -1,11 +1,9 @@
-package com.klewerro.mitemperature2alt.presentation.mainscreen
+package com.klewerro.mitemperature2alt.addThermometerPresentation.search
 
 import app.cash.turbine.test
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import com.klewerro.mitemperature2alt.addThermometerPresentation.search.DeviceSearchEvent
-import com.klewerro.mitemperature2alt.addThermometerPresentation.search.DeviceSearchViewModel
 import com.klewerro.mitemperature2alt.coreTest.fake.FakePersistenceRepository
 import com.klewerro.mitemperature2alt.coreTest.fake.FakeThermometerRepository
 import com.klewerro.mitemperature2alt.coreTest.util.MainCoroutineExtension

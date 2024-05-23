@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt
+package com.klewerro.mitemperature2alt.di
 
 import android.app.Application
 import androidx.room.Room

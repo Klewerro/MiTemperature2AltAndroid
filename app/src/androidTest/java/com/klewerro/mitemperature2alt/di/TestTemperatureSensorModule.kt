@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt
+package com.klewerro.mitemperature2alt.di
 
 import com.klewerro.mitemperature2alt.coreTest.fake.FakeThermometerDevicesBleScanner
 import com.klewerro.mitemperature2alt.coreTest.fake.FakeThermometerRepository
