@@ -45,7 +45,7 @@ android {
 dependencies {
     implementation(project(":coreUi"))
     testImplementation(project(":coreTest"))
-    implementation(project(":domain")) // Todo: Temporary! After move UI, move domain related code
+    implementation(project(":addThermometer:addThermometerDomain"))
 
     implementation(libs.bundles.androidX)
     implementation(libs.bundles.compose)

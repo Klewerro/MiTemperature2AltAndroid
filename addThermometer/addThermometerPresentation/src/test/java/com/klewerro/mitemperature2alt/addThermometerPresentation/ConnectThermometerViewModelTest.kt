@@ -8,14 +8,14 @@ import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
+import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.ConnectToDeviceUseCase
+import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.SaveThermometerUseCase
 import com.klewerro.mitemperature2alt.coreTest.fake.FakePersistenceRepository
 import com.klewerro.mitemperature2alt.coreTest.fake.FakeThermometerRepository
 import com.klewerro.mitemperature2alt.coreTest.util.MainCoroutineExtension
 import com.klewerro.mitemperature2alt.coreTest.util.TestDispatchers
 import com.klewerro.mitemperature2alt.coreUi.UiConstants
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.connect.ConnectToDeviceUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.persistence.SaveThermometerUseCase
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

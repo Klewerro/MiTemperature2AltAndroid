@@ -2,11 +2,11 @@ package com.klewerro.mitemperature2alt.addThermometerPresentation.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.scan.IsScanningForDevicesUseCase
+import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.scan.ScanForDevicesUseCase
+import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.scan.SearchedDevicesUseCase
 import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.coreUi.util.UiText
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.IsScanningForDevicesUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.ScanForDevicesUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.SearchedDevicesUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job

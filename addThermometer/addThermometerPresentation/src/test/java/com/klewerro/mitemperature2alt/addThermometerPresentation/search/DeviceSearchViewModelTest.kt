@@ -4,13 +4,13 @@ import app.cash.turbine.test
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
+import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.scan.IsScanningForDevicesUseCase
+import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.scan.ScanForDevicesUseCase
+import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.scan.SearchedDevicesUseCase
 import com.klewerro.mitemperature2alt.coreTest.fake.FakePersistenceRepository
 import com.klewerro.mitemperature2alt.coreTest.fake.FakeThermometerRepository
 import com.klewerro.mitemperature2alt.coreTest.util.MainCoroutineExtension
 import com.klewerro.mitemperature2alt.coreTest.util.TestDispatchers
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.IsScanningForDevicesUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.ScanForDevicesUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.SearchedDevicesUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -64,9 +64,7 @@ class DeviceSearchViewModelTest {
             isScanningForDevicesUseCase().test {
                 assertThat(awaitItem()).isFalse()
                 val testJob = launch {
-                    deviceSearchViewModel.onEvent(
-                        com.klewerro.mitemperature2alt.addThermometerPresentation.search.DeviceSearchEvent.ScanForDevices()
-                    )
+                    deviceSearchViewModel.onEvent(DeviceSearchEvent.ScanForDevices())
                     val scanStartedItem = awaitItem()
                     assertThat(scanStartedItem).isTrue()
                 }
@@ -74,17 +72,13 @@ class DeviceSearchViewModelTest {
                 val testJob2 = launch {
                     val resultItem = awaitItem()
                     assertThat(resultItem).isFalse()
-                    deviceSearchViewModel.onEvent(
-                        com.klewerro.mitemperature2alt.addThermometerPresentation.search.DeviceSearchEvent.ScanForDevices()
-                    )
+                    deviceSearchViewModel.onEvent(DeviceSearchEvent.ScanForDevices())
                     val scanStartedItem = awaitItem()
                     assertThat(scanStartedItem).isTrue()
                 }
                 delay(2_000)
                 testJob2.cancel()
-                deviceSearchViewModel.onEvent(
-                    com.klewerro.mitemperature2alt.addThermometerPresentation.search.DeviceSearchEvent.StopScanForDevices()
-                )
+                deviceSearchViewModel.onEvent(DeviceSearchEvent.StopScanForDevices())
                 advanceUntilIdle()
                 val finalEmission = awaitItem()
                 assertThat(finalEmission).isFalse()
@@ -98,7 +92,7 @@ class DeviceSearchViewModelTest {
             item1.toString()
 
             deviceSearchViewModel.onEvent(
-                com.klewerro.mitemperature2alt.addThermometerPresentation.search.DeviceSearchEvent.ScanForDevices(
+                DeviceSearchEvent.ScanForDevices(
                     byUser = true
                 )
             )
@@ -108,7 +102,7 @@ class DeviceSearchViewModelTest {
 
             delay(2_000)
             deviceSearchViewModel.onEvent(
-                com.klewerro.mitemperature2alt.addThermometerPresentation.search.DeviceSearchEvent.StopScanForDevices(
+                DeviceSearchEvent.StopScanForDevices(
                     byUser = true
                 )
             )
@@ -125,13 +119,13 @@ class DeviceSearchViewModelTest {
                 val item1 = awaitItem()
 
                 deviceSearchViewModel.onEvent(
-                    com.klewerro.mitemperature2alt.addThermometerPresentation.search.DeviceSearchEvent.StopScanForDevices(
+                    DeviceSearchEvent.StopScanForDevices(
                         byUser = true
                     )
                 )
 
                 deviceSearchViewModel.onEvent(
-                    com.klewerro.mitemperature2alt.addThermometerPresentation.search.DeviceSearchEvent.ScanForDevices(
+                    DeviceSearchEvent.ScanForDevices(
                         byUser = false
                     )
                 )

@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.domain.usecase.thermometer.persistence
+package com.klewerro.mitemperature2alt.addThermometerDomain.usecase
 
 import com.klewerro.mitemperature2alt.domain.repository.PersistenceRepository
 

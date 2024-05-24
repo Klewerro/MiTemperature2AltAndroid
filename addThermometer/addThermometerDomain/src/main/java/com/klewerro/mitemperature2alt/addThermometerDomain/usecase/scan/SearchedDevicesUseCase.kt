@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan
+package com.klewerro.mitemperature2alt.addThermometerDomain.usecase.scan
 
 import com.klewerro.mitemperature2alt.domain.model.ScannedDeviceStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
