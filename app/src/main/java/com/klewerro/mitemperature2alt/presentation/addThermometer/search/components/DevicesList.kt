@@ -1,18 +1,15 @@
-package com.klewerro.mitemperature2alt.presentation.addHeater.components
+package com.klewerro.mitemperature2alt.presentation.addThermometer.search.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import com.klewerro.mitemperature2alt.R
-import com.klewerro.mitemperature2alt.domain.model.ConnectionStatus
+import com.klewerro.mitemperature2alt.domain.model.ScannedDeviceStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.ui.LocalSpacing
 
@@ -75,14 +72,15 @@ fun DevicesList(
                     Text(text = thermometerDevice.name)
                     Text(text = thermometerDevice.address)
                     Text(text = thermometerDevice.rssi.toString())
-                    when (thermometerDevice.connectionStatus) {
-                        ConnectionStatus.NOT_CONNECTED -> { /*Nothing*/ }
-                        ConnectionStatus.CONNECTING -> {
-                            Spacer(modifier = Modifier.height(spacing.spaceSmall))
-                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                        }
-                        ConnectionStatus.CONNECTED -> Text(
+                    when (thermometerDevice.scannedDeviceStatus) {
+                        ScannedDeviceStatus.NOT_CONNECTED -> { /*Nothing*/ }
+                        ScannedDeviceStatus.CONNECTED -> Text(
                             text = stringResource(R.string.connected),
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+
+                        ScannedDeviceStatus.SAVED -> Text(
+                            text = stringResource(R.string.saved),
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }

@@ -1,10 +1,13 @@
 package com.klewerro.mitemperature2alt.di
 
+import com.klewerro.mitemperature2alt.domain.repository.PersistenceRepository
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
+import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ConnectedDevicesUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.connect.ConnectToDeviceUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.connect.ConnectedDevicesUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.SubscribeToCurrentThermometerStatusUseCase
+import com.klewerro.mitemperature2alt.domain.usecase.thermometer.persistence.SaveThermometerUseCase
+import com.klewerro.mitemperature2alt.domain.usecase.thermometer.persistence.SavedThermometersUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.IsScanningForDevicesUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.ScanForDevicesUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.scan.SearchedDevicesUseCase
@@ -34,8 +37,10 @@ object DomainModule {
 
     @Provides
     @ViewModelScoped
-    fun provideSearchedDevicesUseCase(thermometerRepository: ThermometerRepository) =
-        SearchedDevicesUseCase(thermometerRepository)
+    fun provideSearchedDevicesUseCase(
+        thermometerRepository: ThermometerRepository,
+        persistenceRepository: PersistenceRepository
+    ) = SearchedDevicesUseCase(thermometerRepository, persistenceRepository)
 
     @Provides
     @ViewModelScoped
@@ -57,6 +62,16 @@ object DomainModule {
     fun provideSubscribeToCurrentThermometerStatusUseCase(
         thermometerRepository: ThermometerRepository
     ) = SubscribeToCurrentThermometerStatusUseCase(thermometerRepository)
+
+    @Provides
+    @ViewModelScoped
+    fun provideSaveThermometerUseCase(persistenceRepository: PersistenceRepository) =
+        SaveThermometerUseCase(persistenceRepository)
+
+    @Provides
+    @ViewModelScoped
+    fun provideSavedThermometersUseCase(persistenceRepository: PersistenceRepository) =
+        SavedThermometersUseCase(persistenceRepository)
 }
 
 @Module

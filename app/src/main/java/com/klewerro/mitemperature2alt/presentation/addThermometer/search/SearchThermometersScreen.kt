@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.addHeater
+package com.klewerro.mitemperature2alt.presentation.addThermometer.search
 
 import android.Manifest
 import android.app.Activity
@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,34 +27,34 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.klewerro.mitemperature2alt.R
-import com.klewerro.mitemperature2alt.presentation.addHeater.components.DevicesList
-import com.klewerro.mitemperature2alt.presentation.addHeater.components.PermissionDeclinedRationale
-import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewModel
-import com.klewerro.mitemperature2alt.presentation.mainscreen.DeviceSearchViewModel
+import com.klewerro.mitemperature2alt.domain.model.ScannedDeviceStatus
+import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
+import com.klewerro.mitemperature2alt.presentation.addThermometer.search.components.DevicesList
+import com.klewerro.mitemperature2alt.presentation.addThermometer.search.components.PermissionDeclinedRationale
+import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsEvent
+import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsState
 import com.klewerro.mitemperature2alt.presentation.model.PermissionStatus
 import com.klewerro.mitemperature2alt.presentation.util.getActivity
 import com.klewerro.mitemperature2alt.presentation.util.isAndroid12OrGreater
 import com.klewerro.mitemperature2alt.ui.LocalSpacing
 
 @Composable
-fun AddThermometerScreen(
+fun SearchThermometersScreen(
+    bleOperationsState: BleOperationsState,
+    onBleOperationsEvent: (BleOperationsEvent) -> Unit,
+    deviceSearchState: DeviceSearchState,
+    onDeviceSearchEvent: (DeviceSearchEvent) -> Unit,
+    onDeviceListItemClick: (ThermometerScanResult) -> Unit,
     scaffoldState: ScaffoldState,
-    bleOperationsViewModel: BleOperationsViewModel,
-    modifier: Modifier = Modifier,
-    deviceSearchViewModel: DeviceSearchViewModel = hiltViewModel()
+    modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
     val activity = context.getActivity()
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
-
-    val scannedDevices by deviceSearchViewModel.scannerDevices.collectAsStateWithLifecycle()
-    val isScanningForDevices by deviceSearchViewModel.isScanningForDevices.collectAsStateWithLifecycle()
 
     var wasAppSettingsCheckClicked by remember {
         mutableStateOf(false)
@@ -71,23 +72,29 @@ fun AddThermometerScreen(
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 }
             )
-            deviceSearchViewModel.permissionGrantStatus = when {
-                areAllGranted -> PermissionStatus.GRANTED
-                !areAllGranted && !isPermanentlyDeclined -> PermissionStatus.DECLINED
-                else -> PermissionStatus.PERMANENTLY_DECLINED
-            }
+            onDeviceSearchEvent(
+                DeviceSearchEvent.UpdatePermissionStatus(
+                    when {
+                        areAllGranted -> PermissionStatus.GRANTED
+                        !areAllGranted && !isPermanentlyDeclined -> PermissionStatus.DECLINED
+                        else -> PermissionStatus.PERMANENTLY_DECLINED
+                    }
+                )
+            )
         }
     )
 
-    LaunchedEffect(key1 = deviceSearchViewModel.permissionGrantStatus) {
-        if (deviceSearchViewModel.permissionGrantStatus == PermissionStatus.DECLINED) {
+    LaunchedEffect(key1 = deviceSearchState.permissionGrantStatus) {
+        if (deviceSearchState.permissionGrantStatus == PermissionStatus.DECLINED) {
             nearbyDevicesPermissionResultLauncher.launchRequestBlePermissions()
+        } else if (deviceSearchState.permissionGrantStatus == PermissionStatus.GRANTED) {
+            onDeviceSearchEvent(DeviceSearchEvent.ScanForDevices(byUser = false))
         }
     }
 
     LaunchedEffect(key1 = lifecycleState) {
         if (lifecycleState == Lifecycle.State.RESUMED) {
-            if (deviceSearchViewModel.permissionGrantStatus == PermissionStatus.PERMANENTLY_DECLINED &&
+            if (deviceSearchState.permissionGrantStatus == PermissionStatus.PERMANENTLY_DECLINED &&
                 wasAppSettingsCheckClicked
             ) {
                 wasAppSettingsCheckClicked = false
@@ -96,11 +103,19 @@ fun AddThermometerScreen(
         }
     }
 
-    LaunchedEffect(key1 = true) {
-        bleOperationsViewModel.uiTextError.collect { uiText ->
+    LaunchedEffect(key1 = bleOperationsState.error) {
+        bleOperationsState.error?.let { errorUiText ->
+            scaffoldState.snackbarHostState
             scaffoldState.snackbarHostState.showSnackbar(
-                message = uiText.asString(context)
+                message = errorUiText.asString(context)
             )
+            onBleOperationsEvent(BleOperationsEvent.ErrorDismissed)
+        }
+    }
+
+    DisposableEffect(key1 = Unit) {
+        onDispose {
+            onDeviceSearchEvent(DeviceSearchEvent.StopScanForDevices(byUser = false))
         }
     }
 
@@ -111,15 +126,27 @@ fun AddThermometerScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        when (deviceSearchViewModel.permissionGrantStatus) {
+        when (deviceSearchState.permissionGrantStatus) {
             PermissionStatus.GRANTED -> {
                 DevicesList(
-                    isScanningForDevices = isScanningForDevices,
-                    scannedDevices = scannedDevices,
-                    onButtonClickWhenScanning = deviceSearchViewModel::stopScanForDevices,
-                    onButtonClickWhenNotScanning = { deviceSearchViewModel.scanForDevices() },
+                    isScanningForDevices = deviceSearchState.isScanningForDevices,
+                    scannedDevices = deviceSearchState.scannedDevices,
+                    onButtonClickWhenScanning = {
+                        onDeviceSearchEvent(DeviceSearchEvent.StopScanForDevices())
+                    },
+                    onButtonClickWhenNotScanning = {
+                        onDeviceSearchEvent(DeviceSearchEvent.ScanForDevices())
+                    },
                     onDeviceClick = { thermometerDevice ->
-                        bleOperationsViewModel.connectToDevice(thermometerDevice)
+                        if (thermometerDevice.scannedDeviceStatus == ScannedDeviceStatus.SAVED) {
+                            onBleOperationsEvent(
+                                BleOperationsEvent.ErrorConnectingToSavedThermometer(
+                                    thermometerDevice.name
+                                )
+                            )
+                        } else {
+                            onDeviceListItemClick(thermometerDevice)
+                        }
                     }
                 )
             }

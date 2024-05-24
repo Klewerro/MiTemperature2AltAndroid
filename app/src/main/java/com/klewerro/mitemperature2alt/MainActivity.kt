@@ -7,21 +7,33 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.klewerro.mitemperature2alt.presentation.addHeater.AddThermometerScreen
+import androidx.navigation.navArgument
+import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerViewModel
+import com.klewerro.mitemperature2alt.presentation.addThermometer.connecting.ThermometerConnectingScreen
+import com.klewerro.mitemperature2alt.presentation.addThermometer.name.ConnectThermometerNameScreen
+import com.klewerro.mitemperature2alt.presentation.addThermometer.search.DeviceSearchViewModel
+import com.klewerro.mitemperature2alt.presentation.addThermometer.search.SearchThermometersScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
@@ -38,9 +50,10 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val scaffoldState = rememberScaffoldState()
                 val bleOperationsViewModel: BleOperationsViewModel = hiltViewModel()
+                val bleOperationsSate by bleOperationsViewModel.state.collectAsStateWithLifecycle()
 
-                var titleState by remember {
-                    mutableStateOf(Route.MAIN.screenName)
+                var titleResourceIdState by remember {
+                    mutableIntStateOf(Route.MainRoutes.Main.screenName)
                 }
 
                 Scaffold(
@@ -48,10 +61,10 @@ class MainActivity : ComponentActivity() {
                     scaffoldState = scaffoldState,
                     topBar = {
                         TopBar(
-                            title = titleState,
-                            shouldBeButtonVisible = titleState == Route.MAIN.screenName
+                            title = stringResource(titleResourceIdState),
+                            shouldBeButtonVisible = titleResourceIdState == Route.MainRoutes.Main.screenName
                         ) {
-                            navController.navigate(Route.SCAN_FOR_DEVICES.name)
+                            Route.MainRoutes.ScanForDevices.navigate(navController)
                         }
                     }
                 ) { scaffoldPadding ->
@@ -63,23 +76,109 @@ class MainActivity : ComponentActivity() {
                     ) {
                         NavHost(
                             navController = navController,
-                            startDestination = Route.MAIN.name
+                            startDestination = Route.MainRoutes.Main.fullRoute
                         ) {
                             // Animations: https://proandroiddev.com/screen-transition-animations-with-jetpack-navigation-17afdc714d0e
-                            composable(Route.MAIN.name) {
-                                MainScreen(bleOperationsViewModel)
-                                titleState = Route.MAIN.screenName
-                            }
-                            composable(Route.SCAN_FOR_DEVICES.name) {
-                                AddThermometerScreen(
-                                    scaffoldState = scaffoldState,
-                                    bleOperationsViewModel = bleOperationsViewModel
+                            composable(Route.MainRoutes.Main.fullRoute) {
+                                MainScreen(
+                                    state = bleOperationsSate,
+                                    onEvent = { event ->
+                                        bleOperationsViewModel.onEvent(event)
+                                    },
+                                    scaffoldState = scaffoldState
                                 )
-                                titleState = Route.SCAN_FOR_DEVICES.screenName
+                                titleResourceIdState = Route.MainRoutes.Main.screenName
                             }
+                            composable(Route.MainRoutes.ScanForDevices.fullRoute) {
+                                val deviceSearchViewModel = hiltViewModel<DeviceSearchViewModel>()
+                                val deviceSearchState by deviceSearchViewModel.state
+                                    .collectAsStateWithLifecycle()
+                                SearchThermometersScreen(
+                                    bleOperationsState = bleOperationsSate,
+                                    onBleOperationsEvent = { bleOperationsEvent ->
+                                        bleOperationsViewModel.onEvent(bleOperationsEvent)
+                                    },
+                                    deviceSearchState = deviceSearchState,
+                                    onDeviceSearchEvent = { deviceSearchEvent ->
+                                        deviceSearchViewModel.onEvent(deviceSearchEvent)
+                                    },
+                                    onDeviceListItemClick = {
+                                        Route.ConnectDeviceRoutes.ConnectDeviceGraph.navigate(
+                                            navController,
+                                            it.address
+                                        )
+                                    },
+                                    scaffoldState = scaffoldState
+                                )
+                                titleResourceIdState = Route.MainRoutes.ScanForDevices.screenName
+                            }
+
+                            connectThermometerGraph(navController, scaffoldState)
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun NavGraphBuilder.connectThermometerGraph(
+        navController: NavController,
+        scaffoldState: ScaffoldState
+    ) {
+        navigation(
+            route = Route.ConnectDeviceRoutes.ConnectDeviceGraph.fullRoute,
+            startDestination = Route.ConnectDeviceRoutes.Connecting.fullRoute,
+            arguments = listOf(
+                navArgument(Route.ConnectDeviceRoutes.PARAM_ADDRESS) {
+                    type = NavType.StringType
+                }
+            )
+
+        ) {
+            composable(
+                route = Route.ConnectDeviceRoutes.Connecting.fullRoute
+            ) {
+                val parentEntry = remember(it) {
+                    navController.getBackStackEntry(
+                        Route.ConnectDeviceRoutes.ConnectDeviceGraph.fullRoute
+                    )
+                }
+                val connectThermometerViewModel: ConnectThermometerViewModel =
+                    hiltViewModel(parentEntry)
+                ThermometerConnectingScreen(
+                    connectThermometerViewModel,
+                    onError = {
+                        navController.popBackStack()
+                    },
+                    onDeviceConnected = {
+                        navController.navigate(
+                            Route.ConnectDeviceRoutes.SetName.fullRoute
+                        ) {
+                            // Removes ConnectThermometerScreen backstack
+                            popUpTo(Route.ConnectDeviceRoutes.Connecting.fullRoute) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+            }
+            composable(Route.ConnectDeviceRoutes.SetName.fullRoute) {
+                val parentEntry = remember(it) {
+                    navController.getBackStackEntry(
+                        Route.ConnectDeviceRoutes.ConnectDeviceGraph.fullRoute
+                    )
+                }
+                val connectThermometerViewModel: ConnectThermometerViewModel =
+                    hiltViewModel(parentEntry)
+                ConnectThermometerNameScreen(
+                    viewModel = connectThermometerViewModel,
+                    onThermometerSaved = {
+                        navController.popBackStack(
+                            Route.MainRoutes.Main.fullRoute,
+                            false
+                        )
+                    }
+                )
             }
         }
     }

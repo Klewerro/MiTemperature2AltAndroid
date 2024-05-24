@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.presentation.addHeater.components
+package com.klewerro.mitemperature2alt.presentation.addThermometer.search.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

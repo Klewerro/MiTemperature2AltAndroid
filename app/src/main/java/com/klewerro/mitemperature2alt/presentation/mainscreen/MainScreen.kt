@@ -6,19 +6,37 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
+import com.klewerro.mitemperature2alt.presentation.mainscreen.components.MainScreenThermometerBox
 import com.klewerro.mitemperature2alt.presentation.mainscreen.components.NoConnectedThermometersInformation
-import com.klewerro.mitemperature2alt.presentation.mainscreen.components.ThermometerBox
+import com.klewerro.mitemperature2alt.presentation.mainscreen.components.SavedThermometerBox
 import com.klewerro.mitemperature2alt.ui.LocalSpacing
 
 @Composable
-fun MainScreen(viewModel: BleOperationsViewModel, modifier: Modifier = Modifier) {
+fun MainScreen(
+    state: BleOperationsState,
+    onEvent: (BleOperationsEvent) -> Unit,
+    scaffoldState: ScaffoldState,
+    modifier: Modifier = Modifier
+) {
     val spacing = LocalSpacing.current
-    val connectedDevices by viewModel.connectedDevices.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = state.error) {
+        state.error?.let { errorUiText ->
+            scaffoldState.snackbarHostState
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = errorUiText.asString(context)
+            )
+            onEvent(BleOperationsEvent.ErrorDismissed)
+        }
+    }
 
     Column(
         modifier = modifier
@@ -26,21 +44,36 @@ fun MainScreen(viewModel: BleOperationsViewModel, modifier: Modifier = Modifier)
             .padding(horizontal = spacing.spaceExtraLarge),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (connectedDevices.isEmpty()) {
+        if (state.connectedDevices.isEmpty() && state.savedThermometers.isEmpty()) {
             NoConnectedThermometersInformation()
         } else {
             LazyColumn(
                 modifier
                     .fillMaxWidth()
             ) {
-                items(connectedDevices) { thermometerDevice ->
-                    ThermometerBox(
+                items(state.savedThermometers) { savedThermometer ->
+                    SavedThermometerBox(
+                        savedThermometer = savedThermometer,
+                        modifier = Modifier
+                            .padding(vertical = spacing.spaceNormal)
+                            .alpha(.5f)
+                    )
+                }
+
+                items(state.connectedDevices) { thermometerDevice ->
+                    MainScreenThermometerBox(
                         thermometerDevice = thermometerDevice,
                         onRefreshClick = {
-                            viewModel.getStatusForDevice(thermometerDevice.address)
+                            onEvent(
+                                BleOperationsEvent.GetStatusForDevice(thermometerDevice.address)
+                            )
                         },
                         onSubscribeClick = {
-                            viewModel.subscribeForDeviceStatusUpdates(thermometerDevice.address)
+                            onEvent(
+                                BleOperationsEvent.SubscribeForDeviceStatusUpdates(
+                                    thermometerDevice.address
+                                )
+                            )
                         },
                         modifier = Modifier.padding(vertical = spacing.spaceNormal)
                     )

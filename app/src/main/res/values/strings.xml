@@ -12,4 +12,23 @@
     <string name="connected">Connected</string>
     <string name="no_connected_thermometers">No connected thermometers</string>
     <string name="no_connected_thermometers_rationale">Please click \'+\' icon on the status-bar right corner to search for devices.</string>
+    <string name="unexpected_error_occurred_try_again">Unexpected error occurred, please try again.</string>
+    <string name="unexpected_error_during_connecting_to_device">Unexpected error occurred during connecting to the device. Please restart application and try again.</string>
+    <string name="name">Name</string>
+    <string name="save">Save</string>
+    <string name="saved">Saved</string>
+    <string name="thermometer_name_must_not_be_empty">Thermometer name must not be empty!</string>
+    <string name="content_description_error_indicator">Error indicator</string>
+    <string name="title_mi_temperature_2_alt">Mi Temperature 2 Alt</string>
+    <string name="connect">Connect</string>
+    <string name="connecting_to_thermometer">Connecting to thermometer</string>
+    <string name="connecting_to_ADDRESS_thermometer">Connecting to %1$s thermometer</string>
+    <string name="connected_to_ADDRESS_thermometer">Connected to %1$s thermometer</string>
+    <string name="set_thermometer_name">Set thermometer name</string>
+    <string name="thermometer_is_already_saved">Thermometer is already saved</string>
+    <string name="thermometer_name">Thermometer name</string>
+    <string name="add_new_thermometer">Add new thermometer</string>
+    <string name="humidity_sensor">Humidity sensor</string>
+    <string name="thermometer_connected">Thermometer connected</string>
+    <string name="connecting_thermometer_error">Connecting thermometer error</string>
 </resources>

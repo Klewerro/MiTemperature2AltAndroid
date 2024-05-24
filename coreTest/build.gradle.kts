@@ -39,6 +39,7 @@ dependencies {
 
     implementation(libs.androidx.core)
     implementation(libs.androidx.appcompat)
+    api(libs.timber)
 
     // Test
     implementation(libs.junit)

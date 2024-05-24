@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.domain.usecase.thermometer.connect
+package com.klewerro.mitemperature2alt.domain.usecase.thermometer
 
 import com.klewerro.mitemperature2alt.domain.model.ThermometerDevice
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
