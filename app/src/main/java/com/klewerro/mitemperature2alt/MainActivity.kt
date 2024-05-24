@@ -29,16 +29,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.klewerro.mitemperature2alt.presentation.addThermometer.ConnectThermometerViewModel
-import com.klewerro.mitemperature2alt.presentation.addThermometer.connecting.ThermometerConnectingScreen
-import com.klewerro.mitemperature2alt.presentation.addThermometer.name.ConnectThermometerNameScreen
-import com.klewerro.mitemperature2alt.presentation.addThermometer.search.DeviceSearchViewModel
-import com.klewerro.mitemperature2alt.presentation.addThermometer.search.SearchThermometersScreen
+import com.klewerro.mitemperature2alt.addThermometerPresentation.ConnectThermometerViewModel
+import com.klewerro.mitemperature2alt.addThermometerPresentation.ThermometerConnectingScreen
+import com.klewerro.mitemperature2alt.addThermometerPresentation.name.ConnectThermometerNameScreen
+import com.klewerro.mitemperature2alt.addThermometerPresentation.search.SearchThermometersScreen
+import com.klewerro.mitemperature2alt.coreUi.UiConstants
+import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
 import com.klewerro.mitemperature2alt.presentation.navigation.Route
-import com.klewerro.mitemperature2alt.ui.theme.MiTemperature2AltTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -90,25 +90,14 @@ class MainActivity : ComponentActivity() {
                                 titleResourceIdState = Route.MainRoutes.Main.screenName
                             }
                             composable(Route.MainRoutes.ScanForDevices.fullRoute) {
-                                val deviceSearchViewModel = hiltViewModel<DeviceSearchViewModel>()
-                                val deviceSearchState by deviceSearchViewModel.state
-                                    .collectAsStateWithLifecycle()
                                 SearchThermometersScreen(
-                                    bleOperationsState = bleOperationsSate,
-                                    onBleOperationsEvent = { bleOperationsEvent ->
-                                        bleOperationsViewModel.onEvent(bleOperationsEvent)
-                                    },
-                                    deviceSearchState = deviceSearchState,
-                                    onDeviceSearchEvent = { deviceSearchEvent ->
-                                        deviceSearchViewModel.onEvent(deviceSearchEvent)
-                                    },
-                                    onDeviceListItemClick = {
+                                    scaffoldState,
+                                    onDeviceListItemClick = { clickedDeviceAddress ->
                                         Route.ConnectDeviceRoutes.ConnectDeviceGraph.navigate(
                                             navController,
-                                            it.address
+                                            clickedDeviceAddress
                                         )
-                                    },
-                                    scaffoldState = scaffoldState
+                                    }
                                 )
                                 titleResourceIdState = Route.MainRoutes.ScanForDevices.screenName
                             }
@@ -129,7 +118,7 @@ class MainActivity : ComponentActivity() {
             route = Route.ConnectDeviceRoutes.ConnectDeviceGraph.fullRoute,
             startDestination = Route.ConnectDeviceRoutes.Connecting.fullRoute,
             arguments = listOf(
-                navArgument(Route.ConnectDeviceRoutes.PARAM_ADDRESS) {
+                navArgument(UiConstants.NAV_PARAM_ADDRESS) {
                     type = NavType.StringType
                 }
             )

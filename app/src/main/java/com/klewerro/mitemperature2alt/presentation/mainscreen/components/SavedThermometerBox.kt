@@ -23,8 +23,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
 import com.klewerro.mitemperature2alt.domain.model.SavedThermometer
-import com.klewerro.mitemperature2alt.ui.LocalSpacing
 
 @Composable
 fun SavedThermometerBox(savedThermometer: SavedThermometer, modifier: Modifier = Modifier) {
