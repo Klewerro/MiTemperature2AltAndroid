@@ -14,7 +14,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
 import com.klewerro.mitemperature2alt.coreUi.R
-import com.klewerro.mitemperature2alt.coreUi.components.ThermometerBox
+import com.klewerro.mitemperature2alt.coreUi.components.ThermometerTemperatureBox
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
 
 @Composable
@@ -31,7 +31,7 @@ fun EnterNameThermometerBox(
     val spacing = LocalSpacing.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    ThermometerBox(
+    ThermometerTemperatureBox(
         temperature = temperature,
         humidity = humidity,
         voltage = voltage,
