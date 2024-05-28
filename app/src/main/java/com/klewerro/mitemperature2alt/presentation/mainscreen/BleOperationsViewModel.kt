@@ -4,10 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.coreUi.util.UiText
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ConnectedDevicesUseCase
+import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ThermometerListUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.SubscribeToCurrentThermometerStatusUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.persistence.SavedThermometersUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,8 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BleOperationsViewModel @Inject constructor(
-    connectedDevicesUseCase: ConnectedDevicesUseCase,
-    savedThermometersUseCase: SavedThermometersUseCase,
+    thermometerListUseCase: ThermometerListUseCase,
     private val readCurrentThermometerStatusUseCase: ReadCurrentThermometerStatusUseCase,
     private val subscribeToCurrentThermometerStatusUseCase:
         SubscribeToCurrentThermometerStatusUseCase,
@@ -31,12 +29,10 @@ class BleOperationsViewModel @Inject constructor(
     private val _state = MutableStateFlow(BleOperationsState())
     val state = combine(
         _state,
-        connectedDevicesUseCase(),
-        savedThermometersUseCase()
-    ) { stateValue, connectedDevices, savedThermometers ->
+        thermometerListUseCase()
+    ) { stateValue, thermometers ->
         stateValue.copy(
-            connectedDevices = connectedDevices,
-            savedThermometers = savedThermometers
+            thermometers = thermometers
         )
     }
         .stateIn(viewModelScope, SharingStarted.Eagerly, BleOperationsState())
@@ -50,6 +46,11 @@ class BleOperationsViewModel @Inject constructor(
                 it.copy(
                     error = UiText.StringResource(R.string.thermometer_is_already_saved)
                 )
+            }
+            is BleOperationsEvent.ConnectToDevice -> {
+                viewModelScope.launch(dispatchers.io) {
+                    // Todo: Implement connect/reconnect option
+                }
             }
             BleOperationsEvent.ErrorDismissed -> {
                 _state.update {

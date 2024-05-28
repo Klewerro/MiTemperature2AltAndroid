@@ -11,12 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
 import com.klewerro.mitemperature2alt.presentation.mainscreen.components.MainScreenThermometerBox
 import com.klewerro.mitemperature2alt.presentation.mainscreen.components.NoConnectedThermometersInformation
-import com.klewerro.mitemperature2alt.presentation.mainscreen.components.SavedThermometerBox
 
 @Composable
 fun MainScreen(
@@ -44,35 +42,31 @@ fun MainScreen(
             .padding(horizontal = spacing.spaceExtraLarge),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (state.connectedDevices.isEmpty() && state.savedThermometers.isEmpty()) {
+        if (state.thermometers.isEmpty()) {
             NoConnectedThermometersInformation()
         } else {
             LazyColumn(
                 modifier
                     .fillMaxWidth()
             ) {
-                items(state.savedThermometers) { savedThermometer ->
-                    SavedThermometerBox(
-                        savedThermometer = savedThermometer,
-                        modifier = Modifier
-                            .padding(vertical = spacing.spaceNormal)
-                            .alpha(.5f)
-                    )
-                }
-
-                items(state.connectedDevices) { thermometerDevice ->
+                items(state.thermometers) { thermometer ->
                     MainScreenThermometerBox(
-                        thermometerDevice = thermometerDevice,
+                        thermometer = thermometer,
                         onRefreshClick = {
                             onEvent(
-                                BleOperationsEvent.GetStatusForDevice(thermometerDevice.address)
+                                BleOperationsEvent.GetStatusForDevice(thermometer.address)
                             )
                         },
                         onSubscribeClick = {
                             onEvent(
                                 BleOperationsEvent.SubscribeForDeviceStatusUpdates(
-                                    thermometerDevice.address
+                                    thermometer.address
                                 )
+                            )
+                        },
+                        onConnectClick = { deviceAddress ->
+                            onEvent(
+                                BleOperationsEvent.ConnectToDevice(deviceAddress)
                             )
                         },
                         modifier = Modifier.padding(vertical = spacing.spaceNormal)

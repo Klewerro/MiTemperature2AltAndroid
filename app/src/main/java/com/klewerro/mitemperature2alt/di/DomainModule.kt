@@ -2,10 +2,9 @@ package com.klewerro.mitemperature2alt.di
 
 import com.klewerro.mitemperature2alt.domain.repository.PersistenceRepository
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ConnectedDevicesUseCase
+import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ThermometerListUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.SubscribeToCurrentThermometerStatusUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.persistence.SavedThermometersUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import com.klewerro.mitemperature2alt.domain.util.StandardDispatchers
 import dagger.Module
@@ -22,11 +21,6 @@ object DomainModule {
 
     @Provides
     @ViewModelScoped
-    fun provideConnectedDevicesUseCase(thermometerRepository: ThermometerRepository) =
-        ConnectedDevicesUseCase(thermometerRepository)
-
-    @Provides
-    @ViewModelScoped
     fun provideReadCurrentThermometerStatusUseCase(thermometerRepository: ThermometerRepository) =
         ReadCurrentThermometerStatusUseCase(thermometerRepository)
 
@@ -38,8 +32,10 @@ object DomainModule {
 
     @Provides
     @ViewModelScoped
-    fun provideSavedThermometersUseCase(persistenceRepository: PersistenceRepository) =
-        SavedThermometersUseCase(persistenceRepository)
+    fun provideThermometerListUseCase(
+        persistenceRepository: PersistenceRepository,
+        thermometerRepository: ThermometerRepository
+    ) = ThermometerListUseCase(persistenceRepository, thermometerRepository)
 }
 
 @Module
