@@ -7,11 +7,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import no.nordicsemi.android.kotlin.ble.client.main.callback.ClientBleGatt
 import no.nordicsemi.android.kotlin.ble.client.main.service.ClientBleGattCharacteristic
+import no.nordicsemi.android.kotlin.ble.core.data.GattConnectionState
 
 @SuppressLint("MissingPermission")
 class ThermometerDeviceBleClient(private val connection: ClientBleGatt) {
 
     private var temperatureHumidityCharacteristic: ClientBleGattCharacteristic? = null
+
+    val connectionState: Flow<GattConnectionState> = connection.connectionState
 
     suspend fun discoverDeviceOperations() {
         val services = connection.discoverServices()

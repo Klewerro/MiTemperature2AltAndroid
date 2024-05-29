@@ -1,5 +1,6 @@
 package com.klewerro.mitemperature2alt.temperatureSensor
 
+import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
 import com.klewerro.mitemperature2alt.temperatureSensor.contracts.ThermometerDevicesBleScanner
@@ -9,9 +10,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import no.nordicsemi.android.kotlin.ble.core.data.GattConnectionState
+import timber.log.Timber
 
 class NordicBleThermometerRepository(
     private val scanner: ThermometerDevicesBleScanner
@@ -30,28 +35,79 @@ class NordicBleThermometerRepository(
     )
     override val connectedDevicesStatuses = _connectedDevicesStatuses.asStateFlow()
 
+    private var _thermometerConnectionStatuses =
+        MutableStateFlow<Map<String, ThermometerConnectionStatus>>(emptyMap())
+    override val thermometerConnectionStatuses = _thermometerConnectionStatuses.asStateFlow()
+
     private var _rssiStrengths = MutableStateFlow<Map<String, Int>>(emptyMap())
     override val rssiStrengths = _rssiStrengths.asStateFlow()
 
     override suspend fun connectToDevice(coroutineScope: CoroutineScope, address: String) {
+        _thermometerConnectionStatuses.updateUsingMutableMap(
+            address,
+            ThermometerConnectionStatus.CONNECTING
+        )
         val connectedDeviceClient = scanner.connectToDevice(coroutineScope, address)
         connectedDeviceClient.readThermometerStatus()?.let { thermometerStatus ->
             _connectedDevicesStatuses.update {
-                it.plus(
-                    Pair(
-                        address,
-                        thermometerStatus
-                    )
-                )
+                it.plus(address to thermometerStatus)
             }
         }
 
-        connectedDevicesClients = connectedDevicesClients.plus(
-            Pair(
-                address,
-                connectedDeviceClient
-            )
+        connectedDevicesClients = connectedDevicesClients.plus(address to connectedDeviceClient)
+        observeConnectionStatus(address, connectedDeviceClient, coroutineScope)
+    }
+
+    override suspend fun scanAndConnect(coroutineScope: CoroutineScope, address: String) {
+        _thermometerConnectionStatuses.updateUsingMutableMap(
+            address,
+            ThermometerConnectionStatus.CONNECTING
         )
+        try {
+            val deviceClient = scanner.scanAndConnect(coroutineScope, address) // .also{}
+            deviceClient.readThermometerStatus()?.let { thermometerStatus ->
+                _connectedDevicesStatuses.update {
+                    it.plus(address to thermometerStatus)
+                }
+            }
+            connectedDevicesClients = connectedDevicesClients.plus(address to deviceClient)
+            observeConnectionStatus(address, deviceClient, coroutineScope)
+        } catch (illegalStateException: IllegalStateException) {
+            Timber.e(illegalStateException)
+            _thermometerConnectionStatuses.updateUsingMutableMap(
+                address,
+                ThermometerConnectionStatus.DISCONNECTED
+            )
+            throw illegalStateException
+        }
+    }
+
+    private fun observeConnectionStatus(
+        address: String,
+        thermometerClient: ThermometerDeviceBleClient,
+        coroutineScope: CoroutineScope
+    ) {
+        thermometerClient
+            .connectionState
+            .onEach { gattConnectionState ->
+                Timber.d("ConnectionState: ${gattConnectionState.name}")
+                val mappedConnectionStatus = when (gattConnectionState) {
+                    GattConnectionState.STATE_CONNECTING ->
+                        ThermometerConnectionStatus.CONNECTING
+                    GattConnectionState.STATE_CONNECTED ->
+                        ThermometerConnectionStatus.CONNECTED
+                    GattConnectionState.STATE_DISCONNECTING ->
+                        ThermometerConnectionStatus.DISCONNECTING
+                    GattConnectionState.STATE_DISCONNECTED -> {
+                        connectedDevicesClients = connectedDevicesClients.minus(address)
+                        ThermometerConnectionStatus.DISCONNECTED
+                    }
+                }
+                _thermometerConnectionStatuses.updateUsingMutableMap(
+                    address,
+                    mappedConnectionStatus
+                )
+            }.launchIn(coroutineScope)
     }
 
     override suspend fun readCurrentThermometerStatus(deviceAddress: String): ThermometerStatus? {
@@ -59,12 +115,7 @@ class NordicBleThermometerRepository(
             val readStatus = deviceClient.readThermometerStatus()
             readStatus?.let { readStatusValue ->
                 _connectedDevicesStatuses.update {
-                    it.plus(
-                        Pair(
-                            deviceAddress,
-                            readStatusValue
-                        )
-                    )
+                    it.plus(deviceAddress to readStatusValue)
                 }
             }
             return readStatus
@@ -81,13 +132,33 @@ class NordicBleThermometerRepository(
             coroutineScope.launch(Dispatchers.IO) {
                 deviceClient.subscribeToThermometerStatus()?.collect { statusUpdate ->
                     _connectedDevicesStatuses.update {
-                        it.plus(
-                            Pair(
-                                deviceAddress,
-                                statusUpdate
-                            )
-                        )
+                        it.plus(deviceAddress to statusUpdate)
                     }
+                }
+            }
+        }
+    }
+
+    override suspend fun subscribeToConnectionStatus(
+        deviceAddress: String,
+        coroutineScope: CoroutineScope
+    ) {
+        connectedDevicesClients[deviceAddress]?.let { deviceClient ->
+            coroutineScope.launch(Dispatchers.IO) {
+                deviceClient.connectionState.collect { gattConnectionState ->
+                    _thermometerConnectionStatuses.updateUsingMutableMap(
+                        deviceAddress,
+                        when (gattConnectionState) {
+                            GattConnectionState.STATE_DISCONNECTED ->
+                                ThermometerConnectionStatus.DISCONNECTED
+                            GattConnectionState.STATE_CONNECTING ->
+                                ThermometerConnectionStatus.CONNECTING
+                            GattConnectionState.STATE_CONNECTED ->
+                                ThermometerConnectionStatus.CONNECTED
+                            GattConnectionState.STATE_DISCONNECTING ->
+                                ThermometerConnectionStatus.DISCONNECTING
+                        }
+                    )
                 }
             }
         }
@@ -99,16 +170,19 @@ class NordicBleThermometerRepository(
                 while (this.isActive) {
                     val rssi = deviceClient.readRssi()
                     _rssiStrengths.update {
-                        it.plus(
-                            Pair(
-                                deviceAddress,
-                                rssi
-                            )
-                        )
+                        it.plus(deviceAddress to rssi)
                     }
                     delay(BleConstants.READ_RSSI_DELAY)
                 }
             }
+        }
+    }
+
+    private fun <V, K> MutableStateFlow<Map<V, K>>.updateUsingMutableMap(key: V, value: K) {
+        this.update {
+            it.toMutableMap().apply {
+                this[key] = value
+            }.toMap()
         }
     }
 }

@@ -15,4 +15,8 @@ interface ThermometerDevicesBleScanner {
         coroutineScope: CoroutineScope,
         bleDeviceAddress: String
     ): ThermometerDeviceBleClient
+    suspend fun scanAndConnect(
+        coroutineScope: CoroutineScope,
+        address: String
+    ): ThermometerDeviceBleClient
 }
