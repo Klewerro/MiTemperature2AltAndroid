@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
@@ -60,6 +61,27 @@ class NordicThermometerDevicesBleScanner(
                 _isScanning.update { false }
             }
             .launchIn(coroutineScope)
+    }
+
+    override suspend fun scanAndConnect(
+        coroutineScope: CoroutineScope,
+        address: String
+    ): ThermometerDeviceBleClient {
+        _isScanning.update { true }
+        val bleDevice = BleScanner(context)
+            .scan()
+            .filter { it.device.name == BleConstants.DEVICE_NAME && it.device.address == address }
+            .onCompletion {
+                _isScanning.update { false }
+            }
+            .first()
+            .device
+
+        val gattConnection = ClientBleGatt.connect(context, bleDevice, coroutineScope)
+        val client = ThermometerDeviceBleClient(gattConnection).apply {
+            discoverDeviceOperations()
+        }
+        return client
     }
 
     override suspend fun connectToDevice(

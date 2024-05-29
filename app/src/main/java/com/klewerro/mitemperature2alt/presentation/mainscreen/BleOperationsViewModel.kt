@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.coreUi.util.UiText
+import com.klewerro.mitemperature2alt.domain.usecase.ScanAndConnectToDeviceUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ThermometerListUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.SubscribeToCurrentThermometerStatusUseCase
@@ -23,6 +24,7 @@ class BleOperationsViewModel @Inject constructor(
     private val readCurrentThermometerStatusUseCase: ReadCurrentThermometerStatusUseCase,
     private val subscribeToCurrentThermometerStatusUseCase:
         SubscribeToCurrentThermometerStatusUseCase,
+    private val scanAndConnectToDeviceUseCase: ScanAndConnectToDeviceUseCase,
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
@@ -49,7 +51,17 @@ class BleOperationsViewModel @Inject constructor(
             }
             is BleOperationsEvent.ConnectToDevice -> {
                 viewModelScope.launch(dispatchers.io) {
-                    // Todo: Implement connect/reconnect option
+                    try {
+                        scanAndConnectToDeviceUseCase(this, event.address) // Todo: Test
+                    } catch (illegalStateException: IllegalStateException) {
+                        _state.update {
+                            it.copy(
+                                error = UiText.StringResource(
+                                    R.string.unexpected_error_during_connecting_to_device
+                                )
+                            )
+                        }
+                    }
                 }
             }
             BleOperationsEvent.ErrorDismissed -> {
