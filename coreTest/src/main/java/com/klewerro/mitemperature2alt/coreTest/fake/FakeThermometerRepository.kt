@@ -1,9 +1,11 @@
 package com.klewerro.mitemperature2alt.coreTest.fake
 
 import com.klewerro.mitemperature2alt.coreTest.generators.ThermometerScanResultsGenerator
+import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
+import kotlin.random.Random
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -12,7 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 class FakeThermometerRepository : ThermometerRepository {
 
@@ -37,6 +38,11 @@ class FakeThermometerRepository : ThermometerRepository {
 
     val rssiStrengthsInternal = MutableStateFlow<Map<String, Int>>(emptyMap())
     override val rssiStrengths: StateFlow<Map<String, Int>> = rssiStrengthsInternal
+
+    val thermometerConnectionStatusesInternal =
+        MutableStateFlow<Map<String, ThermometerConnectionStatus>>(emptyMap())
+    override val thermometerConnectionStatuses: StateFlow<Map<String, ThermometerConnectionStatus>> =
+        thermometerConnectionStatusesInternal
 
     override fun scanForDevices(coroutineScope: CoroutineScope): Job {
         return coroutineScope.launch {
@@ -64,6 +70,13 @@ class FakeThermometerRepository : ThermometerRepository {
         }
     }
 
+    override suspend fun scanAndConnect(coroutineScope: CoroutineScope, address: String) {
+        delay(operationDelay)
+        if (isConnectToDeviceThrowingError) {
+            throw IllegalStateException("STUB exception!")
+        }
+    }
+
     override suspend fun readCurrentThermometerStatus(deviceAddress: String): ThermometerStatus {
         return thermometerStatus
     }
@@ -76,12 +89,7 @@ class FakeThermometerRepository : ThermometerRepository {
             if (isActive) {
                 connectedDevicesStatusesInternal.update {
                     it.toMutableMap().apply {
-                        this.plus(
-                            Pair(
-                                deviceAddress,
-                                thermometerStatus
-                            )
-                        )
+                        this.plus(deviceAddress to thermometerStatus)
                     }
                 }
                 delay(operationDelay)
@@ -94,16 +102,18 @@ class FakeThermometerRepository : ThermometerRepository {
             if (isActive) {
                 rssiStrengthsInternal.update {
                     it.toMutableMap().apply {
-                        this.plus(
-                            Pair(
-                                deviceAddress,
-                                Random.nextInt(-99, -1)
-                            )
-                        )
+                        this.plus(deviceAddress to Random.nextInt(-99, -1))
                     }
                 }
                 delay(operationDelay)
             }
         }
+    }
+
+    override suspend fun subscribeToConnectionStatus(
+        deviceAddress: String,
+        coroutineScope: CoroutineScope
+    ) {
+        TODO("Not yet implemented")
     }
 }

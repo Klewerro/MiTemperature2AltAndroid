@@ -12,10 +12,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import no.nordicsemi.android.kotlin.ble.core.data.GattConnectionState
 
 class FakeThermometerDevicesBleScanner : ThermometerDevicesBleScanner {
+    var clientConnectionStateInternal = flowOf(GattConnectionState.STATE_CONNECTED)
     var isScanningInternal = MutableStateFlow(false)
     override val isScanning: StateFlow<Boolean> = isScanningInternal
 
@@ -56,7 +59,17 @@ class FakeThermometerDevicesBleScanner : ThermometerDevicesBleScanner {
         coEvery {
             thermometerDeviceBleClientMock.readThermometerStatus()
         } returns ThermometerStatusGenerator.thermometerStatus1
+        coEvery {
+            thermometerDeviceBleClientMock.connectionState
+        } returns clientConnectionStateInternal
         return thermometerDeviceBleClientMock
+    }
+
+    override suspend fun scanAndConnect(
+        coroutineScope: CoroutineScope,
+        address: String
+    ): ThermometerDeviceBleClient {
+        TODO("Not yet implemented")
     }
 
     private fun updateScanResults(scanResult: ThermometerScanResult) {
