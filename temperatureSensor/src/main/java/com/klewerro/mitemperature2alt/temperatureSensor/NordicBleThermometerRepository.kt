@@ -82,34 +82,6 @@ class NordicBleThermometerRepository(
         }
     }
 
-    private fun observeConnectionStatus(
-        address: String,
-        thermometerClient: ThermometerDeviceBleClient,
-        coroutineScope: CoroutineScope
-    ) {
-        thermometerClient
-            .connectionState
-            .onEach { gattConnectionState ->
-                Timber.d("ConnectionState: ${gattConnectionState.name}")
-                val mappedConnectionStatus = when (gattConnectionState) {
-                    GattConnectionState.STATE_CONNECTING ->
-                        ThermometerConnectionStatus.CONNECTING
-                    GattConnectionState.STATE_CONNECTED ->
-                        ThermometerConnectionStatus.CONNECTED
-                    GattConnectionState.STATE_DISCONNECTING ->
-                        ThermometerConnectionStatus.DISCONNECTING
-                    GattConnectionState.STATE_DISCONNECTED -> {
-                        connectedDevicesClients = connectedDevicesClients.minus(address)
-                        ThermometerConnectionStatus.DISCONNECTED
-                    }
-                }
-                _thermometerConnectionStatuses.updateUsingMutableMap(
-                    address,
-                    mappedConnectionStatus
-                )
-            }.launchIn(coroutineScope)
-    }
-
     override suspend fun readCurrentThermometerStatus(deviceAddress: String): ThermometerStatus? {
         connectedDevicesClients[deviceAddress]?.let { deviceClient ->
             val readStatus = deviceClient.readThermometerStatus()
@@ -176,6 +148,34 @@ class NordicBleThermometerRepository(
                 }
             }
         }
+    }
+
+    private fun observeConnectionStatus(
+        address: String,
+        thermometerClient: ThermometerDeviceBleClient,
+        coroutineScope: CoroutineScope
+    ) {
+        thermometerClient
+            .connectionState
+            .onEach { gattConnectionState ->
+                Timber.d("ConnectionState: ${gattConnectionState.name}")
+                val mappedConnectionStatus = when (gattConnectionState) {
+                    GattConnectionState.STATE_CONNECTING ->
+                        ThermometerConnectionStatus.CONNECTING
+                    GattConnectionState.STATE_CONNECTED ->
+                        ThermometerConnectionStatus.CONNECTED
+                    GattConnectionState.STATE_DISCONNECTING ->
+                        ThermometerConnectionStatus.DISCONNECTING
+                    GattConnectionState.STATE_DISCONNECTED -> {
+                        connectedDevicesClients = connectedDevicesClients.minus(address)
+                        ThermometerConnectionStatus.DISCONNECTED
+                    }
+                }
+                _thermometerConnectionStatuses.updateUsingMutableMap(
+                    address,
+                    mappedConnectionStatus
+                )
+            }.launchIn(coroutineScope)
     }
 
     private fun <V, K> MutableStateFlow<Map<V, K>>.updateUsingMutableMap(key: V, value: K) {

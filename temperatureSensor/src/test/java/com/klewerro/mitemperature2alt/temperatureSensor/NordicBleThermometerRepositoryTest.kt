@@ -7,11 +7,15 @@ import assertk.assertions.isFalse
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isTrue
 import com.klewerro.mitemperature2alt.coreTest.fake.FakeThermometerDevicesBleScanner
+import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import no.nordicsemi.android.kotlin.ble.core.data.GattConnectionState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class NordicBleThermometerRepositoryTest {
 
@@ -133,6 +137,98 @@ class NordicBleThermometerRepositoryTest {
                     mac1 to fakeThermometerDevicesBleScanner.readThermometerStatus
                 )
                 assertThat(statusItem).isEqualTo(expectedResult)
+            }
+        }
+    }
+
+    @Test
+    fun `scanAndConnect after connection when readThermometerStatus is success, status is added to stateFlow map under address key`() {
+        runTest {
+            nordicBleThermometerRepository.connectedDevicesStatuses.test {
+                awaitItem() // Initial emission
+                nordicBleThermometerRepository.scanAndConnect(this, mac1)
+                val statusItem = awaitItem()
+
+                val expectedResult = mapOf(
+                    mac1 to fakeThermometerDevicesBleScanner.readThermometerStatus
+                )
+                assertThat(statusItem).isEqualTo(expectedResult)
+            }
+        }
+    }
+
+    @Test
+    fun `scanAndConnect in case of error emits error connection status`() {
+        fakeThermometerDevicesBleScanner.isScanError = true
+        runTest {
+            nordicBleThermometerRepository.thermometerConnectionStatuses.test {
+                awaitItem() // Initial emission
+                assertThrows<IllegalStateException> {
+                    nordicBleThermometerRepository.scanAndConnect(this, mac1)
+                }
+                val connectingItem = awaitItem()
+                val disconnectedItem = awaitItem()
+
+                val expectedConnectingItem = mapOf(
+                    mac1 to ThermometerConnectionStatus.CONNECTING
+                )
+                val expectedDisconnectedItem = mapOf(
+                    mac1 to ThermometerConnectionStatus.DISCONNECTED
+                )
+                assertThat(connectingItem).isEqualTo(expectedConnectingItem)
+                assertThat(disconnectedItem).isEqualTo(expectedDisconnectedItem)
+            }
+        }
+    }
+
+    @Test
+    fun ` in case of connection emits connecting and connected status`() {
+        runTest {
+            nordicBleThermometerRepository.thermometerConnectionStatuses.test {
+                awaitItem() // Initial emission
+                nordicBleThermometerRepository.scanAndConnect(this, mac1)
+                val connectingItem = awaitItem()
+                val connectedItem = awaitItem()
+
+                val expectedConnectingItem = mapOf(
+                    mac1 to ThermometerConnectionStatus.CONNECTING
+                )
+                val expectedConnectedItem = mapOf(
+                    mac1 to ThermometerConnectionStatus.CONNECTED
+                )
+                assertThat(connectingItem).isEqualTo(expectedConnectingItem)
+                assertThat(connectedItem).isEqualTo(expectedConnectedItem)
+            }
+        }
+    }
+
+    @Test
+    fun `scanAndConnect in case of connection and then disconnection emits connecting, connected and disconnected status`() {
+        fakeThermometerDevicesBleScanner.clientConnectionStateInternal = flow<GattConnectionState> {
+            emit(GattConnectionState.STATE_CONNECTED)
+            delay(500)
+            emit(GattConnectionState.STATE_DISCONNECTED)
+        }
+        runTest {
+            nordicBleThermometerRepository.thermometerConnectionStatuses.test {
+                awaitItem() // Initial emission
+                nordicBleThermometerRepository.scanAndConnect(this, mac1)
+                val connectingItem = awaitItem()
+                val connectedItem = awaitItem()
+                val disconnectedItem = awaitItem()
+
+                val expectedConnectingItem = mapOf(
+                    mac1 to ThermometerConnectionStatus.CONNECTING
+                )
+                val expectedConnectedItem = mapOf(
+                    mac1 to ThermometerConnectionStatus.CONNECTED
+                )
+                val expectedDisconnectedItem = mapOf(
+                    mac1 to ThermometerConnectionStatus.DISCONNECTED
+                )
+                assertThat(connectingItem).isEqualTo(expectedConnectingItem)
+                assertThat(connectedItem).isEqualTo(expectedConnectedItem)
+                assertThat(disconnectedItem).isEqualTo(expectedDisconnectedItem)
             }
         }
     }

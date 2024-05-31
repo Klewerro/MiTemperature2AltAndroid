@@ -27,6 +27,7 @@ class FakeThermometerDevicesBleScanner : ThermometerDevicesBleScanner {
 
     var isScanCancelledFlag = false
     var scanResultDelay = 1_000L
+    var isScanError = false
     var readThermometerStatus = ThermometerStatusGenerator.thermometerStatus1
     var mac1 = ThermometerScanResultsGenerator.mac1
     var mac2 = ThermometerScanResultsGenerator.mac2
@@ -55,21 +56,19 @@ class FakeThermometerDevicesBleScanner : ThermometerDevicesBleScanner {
         bleDeviceAddress: String
     ): ThermometerDeviceBleClient {
         delay(scanResultDelay)
-        val thermometerDeviceBleClientMock = mockk<ThermometerDeviceBleClient>()
-        coEvery {
-            thermometerDeviceBleClientMock.readThermometerStatus()
-        } returns ThermometerStatusGenerator.thermometerStatus1
-        coEvery {
-            thermometerDeviceBleClientMock.connectionState
-        } returns clientConnectionStateInternal
-        return thermometerDeviceBleClientMock
+        return createThermometerBleDeviceMock()
     }
 
     override suspend fun scanAndConnect(
         coroutineScope: CoroutineScope,
         address: String
     ): ThermometerDeviceBleClient {
-        TODO("Not yet implemented")
+        delay(scanResultDelay)
+        return if (isScanError) {
+            throw IllegalStateException("STUB!")
+        } else {
+            createThermometerBleDeviceMock()
+        }
     }
 
     private fun updateScanResults(scanResult: ThermometerScanResult) {
@@ -87,5 +86,16 @@ class FakeThermometerDevicesBleScanner : ThermometerDevicesBleScanner {
                 }
             }.toList()
         }
+    }
+
+    private fun createThermometerBleDeviceMock(): ThermometerDeviceBleClient {
+        val thermometerDeviceBleClientMock = mockk<ThermometerDeviceBleClient>()
+        coEvery {
+            thermometerDeviceBleClientMock.readThermometerStatus()
+        } returns ThermometerStatusGenerator.thermometerStatus1
+        coEvery {
+            thermometerDeviceBleClientMock.connectionState
+        } returns clientConnectionStateInternal
+        return thermometerDeviceBleClientMock
     }
 }
