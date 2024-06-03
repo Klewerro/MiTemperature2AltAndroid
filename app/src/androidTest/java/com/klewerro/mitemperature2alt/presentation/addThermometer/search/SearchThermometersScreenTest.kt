@@ -1,7 +1,6 @@
 package com.klewerro.mitemperature2alt.presentation.addThermometer.search
 
 import android.Manifest
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -18,7 +17,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 
-@OptIn(ExperimentalTestApi::class)
 @HiltAndroidTest
 class SearchThermometersScreenTest : MiTemperature2AltAndroidTest() {
 

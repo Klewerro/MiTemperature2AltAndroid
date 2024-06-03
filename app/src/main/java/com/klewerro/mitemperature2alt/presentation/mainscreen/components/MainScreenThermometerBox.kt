@@ -21,10 +21,12 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
+import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.coreUi.components.ThermometerBox
 import com.klewerro.mitemperature2alt.coreUi.components.ThermometerTemperatureBox
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
@@ -63,7 +65,7 @@ fun MainScreenThermometerBox(
                         Spacer(Modifier.height(spacing.spaceLarge))
                         CircularProgressIndicator()
                         Text(
-                            text = "CONNECTING",
+                            text = stringResource(R.string.connecting).uppercase(),
                             style = MaterialTheme.typography.h3,
                             textAlign = TextAlign.Center
                         )
@@ -116,13 +118,13 @@ fun MainScreenThermometerBox(
                         Text(text = thermometer.address)
                         Spacer(Modifier.height(spacing.spaceLarge))
                         Text(
-                            text = "DISCONNECTED",
+                            text = stringResource(R.string.disconnected).uppercase(),
                             style = MaterialTheme.typography.h3,
                             textAlign = TextAlign.Center
                         )
                         Spacer(Modifier.height(spacing.spaceLarge))
                         OutlinedButton(onClick = { onConnectClick(thermometer.address) }) {
-                            Text(text = "Connect")
+                            Text(text = stringResource(R.string.connect))
                         }
                     }
                 }

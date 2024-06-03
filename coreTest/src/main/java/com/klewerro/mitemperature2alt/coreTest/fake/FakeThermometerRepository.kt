@@ -5,7 +5,6 @@ import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
-import kotlin.random.Random
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -14,10 +13,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class FakeThermometerRepository : ThermometerRepository {
 
-    var operationDelay = 2_000L
+    var operationDelay = 1_000L
     var thermometerStatus = ThermometerStatus(
         21.0f,
         51,
@@ -71,9 +71,37 @@ class FakeThermometerRepository : ThermometerRepository {
     }
 
     override suspend fun scanAndConnect(coroutineScope: CoroutineScope, address: String) {
-        delay(operationDelay)
-        if (isConnectToDeviceThrowingError) {
-            throw IllegalStateException("STUB exception!")
+        try {
+            isScanningForDevicesInternal.update { true }
+            delay(operationDelay)
+            scannedDevicesInternal.update {
+                it.toMutableList().apply {
+                    add(ThermometerScanResultsGenerator.scanResult1)
+                }.toList()
+            }
+            thermometerConnectionStatusesInternal.update {
+                it.toMutableMap().apply {
+                    put(address, ThermometerConnectionStatus.CONNECTING)
+                }
+            }
+
+            delay(operationDelay)
+            if (isConnectToDeviceThrowingError) {
+                throw IllegalStateException("STUB!")
+            }
+
+            thermometerConnectionStatusesInternal.update {
+                it.toMutableMap().apply {
+                    put(address, ThermometerConnectionStatus.CONNECTED)
+                }
+            }
+        } catch (illegalState: IllegalStateException) {
+            thermometerConnectionStatusesInternal.update {
+                it.plus(address to ThermometerConnectionStatus.DISCONNECTED)
+            }
+            throw illegalState
+        } finally {
+            isScanningForDevicesInternal.update { false }
         }
     }
 

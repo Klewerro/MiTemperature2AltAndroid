@@ -51,17 +51,16 @@ class BleOperationsViewModel @Inject constructor(
             }
             is BleOperationsEvent.ConnectToDevice -> {
                 viewModelScope.launch(dispatchers.io) {
-                    try {
-                        scanAndConnectToDeviceUseCase(this, event.address) // Todo: Test
-                    } catch (illegalStateException: IllegalStateException) {
-                        _state.update {
-                            it.copy(
-                                error = UiText.StringResource(
-                                    R.string.unexpected_error_during_connecting_to_device
+                    scanAndConnectToDeviceUseCase(this, event.address)
+                        .onFailure {
+                            _state.update {
+                                it.copy(
+                                    error = UiText.StringResource(
+                                        R.string.unexpected_error_during_connecting_to_device
+                                    )
                                 )
-                            )
+                            }
                         }
-                    }
                 }
             }
             BleOperationsEvent.ErrorDismissed -> {

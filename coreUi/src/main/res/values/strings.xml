@@ -31,4 +31,6 @@
     <string name="humidity_sensor">Humidity sensor</string>
     <string name="thermometer_connected">Thermometer connected</string>
     <string name="connecting_thermometer_error">Connecting thermometer error</string>
+    <string name="connecting">Connecting</string>
+    <string name="disconnected">Disconnected</string>
 </resources>
