@@ -64,7 +64,7 @@ class NordicBleThermometerRepository(
             ThermometerConnectionStatus.CONNECTING
         )
         try {
-            val deviceClient = scanner.scanAndConnect(coroutineScope, address) // .also{}
+            val deviceClient = scanner.scanAndConnect(coroutineScope, address)
             deviceClient.readThermometerStatus()?.let { thermometerStatus ->
                 _connectedDevicesStatuses.update {
                     it.plus(address to thermometerStatus)
