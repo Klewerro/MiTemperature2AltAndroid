@@ -1,7 +1,6 @@
 package com.klewerro.mitemperature2alt.presentation.mainscreen.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,15 +8,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,8 +31,6 @@ import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 @Composable
 fun MainScreenThermometerBox(
     thermometer: Thermometer,
-    onRefreshClick: () -> Unit,
-    onSubscribeClick: () -> Unit,
     onConnectClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -82,24 +74,6 @@ fun MainScreenThermometerBox(
                     nameComposable = {
                         Text(text = thermometer.name)
                     }
-                )
-                Icon(
-                    Icons.Default.Refresh,
-                    "Refresh thermometer temperature",
-                    tint = MaterialTheme.colors.onBackground,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .clickable { onRefreshClick() }
-                        .padding(2.dp)
-                )
-                Icon(
-                    Icons.Default.Notifications,
-                    "Refresh thermometer temperature",
-                    tint = MaterialTheme.colors.onBackground,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .clickable { onSubscribeClick() }
-                        .padding(2.dp)
                 )
             }
             ThermometerConnectionStatus.DISCONNECTING,
@@ -153,8 +127,6 @@ private fun MainScreenThermometerBoxPreview() {
                 rssi = RssiStrength.GOOD,
                 thermometerConnectionStatus = ThermometerConnectionStatus.CONNECTED
             ),
-            onRefreshClick = {},
-            onSubscribeClick = {},
             onConnectClick = {}
         )
     }
@@ -179,8 +151,6 @@ private fun MainScreenThermometerBoxDisconnectedPreview() {
                 rssi = RssiStrength.UNKNOWN,
                 thermometerConnectionStatus = ThermometerConnectionStatus.DISCONNECTED
             ),
-            onRefreshClick = {},
-            onSubscribeClick = {},
             onConnectClick = {}
         )
     }
@@ -205,8 +175,6 @@ private fun MainScreenThermometerBoxConnectingPreview() {
                 rssi = RssiStrength.UNKNOWN,
                 thermometerConnectionStatus = ThermometerConnectionStatus.CONNECTING
             ),
-            onRefreshClick = {},
-            onSubscribeClick = {},
             onConnectClick = {}
         )
     }
