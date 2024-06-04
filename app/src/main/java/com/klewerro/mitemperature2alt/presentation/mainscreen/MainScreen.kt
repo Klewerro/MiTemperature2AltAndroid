@@ -52,18 +52,6 @@ fun MainScreen(
                 items(state.thermometers) { thermometer ->
                     MainScreenThermometerBox(
                         thermometer = thermometer,
-                        onRefreshClick = {
-                            onEvent(
-                                BleOperationsEvent.GetStatusForDevice(thermometer.address)
-                            )
-                        },
-                        onSubscribeClick = {
-                            onEvent(
-                                BleOperationsEvent.SubscribeForDeviceStatusUpdates(
-                                    thermometer.address
-                                )
-                            )
-                        },
                         onConnectClick = { deviceAddress ->
                             onEvent(
                                 BleOperationsEvent.ConnectToDevice(deviceAddress)

@@ -101,13 +101,11 @@ class NordicBleThermometerRepository(
         coroutineScope: CoroutineScope
     ) {
         connectedDevicesClients[deviceAddress]?.let { deviceClient ->
-            coroutineScope.launch(Dispatchers.IO) {
-                deviceClient.subscribeToThermometerStatus()?.collect { statusUpdate ->
-                    _connectedDevicesStatuses.update {
-                        it.plus(deviceAddress to statusUpdate)
-                    }
+            deviceClient.subscribeToThermometerStatus()?.onEach { statusUpdate ->
+                _connectedDevicesStatuses.update {
+                    it.plus(deviceAddress to statusUpdate)
                 }
-            }
+            }?.launchIn(coroutineScope)
         }
     }
 
