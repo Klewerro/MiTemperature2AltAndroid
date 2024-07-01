@@ -1,6 +1,7 @@
 package com.klewerro.mitemperature2alt.addThermometerPresentation
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import app.cash.turbine.test
 import assertk.assertThat
 import assertk.assertions.isEqualTo
@@ -73,7 +74,11 @@ class ConnectThermometerViewModelTest {
                 val initialState = awaitItem()
                 val addressState = awaitItem()
 
-                connectThermometerViewModel.onEvent(ConnectThermometerEvent.ConnectToDevice)
+                connectThermometerViewModel.onEvent(
+                    ConnectThermometerEvent.ConnectToDevice(
+                        connectThermometerViewModel.viewModelScope
+                    )
+                )
                 val statusConnectingState = awaitItem()
                 val stateAfterSuccessConnection = awaitItem()
 
@@ -105,7 +110,11 @@ class ConnectThermometerViewModelTest {
                 awaitItem() // Initial state emission
                 val addressState = awaitItem()
 
-                connectThermometerViewModel.onEvent(ConnectThermometerEvent.ConnectToDevice)
+                connectThermometerViewModel.onEvent(
+                    ConnectThermometerEvent.ConnectToDevice(
+                        connectThermometerViewModel.viewModelScope
+                    )
+                )
                 val statusConnectingState = awaitItem()
                 val stateAfterConnectingError = awaitItem()
 

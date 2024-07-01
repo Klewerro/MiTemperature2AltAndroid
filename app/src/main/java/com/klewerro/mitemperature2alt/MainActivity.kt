@@ -12,6 +12,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -20,7 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -35,16 +38,19 @@ import com.klewerro.mitemperature2alt.addThermometerPresentation.name.ConnectThe
 import com.klewerro.mitemperature2alt.addThermometerPresentation.search.SearchThermometersScreen
 import com.klewerro.mitemperature2alt.coreUi.UiConstants
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
+import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsEvent
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
 import com.klewerro.mitemperature2alt.presentation.navigation.Route
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val test = ViewModelProvider(this)
         setContent {
             MiTemperature2AltTheme {
                 val navController = rememberNavController()
@@ -62,7 +68,8 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         TopBar(
                             title = stringResource(titleResourceIdState),
-                            shouldBeButtonVisible = titleResourceIdState == Route.MainRoutes.Main.screenName
+                            shouldBeButtonVisible =
+                            titleResourceIdState == Route.MainRoutes.Main.screenName
                         ) {
                             Route.MainRoutes.ScanForDevices.navigate(navController)
                         }
@@ -80,6 +87,20 @@ class MainActivity : ComponentActivity() {
                         ) {
                             // Animations: https://proandroiddev.com/screen-transition-animations-with-jetpack-navigation-17afdc714d0e
                             composable(Route.MainRoutes.Main.fullRoute) {
+                                val savedDeviceAddress by it.savedStateHandle.getStateFlow<String?>(
+                                    UiConstants.NAV_PARAM_SAVED_DEVICE_ADDRESS,
+                                    null
+                                ).collectAsStateWithLifecycle()
+                                LaunchedEffect(savedDeviceAddress) {
+                                    savedDeviceAddress?.let { savedDeviceAddressValue ->
+                                        bleOperationsViewModel.onEvent(
+                                            BleOperationsEvent.SubscribeForSavedDeviceStatusUpdates(
+                                                savedDeviceAddressValue
+                                            )
+                                        )
+                                    }
+                                }
+
                                 MainScreen(
                                     state = bleOperationsSate,
                                     onEvent = { event ->
@@ -102,7 +123,11 @@ class MainActivity : ComponentActivity() {
                                 titleResourceIdState = Route.MainRoutes.ScanForDevices.screenName
                             }
 
-                            connectThermometerGraph(navController, scaffoldState)
+                            connectThermometerGraph(
+                                navController,
+                                scaffoldState,
+                                bleOperationsViewModel.viewModelScope
+                            )
                         }
                     }
                 }
@@ -112,7 +137,8 @@ class MainActivity : ComponentActivity() {
 
     private fun NavGraphBuilder.connectThermometerGraph(
         navController: NavController,
-        scaffoldState: ScaffoldState
+        scaffoldState: ScaffoldState,
+        bleOperationsViewModelCoroutineScope: CoroutineScope
     ) {
         navigation(
             route = Route.ConnectDeviceRoutes.ConnectDeviceGraph.fullRoute,
@@ -136,6 +162,7 @@ class MainActivity : ComponentActivity() {
                     hiltViewModel(parentEntry)
                 ThermometerConnectingScreen(
                     connectThermometerViewModel,
+                    bleViewModelScope = bleOperationsViewModelCoroutineScope,
                     onError = {
                         navController.popBackStack()
                     },
@@ -161,7 +188,11 @@ class MainActivity : ComponentActivity() {
                     hiltViewModel(parentEntry)
                 ConnectThermometerNameScreen(
                     viewModel = connectThermometerViewModel,
-                    onThermometerSaved = {
+                    onThermometerSaved = { savedThermometerAddress ->
+                        navController.getBackStackEntry(
+                            Route.MainRoutes.Main.fullRoute
+                        ).savedStateHandle[UiConstants.NAV_PARAM_SAVED_DEVICE_ADDRESS] =
+                            savedThermometerAddress
                         navController.popBackStack(
                             Route.MainRoutes.Main.fullRoute,
                             false

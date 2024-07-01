@@ -36,14 +36,14 @@ import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
 @Composable
 fun ConnectThermometerNameScreen(
     viewModel: ConnectThermometerViewModel,
-    onThermometerSaved: () -> Unit,
+    onThermometerSaved: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = state.thermometerSaved) {
         if (state.thermometerSaved) {
-            onThermometerSaved()
+            onThermometerSaved(state.thermometerAddress)
         }
     }
 

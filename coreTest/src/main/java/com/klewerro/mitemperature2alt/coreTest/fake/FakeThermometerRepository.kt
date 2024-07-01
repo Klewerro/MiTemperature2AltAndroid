@@ -44,22 +44,20 @@ class FakeThermometerRepository : ThermometerRepository {
     override val thermometerConnectionStatuses: StateFlow<Map<String, ThermometerConnectionStatus>> =
         thermometerConnectionStatusesInternal
 
-    override fun scanForDevices(coroutineScope: CoroutineScope): Job {
-        return coroutineScope.launch {
-            isScanningForDevicesInternal.update { true }
+    override fun scanForDevices(coroutineScope: CoroutineScope): Job = coroutineScope.launch {
+        isScanningForDevicesInternal.update { true }
+        delay(100)
+        scannedDevicesInternal.update {
+            it.toMutableList().apply {
+                add(ThermometerScanResultsGenerator.scanResult1)
+            }
+        }
+        while (isActive) {
             delay(100)
-            scannedDevicesInternal.update {
-                it.toMutableList().apply {
-                    add(ThermometerScanResultsGenerator.scanResult1)
-                }
-            }
-            while (isActive) {
-                delay(100)
-            }
-        }.apply {
-            invokeOnCompletion {
-                isScanningForDevicesInternal.update { false }
-            }
+        }
+    }.apply {
+        invokeOnCompletion {
+            isScanningForDevicesInternal.update { false }
         }
     }
 
@@ -105,9 +103,8 @@ class FakeThermometerRepository : ThermometerRepository {
         }
     }
 
-    override suspend fun readCurrentThermometerStatus(deviceAddress: String): ThermometerStatus {
-        return thermometerStatus
-    }
+    override suspend fun readCurrentThermometerStatus(deviceAddress: String): ThermometerStatus =
+        thermometerStatus
 
     override suspend fun subscribeToCurrentThermometerStatus(
         deviceAddress: String,
@@ -142,6 +139,13 @@ class FakeThermometerRepository : ThermometerRepository {
         deviceAddress: String,
         coroutineScope: CoroutineScope
     ) {
-        TODO("Not yet implemented")
+        coroutineScope.launch {
+            thermometerConnectionStatusesInternal.update {
+                it.toMutableMap().apply {
+                    this.plus(deviceAddress to ThermometerConnectionStatus.CONNECTED)
+                }
+            }
+            delay(operationDelay)
+        }
     }
 }

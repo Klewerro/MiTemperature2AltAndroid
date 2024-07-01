@@ -10,6 +10,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -18,9 +19,8 @@ import kotlinx.coroutines.launch
 import no.nordicsemi.android.kotlin.ble.core.data.GattConnectionState
 import timber.log.Timber
 
-class NordicBleThermometerRepository(
-    private val scanner: ThermometerDevicesBleScanner
-) : ThermometerRepository {
+class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleScanner) :
+    ThermometerRepository {
 
     private var connectedDevicesClients: Map<String, ThermometerDeviceBleClient> = HashMap()
 
@@ -101,11 +101,19 @@ class NordicBleThermometerRepository(
         coroutineScope: CoroutineScope
     ) {
         connectedDevicesClients[deviceAddress]?.let { deviceClient ->
-            deviceClient.subscribeToThermometerStatus()?.onEach { statusUpdate ->
-                _connectedDevicesStatuses.update {
-                    it.plus(deviceAddress to statusUpdate)
+            deviceClient.subscribeToThermometerStatus()
+                ?.let {
+                    Timber.d("Subscribed to thermometer status updates.")
+                    it
                 }
-            }?.launchIn(coroutineScope)
+                ?.onEach { statusUpdate ->
+                    Timber.d("Thermometer status update: $statusUpdate")
+                    _connectedDevicesStatuses.update {
+                        it.plus(deviceAddress to statusUpdate)
+                    }
+                }
+                ?.distinctUntilChanged()
+                ?.launchIn(coroutineScope)
         }
     }
 
