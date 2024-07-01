@@ -1,12 +1,12 @@
 package com.klewerro.mitemperature2alt.presentation.mainscreen
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.coreUi.util.UiText
 import com.klewerro.mitemperature2alt.domain.usecase.ScanAndConnectToDeviceUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ThermometerListUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.SubscribeToCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BleOperationsViewModel @Inject constructor(
     thermometerListUseCase: ThermometerListUseCase,
-    private val readCurrentThermometerStatusUseCase: ReadCurrentThermometerStatusUseCase,
+    private val savedStateHandle: SavedStateHandle,
     private val subscribeToCurrentThermometerStatusUseCase:
         SubscribeToCurrentThermometerStatusUseCase,
     private val scanAndConnectToDeviceUseCase: ScanAndConnectToDeviceUseCase,
@@ -38,12 +38,8 @@ class BleOperationsViewModel @Inject constructor(
         )
     }
         .stateIn(viewModelScope, SharingStarted.Eagerly, BleOperationsState())
-
     fun onEvent(event: BleOperationsEvent) {
         when (event) {
-            is BleOperationsEvent.GetStatusForDevice -> handleGetStatusForDevice(event.address)
-            is BleOperationsEvent.SubscribeForDeviceStatusUpdates ->
-                handleSubscribeForDeviceStatusUpdates(event.address)
             is BleOperationsEvent.ErrorConnectingToSavedThermometer -> _state.update {
                 it.copy(
                     error = UiText.StringResource(R.string.thermometer_is_already_saved)
@@ -63,6 +59,8 @@ class BleOperationsViewModel @Inject constructor(
                         }
                 }
             }
+            is BleOperationsEvent.SubscribeForSavedDeviceStatusUpdates ->
+                handleSubscribeForDeviceStatusUpdates(event.address)
             BleOperationsEvent.ErrorDismissed -> {
                 _state.update {
                     it.copy(
@@ -73,15 +71,10 @@ class BleOperationsViewModel @Inject constructor(
         }
     }
 
-    private fun handleGetStatusForDevice(address: String) {
-        viewModelScope.launch(dispatchers.io) {
-            readCurrentThermometerStatusUseCase(address)
-        }
-    }
-
     private fun handleSubscribeForDeviceStatusUpdates(address: String) {
         viewModelScope.launch(dispatchers.io) {
             subscribeToCurrentThermometerStatusUseCase(address, this)
         }
+//        savedStateHandle[UiConstants.NAV_PARAM_SAVED_DEVICE_ADDRESS] = null
     }
 }

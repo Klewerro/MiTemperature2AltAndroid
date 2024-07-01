@@ -11,6 +11,7 @@ import com.klewerro.mitemperature2alt.coreUi.util.UiText
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -41,14 +42,16 @@ class ConnectThermometerViewModel @Inject constructor(
 
     fun onEvent(event: ConnectThermometerEvent) {
         when (event) {
-            ConnectThermometerEvent.ConnectToDevice -> handleConnectToDevice()
+            is ConnectThermometerEvent.ConnectToDevice -> handleConnectToDevice(
+                event.bleOperationsViewModelScope
+            )
             is ConnectThermometerEvent.ChangeThermometerName ->
                 handleChangeThermometerName(event.name)
             ConnectThermometerEvent.SaveThermometer -> handleSaveThermometer()
         }
     }
 
-    private fun handleConnectToDevice() {
+    private fun handleConnectToDevice(bleViewModelScope: CoroutineScope) {
         viewModelScope.launch(dispatchers.io) {
             try {
                 _state.update {
@@ -57,7 +60,7 @@ class ConnectThermometerViewModel @Inject constructor(
                     )
                 }
                 with(state.value.thermometerAddress) {
-                    connectToDeviceUseCase(this@launch, this)
+                    connectToDeviceUseCase(bleViewModelScope, this)
                     val currentStatus = readCurrentThermometerStatusUseCase(this)
                     _state.update {
                         it.copy(

@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import com.klewerro.mitemperature2alt.coreUi.R as RCore
 
@@ -43,6 +44,7 @@ private const val SCREEN_CHANGE_DELAY = 1_500L
 @Composable
 fun ThermometerConnectingScreen(
     viewModel: ConnectThermometerViewModel,
+    bleViewModelScope: CoroutineScope,
     onError: () -> Unit,
     onDeviceConnected: () -> Unit,
     modifier: Modifier = Modifier
@@ -51,7 +53,7 @@ fun ThermometerConnectingScreen(
 
     LaunchedEffect(key1 = state.thermometerAddress) {
         if (state.thermometerAddress.isNotEmpty()) {
-            viewModel.onEvent(ConnectThermometerEvent.ConnectToDevice)
+            viewModel.onEvent(ConnectThermometerEvent.ConnectToDevice(bleViewModelScope))
         }
     }
     LaunchedEffect(key1 = state.connectingStatus) {
@@ -67,7 +69,7 @@ fun ThermometerConnectingScreen(
 }
 
 @Composable
-private fun ThermometerConnectingScreenContent(
+fun ThermometerConnectingScreenContent(
     state: ConnectThermometerState,
     onErrorClick: () -> Unit,
     modifier: Modifier = Modifier
