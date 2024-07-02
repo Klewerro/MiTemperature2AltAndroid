@@ -5,7 +5,6 @@ import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
 import com.klewerro.mitemperature2alt.domain.usecase.ScanAndConnectToDeviceUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ThermometerListUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.SubscribeToCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import com.klewerro.mitemperature2alt.domain.util.StandardDispatchers
 import dagger.Module
@@ -24,12 +23,6 @@ object DomainModule {
     @ViewModelScoped
     fun provideReadCurrentThermometerStatusUseCase(thermometerRepository: ThermometerRepository) =
         ReadCurrentThermometerStatusUseCase(thermometerRepository)
-
-    @Provides
-    @ViewModelScoped
-    fun provideSubscribeToCurrentThermometerStatusUseCase(
-        thermometerRepository: ThermometerRepository
-    ) = SubscribeToCurrentThermometerStatusUseCase(thermometerRepository)
 
     @Provides
     @ViewModelScoped

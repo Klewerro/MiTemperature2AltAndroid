@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +36,6 @@ import com.klewerro.mitemperature2alt.addThermometerPresentation.name.ConnectThe
 import com.klewerro.mitemperature2alt.addThermometerPresentation.search.SearchThermometersScreen
 import com.klewerro.mitemperature2alt.coreUi.UiConstants
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
-import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsEvent
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
@@ -87,20 +84,6 @@ class MainActivity : ComponentActivity() {
                         ) {
                             // Animations: https://proandroiddev.com/screen-transition-animations-with-jetpack-navigation-17afdc714d0e
                             composable(Route.MainRoutes.Main.fullRoute) {
-                                val savedDeviceAddress by it.savedStateHandle.getStateFlow<String?>(
-                                    UiConstants.NAV_PARAM_SAVED_DEVICE_ADDRESS,
-                                    null
-                                ).collectAsStateWithLifecycle()
-                                LaunchedEffect(savedDeviceAddress) {
-                                    savedDeviceAddress?.let { savedDeviceAddressValue ->
-                                        bleOperationsViewModel.onEvent(
-                                            BleOperationsEvent.SubscribeForSavedDeviceStatusUpdates(
-                                                savedDeviceAddressValue
-                                            )
-                                        )
-                                    }
-                                }
-
                                 MainScreen(
                                     state = bleOperationsSate,
                                     onEvent = { event ->
@@ -125,7 +108,6 @@ class MainActivity : ComponentActivity() {
 
                             connectThermometerGraph(
                                 navController,
-                                scaffoldState,
                                 bleOperationsViewModel.viewModelScope
                             )
                         }
@@ -137,7 +119,6 @@ class MainActivity : ComponentActivity() {
 
     private fun NavGraphBuilder.connectThermometerGraph(
         navController: NavController,
-        scaffoldState: ScaffoldState,
         bleOperationsViewModelCoroutineScope: CoroutineScope
     ) {
         navigation(
@@ -188,11 +169,7 @@ class MainActivity : ComponentActivity() {
                     hiltViewModel(parentEntry)
                 ConnectThermometerNameScreen(
                     viewModel = connectThermometerViewModel,
-                    onThermometerSaved = { savedThermometerAddress ->
-                        navController.getBackStackEntry(
-                            Route.MainRoutes.Main.fullRoute
-                        ).savedStateHandle[UiConstants.NAV_PARAM_SAVED_DEVICE_ADDRESS] =
-                            savedThermometerAddress
+                    onThermometerSaved = {
                         navController.popBackStack(
                             Route.MainRoutes.Main.fullRoute,
                             false
