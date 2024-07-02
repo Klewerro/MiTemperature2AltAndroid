@@ -32,6 +32,7 @@ compose-navigation = { module = "androidx.navigation:navigation-compose", versio
 compose-icons = { module = "androidx.compose.material:material-icons-extended", version.ref = "compose" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 timber = { module = "com.jakewharton.timber:timber", version = "5.0.1"}
+leakCanary = { module = "com.squareup.leakcanary:leakcanary-android", version = "2.14"}
 # hilt
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
