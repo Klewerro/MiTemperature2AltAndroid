@@ -1,13 +1,11 @@
 package com.klewerro.mitemperature2alt.presentation.mainscreen
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.coreUi.util.UiText
 import com.klewerro.mitemperature2alt.domain.usecase.ScanAndConnectToDeviceUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ThermometerListUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.SubscribeToCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,9 +19,6 @@ import javax.inject.Inject
 @HiltViewModel
 class BleOperationsViewModel @Inject constructor(
     thermometerListUseCase: ThermometerListUseCase,
-    private val savedStateHandle: SavedStateHandle,
-    private val subscribeToCurrentThermometerStatusUseCase:
-        SubscribeToCurrentThermometerStatusUseCase,
     private val scanAndConnectToDeviceUseCase: ScanAndConnectToDeviceUseCase,
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
@@ -59,8 +54,6 @@ class BleOperationsViewModel @Inject constructor(
                         }
                 }
             }
-            is BleOperationsEvent.SubscribeForSavedDeviceStatusUpdates ->
-                handleSubscribeForDeviceStatusUpdates(event.address)
             BleOperationsEvent.ErrorDismissed -> {
                 _state.update {
                     it.copy(
@@ -69,12 +62,5 @@ class BleOperationsViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    private fun handleSubscribeForDeviceStatusUpdates(address: String) {
-        viewModelScope.launch(dispatchers.io) {
-            subscribeToCurrentThermometerStatusUseCase(address, this)
-        }
-//        savedStateHandle[UiConstants.NAV_PARAM_SAVED_DEVICE_ADDRESS] = null
     }
 }
