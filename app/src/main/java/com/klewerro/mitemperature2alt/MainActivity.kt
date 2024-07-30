@@ -39,6 +39,7 @@ import com.klewerro.mitemperature2alt.addThermometerPresentation.search.SearchTh
 import com.klewerro.mitemperature2alt.coreUi.UiConstants
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
 import com.klewerro.mitemperature2alt.presentation.bottomSheet.BottomSheetContent
+import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsEvent
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
@@ -73,7 +74,12 @@ class MainActivity : ComponentActivity() {
                     sheetContent = {
                         BottomSheetContent(
                             isOperationPending = false,
-                            thermometers = bleOperationsSate.thermometers
+                            thermometers = bleOperationsSate.thermometers,
+                            onConnectThermometerClick = { thermometer ->
+                                bleOperationsViewModel.onEvent(
+                                    BleOperationsEvent.ConnectToDevice(thermometer.address)
+                                )
+                            }
                         )
                     },
                     sheetShape = RoundedCornerShape(12.dp),

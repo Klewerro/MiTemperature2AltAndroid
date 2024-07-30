@@ -27,6 +27,7 @@ import com.klewerro.mitemperature2alt.presentation.bottomSheet.components.Bottom
 fun BottomSheetContent(
     isOperationPending: Boolean,
     thermometers: List<Thermometer>,
+    onConnectThermometerClick: (Thermometer) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -55,6 +56,9 @@ fun BottomSheetContent(
             items(thermometers) { thermometer ->
                 BottomSheetThermometerItem(
                     thermometer = thermometer,
+                    onConnectButtonClick = {
+                        onConnectThermometerClick(thermometer)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(spacing.spaceSmall)
@@ -69,13 +73,13 @@ fun BottomSheetContent(
 fun BottomSheetContentPreview(modifier: Modifier = Modifier) {
     MiTemperature2AltTheme {
         BottomSheetContent(
-            false,
-            listOf(
+            isOperationPending = false,
+            thermometers = listOf(
                 ThermometerPreviewModels.thermometer,
                 ThermometerPreviewModels.thermometer,
                 ThermometerPreviewModels.thermometer
-
-            )
+            ),
+            onConnectThermometerClick = {}
         )
     }
 }
@@ -85,13 +89,13 @@ fun BottomSheetContentPreview(modifier: Modifier = Modifier) {
 fun BottomSheetContentOperationPendingPreview(modifier: Modifier = Modifier) {
     MiTemperature2AltTheme {
         BottomSheetContent(
-            false,
-            listOf(
+            isOperationPending = false,
+            thermometers = listOf(
                 ThermometerPreviewModels.thermometer,
                 ThermometerPreviewModels.thermometer,
                 ThermometerPreviewModels.thermometer
-
-            )
+            ),
+            onConnectThermometerClick = {}
         )
     }
 }

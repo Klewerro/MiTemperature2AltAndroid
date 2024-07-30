@@ -2,25 +2,33 @@ package com.klewerro.mitemperature2alt.presentation.bottomSheet
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
+import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.coreUi.previewModel.ThermometerPreviewModels
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
+import com.klewerro.mitemperature2alt.coreUi.util.alphaDisabled
 import com.klewerro.mitemperature2alt.domain.model.RssiStrength
 import com.klewerro.mitemperature2alt.domain.model.Thermometer
 import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 import com.klewerro.mitemperature2alt.presentation.bottomSheet.components.BottomSheetThermometerStatus
 
 @Composable
-fun BottomSheetThermometerItem(thermometer: Thermometer, modifier: Modifier = Modifier) {
+fun BottomSheetThermometerItem(
+    thermometer: Thermometer,
+    onConnectButtonClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val spacing = LocalSpacing.current
 
     Card(modifier = modifier) {
@@ -29,20 +37,30 @@ fun BottomSheetThermometerItem(thermometer: Thermometer, modifier: Modifier = Mo
             val bottomSheetThermometerStatus = createRefFor("bottomSheetThermometerStatus")
             val addressText = createRefFor("addressText")
             val voltageText = createRefFor("voltageText")
+            val connectButton = createRefFor("connectButton")
 
             constrain(thermometerNameText) {
                 width = Dimension.fillToConstraints
             }
             constrain(bottomSheetThermometerStatus) {
                 end.linkTo(parent.end)
+                if (thermometer.thermometerConnectionStatus ==
+                    ThermometerConnectionStatus.CONNECTING
+                ) {
+                    centerVerticallyTo(parent)
+                }
             }
             constrain(addressText) {
                 start.linkTo(parent.start)
-                top.linkTo(bottomSheetThermometerStatus.bottom)
+                top.linkTo(thermometerNameText.bottom)
             }
             constrain(voltageText) {
                 end.linkTo(parent.end)
                 top.linkTo(bottomSheetThermometerStatus.bottom)
+            }
+            constrain(connectButton) {
+                end.linkTo(parent.end)
+                centerVerticallyTo(parent)
             }
         }
 
@@ -53,21 +71,47 @@ fun BottomSheetThermometerItem(thermometer: Thermometer, modifier: Modifier = Mo
         ) {
             Text(
                 text = thermometer.name,
-                modifier = Modifier.layoutId("thermometerNameText")
-            )
-            BottomSheetThermometerStatus(
-                thermometer.rssi,
-                thermometer.thermometerConnectionStatus,
-                modifier = Modifier.layoutId("bottomSheetThermometerStatus")
+                modifier = Modifier
+                    .layoutId("thermometerNameText")
+                    .alphaDisabled(
+                        thermometer.thermometerConnectionStatus ==
+                            ThermometerConnectionStatus.DISCONNECTED
+                    )
             )
             Text(
                 thermometer.address,
-                Modifier.layoutId("addressText")
+                Modifier
+                    .layoutId("addressText")
+                    .alphaDisabled(
+                        thermometer.thermometerConnectionStatus ==
+                            ThermometerConnectionStatus.DISCONNECTED
+                    )
             )
-            Text(
-                text = thermometer.voltage.toString(),
-                modifier = Modifier.layoutId("voltageText")
-            )
+
+            if (thermometer.thermometerConnectionStatus ==
+                ThermometerConnectionStatus.DISCONNECTED
+            ) {
+                Button(
+                    onClick = onConnectButtonClick,
+                    modifier = Modifier.layoutId("connectButton")
+                ) {
+                    Text(text = stringResource(id = R.string.connect))
+                }
+            } else {
+                BottomSheetThermometerStatus(
+                    thermometer.rssi,
+                    thermometer.thermometerConnectionStatus,
+                    modifier = Modifier.layoutId("bottomSheetThermometerStatus")
+                )
+            }
+            if (thermometer.thermometerConnectionStatus ==
+                ThermometerConnectionStatus.CONNECTED
+            ) {
+                Text(
+                    text = thermometer.voltage.toString(),
+                    modifier = Modifier.layoutId("voltageText")
+                )
+            }
         }
     }
 }
@@ -79,6 +123,7 @@ private fun BottomSheetThermometerItemPreview() {
     MiTemperature2AltTheme {
         BottomSheetThermometerItem(
             thermometer = ThermometerPreviewModels.thermometer,
+            onConnectButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -90,8 +135,9 @@ private fun BottomSheetThermometerItemPreviewThermometerConnectionStatusConnecti
     MiTemperature2AltTheme {
         BottomSheetThermometerItem(
             thermometer = ThermometerPreviewModels.thermometer.copy(
-                thermometerConnectionStatus = ThermometerConnectionStatus.CONNECTING,
+                thermometerConnectionStatus = ThermometerConnectionStatus.CONNECTING
             ),
+            onConnectButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -105,6 +151,7 @@ private fun BottomSheetThermometerItemPreviewThermometerConnectionStatusConnecte
             thermometer = ThermometerPreviewModels.thermometer.copy(
                 thermometerConnectionStatus = ThermometerConnectionStatus.CONNECTED
             ),
+            onConnectButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -118,6 +165,7 @@ private fun BottomSheetThermometerItemPreviewThermometerConnectionStatusDisconne
             thermometer = ThermometerPreviewModels.thermometer.copy(
                 thermometerConnectionStatus = ThermometerConnectionStatus.DISCONNECTING
             ),
+            onConnectButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -131,6 +179,7 @@ private fun BottomSheetThermometerItemPreviewThermometerConnectionStatusDisconne
             thermometer = ThermometerPreviewModels.thermometer.copy(
                 thermometerConnectionStatus = ThermometerConnectionStatus.DISCONNECTED
             ),
+            onConnectButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -144,6 +193,7 @@ private fun BottomSheetThermometerItemPreviewRssiExcellent() {
             thermometer = ThermometerPreviewModels.thermometer.copy(
                 rssi = RssiStrength.EXCELLENT
             ),
+            onConnectButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -157,6 +207,7 @@ private fun BottomSheetThermometerItemPreviewRssiVeryGood() {
             thermometer = ThermometerPreviewModels.thermometer.copy(
                 rssi = RssiStrength.VERY_GOOD
             ),
+            onConnectButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -170,6 +221,7 @@ private fun BottomSheetThermometerItemPreviewRssiGood() {
             thermometer = ThermometerPreviewModels.thermometer.copy(
                 rssi = RssiStrength.GOOD
             ),
+            onConnectButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -183,6 +235,7 @@ private fun BottomSheetThermometerItemPreviewRssiPoor() {
             thermometer = ThermometerPreviewModels.thermometer.copy(
                 rssi = RssiStrength.POOR
             ),
+            onConnectButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -196,6 +249,7 @@ private fun BottomSheetThermometerItemPreviewRssiUnusable() {
             thermometer = ThermometerPreviewModels.thermometer.copy(
                 rssi = RssiStrength.UNUSABLE
             ),
+            onConnectButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -209,6 +263,7 @@ private fun BottomSheetThermometerItemPreviewRssiUnknown() {
             thermometer = ThermometerPreviewModels.thermometer.copy(
                 rssi = RssiStrength.UNKNOWN
             ),
+            onConnectButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
