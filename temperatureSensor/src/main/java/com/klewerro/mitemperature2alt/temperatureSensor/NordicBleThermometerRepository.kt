@@ -27,9 +27,6 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
     override val scannedDevices = scanner.bleDevices
     override val isScanningForDevices = scanner.isScanning
 
-    override fun scanForDevices(coroutineScope: CoroutineScope): Job =
-        scanner.scanForDevices(coroutineScope)
-
     private var _connectedDevicesStatuses = MutableStateFlow<Map<String, ThermometerStatus>>(
         emptyMap()
     )
@@ -41,6 +38,9 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
 
     private var _rssiStrengths = MutableStateFlow<Map<String, Int>>(emptyMap())
     override val rssiStrengths = _rssiStrengths.asStateFlow()
+
+    override fun scanForDevices(coroutineScope: CoroutineScope): Job =
+        scanner.scanForDevices(coroutineScope)
 
     override suspend fun connectToDevice(coroutineScope: CoroutineScope, address: String) {
         _thermometerConnectionStatuses.updateUsingMutableMap(

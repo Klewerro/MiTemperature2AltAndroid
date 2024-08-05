@@ -51,9 +51,9 @@ fun MainScreen(
                 items(state.thermometers) { thermometer ->
                     MainScreenThermometerBox(
                         thermometer = thermometer,
-                        onConnectClick = { deviceAddress ->
+                        onConnectClick = {
                             onEvent(
-                                BleOperationsEvent.ConnectToDevice(deviceAddress)
+                                BleOperationsEvent.ConnectToDevice(thermometer)
                             )
                         },
                         modifier = Modifier.padding(vertical = spacing.spaceNormal)

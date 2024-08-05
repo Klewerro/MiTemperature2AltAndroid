@@ -41,8 +41,11 @@ class BleOperationsViewModel @Inject constructor(
                 )
             }
             is BleOperationsEvent.ConnectToDevice -> {
+                changeThermometerOperationType(
+                    ThermometerOperationType.ConnectingToDevice(event.thermometer.name)
+                )
                 viewModelScope.launch(dispatchers.io) {
-                    scanAndConnectToDeviceUseCase(this, event.address)
+                    scanAndConnectToDeviceUseCase(this, event.thermometer.address)
                         .onFailure {
                             _state.update {
                                 it.copy(
@@ -52,6 +55,7 @@ class BleOperationsViewModel @Inject constructor(
                                 )
                             }
                         }
+                    changeThermometerOperationType(ThermometerOperationType.Idle)
                 }
             }
             BleOperationsEvent.ErrorDismissed -> {
@@ -61,6 +65,12 @@ class BleOperationsViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun changeThermometerOperationType(operationType: ThermometerOperationType) {
+        _state.update {
+            it.copy(thermometerOperationType = operationType)
         }
     }
 }

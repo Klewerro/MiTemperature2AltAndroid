@@ -73,11 +73,11 @@ class MainActivity : ComponentActivity() {
                     scaffoldState = bottomSheetScaffoldState,
                     sheetContent = {
                         BottomSheetContent(
-                            isOperationPending = false,
+                            thermometerOperationType = bleOperationsSate.thermometerOperationType,
                             thermometers = bleOperationsSate.thermometers,
                             onConnectThermometerClick = { thermometer ->
                                 bleOperationsViewModel.onEvent(
-                                    BleOperationsEvent.ConnectToDevice(thermometer.address)
+                                    BleOperationsEvent.ConnectToDevice(thermometer)
                                 )
                             }
                         )

@@ -33,4 +33,6 @@
     <string name="connecting_thermometer_error">Connecting thermometer error</string>
     <string name="connecting">Connecting</string>
     <string name="disconnected">Disconnected</string>
+    <string name="string_of_string_thermometers_connected">%1$s of %2$s thermometers connected</string>
+    <string name="connecting_to_string">Connecting to %1$s</string>
 </resources>

@@ -108,7 +108,7 @@ fun BottomSheetThermometerItem(
                 ThermometerConnectionStatus.CONNECTED
             ) {
                 Text(
-                    text = thermometer.voltage.toString(),
+                    text = thermometer.voltage.toString() + "V",
                     modifier = Modifier.layoutId("voltageText")
                 )
             }
