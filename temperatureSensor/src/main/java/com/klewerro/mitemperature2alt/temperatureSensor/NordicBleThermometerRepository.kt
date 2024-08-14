@@ -1,5 +1,7 @@
 package com.klewerro.mitemperature2alt.temperatureSensor
 
+import com.klewerro.mitemperature2alt.domain.model.HourlyRecord
+import com.klewerro.mitemperature2alt.domain.model.LastIndexTotalRecords
 import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
@@ -13,11 +15,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.toCollection
+import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import no.nordicsemi.android.kotlin.ble.core.data.GattConnectionState
 import timber.log.Timber
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleScanner) :
     ThermometerRepository {
@@ -96,6 +102,35 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
         }
     }
 
+    override suspend fun readLastIndexAndTotalRecords(
+        deviceAddress: String
+    ): LastIndexTotalRecords? {
+        connectedDevicesClients[deviceAddress]?.let { deviceClient ->
+            return deviceClient.readLastIndexAndTotalRecords()
+        } ?: run {
+            return null
+        }
+    }
+
+    override suspend fun readThermometerHourlyRecords(
+        coroutineScope: CoroutineScope,
+        deviceAddress: String,
+        startIndex: Int
+    ): List<HourlyRecord>? {
+        connectedDevicesClients[deviceAddress]?.let { deviceClient ->
+            val lastIndexTotalRecords = deviceClient.readLastIndexAndTotalRecords()
+            val totalRecords = lastIndexTotalRecords?.totalRecords ?: startIndex
+
+            return collectHourlyRecords(
+                coroutineScope = coroutineScope,
+                deviceClient = deviceClient,
+                totalRecords = totalRecords
+            )
+        } ?: run {
+            return null
+        }
+    }
+
     override suspend fun subscribeToCurrentThermometerStatus(
         deviceAddress: String,
         coroutineScope: CoroutineScope
@@ -129,10 +164,13 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
                         when (gattConnectionState) {
                             GattConnectionState.STATE_DISCONNECTED ->
                                 ThermometerConnectionStatus.DISCONNECTED
+
                             GattConnectionState.STATE_CONNECTING ->
                                 ThermometerConnectionStatus.CONNECTING
+
                             GattConnectionState.STATE_CONNECTED ->
                                 ThermometerConnectionStatus.CONNECTED
+
                             GattConnectionState.STATE_DISCONNECTING ->
                                 ThermometerConnectionStatus.DISCONNECTING
                         }
@@ -168,10 +206,13 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
                 val mappedConnectionStatus = when (gattConnectionState) {
                     GattConnectionState.STATE_CONNECTING ->
                         ThermometerConnectionStatus.CONNECTING
+
                     GattConnectionState.STATE_CONNECTED ->
                         ThermometerConnectionStatus.CONNECTED
+
                     GattConnectionState.STATE_DISCONNECTING ->
                         ThermometerConnectionStatus.DISCONNECTING
+
                     GattConnectionState.STATE_DISCONNECTED -> {
                         connectedDevicesClients = connectedDevicesClients.minus(address)
                         ThermometerConnectionStatus.DISCONNECTED
@@ -189,6 +230,29 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
             it.toMutableMap().apply {
                 this[key] = value
             }.toMap()
+        }
+    }
+
+    private suspend fun collectHourlyRecords(
+        coroutineScope: CoroutineScope,
+        deviceClient: ThermometerDeviceBleClient,
+        totalRecords: Int
+    ) = suspendCoroutine<List<HourlyRecord>> { continuation ->
+        val testCollection = mutableListOf<HourlyRecord>()
+        var counter: Int
+        coroutineScope.launch {
+            deviceClient.subscribeToThermometerHourlyRecords()
+                ?.transformWhile {
+                    counter = it.index + 1
+                    Timber.d(
+                        "HourlyRecord collected: time: ${it.time} [${it.index + 1}/$totalRecords]"
+                    )
+                    emit(it)
+                    counter < totalRecords
+                }
+                ?.toCollection(testCollection)
+        }.invokeOnCompletion {
+            continuation.resume(testCollection)
         }
     }
 }
