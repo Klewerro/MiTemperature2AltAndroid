@@ -31,6 +31,7 @@ interface ThermometerRepository {
     suspend fun readThermometerHourlyRecords(
         coroutineScope: CoroutineScope,
         deviceAddress: String,
-        startIndex: Int
+        startIndex: Int,
+        progressUpdate: (Int, Int) -> Unit
     ): List<HourlyRecord>?
 }

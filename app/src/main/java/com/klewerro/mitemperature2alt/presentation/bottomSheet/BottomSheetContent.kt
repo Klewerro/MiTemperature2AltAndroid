@@ -21,6 +21,7 @@ import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
 import com.klewerro.mitemperature2alt.domain.model.Thermometer
 import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 import com.klewerro.mitemperature2alt.presentation.bottomSheet.components.BottomSheetProgressAnchor
+import com.klewerro.mitemperature2alt.presentation.bottomSheet.components.BottomSheetProgressType
 import com.klewerro.mitemperature2alt.presentation.mainscreen.ThermometerOperationType
 
 @Composable
@@ -38,7 +39,17 @@ fun BottomSheetContent(
             .height(240.dp)
     ) {
         BottomSheetProgressAnchor(
-            thermometerOperationType is ThermometerOperationType.ConnectingToDevice,
+            isInProgress = thermometerOperationType !is ThermometerOperationType.Idle,
+            progressType = when (thermometerOperationType) {
+                ThermometerOperationType.Idle, is ThermometerOperationType.ConnectingToDevice ->
+                    BottomSheetProgressType.Indeterminate
+
+                is ThermometerOperationType.RetrievingHourlyRecords ->
+                    BottomSheetProgressType.Determinate(
+                        thermometerOperationType.currentRecordNumber,
+                        thermometerOperationType.numberOrRecords
+                    )
+            },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
@@ -58,6 +69,13 @@ fun BottomSheetContent(
                 is ThermometerOperationType.ConnectingToDevice -> stringResource(
                     R.string.connecting_to_string,
                     thermometerOperationType.thermometerName
+                )
+
+                is ThermometerOperationType.RetrievingHourlyRecords -> stringResource(
+                    R.string.getting_hourly_records_for_string_int_of_int,
+                    thermometerOperationType.thermometerName,
+                    thermometerOperationType.currentRecordNumber,
+                    thermometerOperationType.numberOrRecords
                 )
             },
             textAlign = TextAlign.Center,
@@ -102,6 +120,26 @@ fun BottomSheetContentOperationPendingPreview() {
     MiTemperature2AltTheme {
         BottomSheetContent(
             thermometerOperationType = ThermometerOperationType.ConnectingToDevice("Device_name"),
+            thermometers = listOf(
+                ThermometerPreviewModels.thermometer,
+                ThermometerPreviewModels.thermometer,
+                ThermometerPreviewModels.thermometer
+            ),
+            onConnectThermometerClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BottomSheetContentGettingHourlyRecordsPreview() {
+    MiTemperature2AltTheme {
+        BottomSheetContent(
+            thermometerOperationType = ThermometerOperationType.RetrievingHourlyRecords(
+                ThermometerPreviewModels.thermometer.name,
+                1,
+                32
+            ),
             thermometers = listOf(
                 ThermometerPreviewModels.thermometer,
                 ThermometerPreviewModels.thermometer,

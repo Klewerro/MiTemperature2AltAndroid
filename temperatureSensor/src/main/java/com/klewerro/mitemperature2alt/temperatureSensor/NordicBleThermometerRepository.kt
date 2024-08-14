@@ -115,17 +115,21 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
     override suspend fun readThermometerHourlyRecords(
         coroutineScope: CoroutineScope,
         deviceAddress: String,
-        startIndex: Int
+        startIndex: Int,
+        progressUpdate: (Int, Int) -> Unit
     ): List<HourlyRecord>? {
         connectedDevicesClients[deviceAddress]?.let { deviceClient ->
             val lastIndexTotalRecords = deviceClient.readLastIndexAndTotalRecords()
             val totalRecords = lastIndexTotalRecords?.totalRecords ?: startIndex
 
+            progressUpdate(0, totalRecords)
             return collectHourlyRecords(
                 coroutineScope = coroutineScope,
                 deviceClient = deviceClient,
                 totalRecords = totalRecords
-            )
+            ) { currentItemNumber ->
+                progressUpdate(currentItemNumber, totalRecords)
+            }
         } ?: run {
             return null
         }
@@ -236,7 +240,8 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
     private suspend fun collectHourlyRecords(
         coroutineScope: CoroutineScope,
         deviceClient: ThermometerDeviceBleClient,
-        totalRecords: Int
+        totalRecords: Int,
+        currentItemNumberUpdate: (Int) -> Unit
     ) = suspendCoroutine<List<HourlyRecord>> { continuation ->
         val testCollection = mutableListOf<HourlyRecord>()
         var counter: Int
@@ -248,6 +253,7 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
                         "HourlyRecord collected: time: ${it.time} [${it.index + 1}/$totalRecords]"
                     )
                     emit(it)
+                    currentItemNumberUpdate(counter)
                     counter < totalRecords
                 }
                 ?.toCollection(testCollection)

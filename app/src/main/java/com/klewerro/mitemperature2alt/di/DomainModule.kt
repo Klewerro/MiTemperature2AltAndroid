@@ -2,6 +2,7 @@ package com.klewerro.mitemperature2alt.di
 
 import com.klewerro.mitemperature2alt.domain.repository.PersistenceRepository
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
+import com.klewerro.mitemperature2alt.domain.usecase.GetHourlyResultsUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.ScanAndConnectToDeviceUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ThermometerListUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
@@ -35,6 +36,11 @@ object DomainModule {
     @ViewModelScoped
     fun provideScanAndConnectToDeviceUseCase(thermometerRepository: ThermometerRepository) =
         ScanAndConnectToDeviceUseCase(thermometerRepository)
+
+    @Provides
+    @ViewModelScoped
+    fun provideGetHourlyResultsUseCase(thermometerRepository: ThermometerRepository) =
+        GetHourlyResultsUseCase(thermometerRepository)
 }
 
 @Module
