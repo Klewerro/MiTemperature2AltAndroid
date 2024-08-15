@@ -14,9 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -84,22 +82,15 @@ class BleOperationsViewModel @Inject constructor(
         coroutineScope: CoroutineScope,
         thermometer: Thermometer
     ) {
-        getHourlyResultsUseCase.progress
-            .transformWhile { progressUpdate ->
-                emit(
-                    changeThermometerOperationType(
-                        ThermometerOperationType.RetrievingHourlyRecords(
-                            thermometerName = thermometer.name,
-                            currentRecordNumber = progressUpdate.currentItemNumber,
-                            numberOrRecords = progressUpdate.itemsCount
-                        )
-                    )
+        getHourlyResultsUseCase(coroutineScope, thermometer.address) { progressCallback ->
+            changeThermometerOperationType(
+                ThermometerOperationType.RetrievingHourlyRecords(
+                    thermometerName = thermometer.name,
+                    currentRecordNumber = progressCallback.currentItemNumber,
+                    numberOrRecords = progressCallback.itemsCount
                 )
-                progressUpdate.currentItemNumber < progressUpdate.itemsCount ||
-                    (progressUpdate.currentItemNumber == 0 && progressUpdate.itemsCount == 0)
-            }
-            .launchIn(coroutineScope)
-        getHourlyResultsUseCase(coroutineScope, thermometer.address)
+            )
+        }
         changeThermometerOperationType(ThermometerOperationType.Idle)
     }
 

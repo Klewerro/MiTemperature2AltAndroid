@@ -1,5 +1,6 @@
 package com.klewerro.mitemperature2alt.di
 
+import com.klewerro.mitemperature2alt.domain.repository.HourlyRecordRepository
 import com.klewerro.mitemperature2alt.domain.repository.PersistenceRepository
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
 import com.klewerro.mitemperature2alt.domain.usecase.GetHourlyResultsUseCase
@@ -39,8 +40,10 @@ object DomainModule {
 
     @Provides
     @ViewModelScoped
-    fun provideGetHourlyResultsUseCase(thermometerRepository: ThermometerRepository) =
-        GetHourlyResultsUseCase(thermometerRepository)
+    fun provideGetHourlyResultsUseCase(
+        thermometerRepository: ThermometerRepository,
+        hourlyRecordRepository: HourlyRecordRepository
+    ) = GetHourlyResultsUseCase(thermometerRepository, hourlyRecordRepository)
 }
 
 @Module

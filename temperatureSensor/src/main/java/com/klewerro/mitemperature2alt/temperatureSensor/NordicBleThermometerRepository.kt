@@ -122,6 +122,10 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
             val lastIndexTotalRecords = deviceClient.readLastIndexAndTotalRecords()
             val totalRecords = lastIndexTotalRecords?.totalRecords ?: startIndex
 
+            if (totalRecords == 0) {
+                return null
+            }
+
             progressUpdate(0, totalRecords)
             return collectHourlyRecords(
                 coroutineScope = coroutineScope,
