@@ -6,4 +6,5 @@ sealed class BleOperationsEvent {
     data class ConnectToDevice(val thermometer: Thermometer) : BleOperationsEvent()
     data class ErrorConnectingToSavedThermometer(val name: String) : BleOperationsEvent()
     data object ErrorDismissed : BleOperationsEvent()
+    data object CancelHourlyRecordsSync : BleOperationsEvent()
 }

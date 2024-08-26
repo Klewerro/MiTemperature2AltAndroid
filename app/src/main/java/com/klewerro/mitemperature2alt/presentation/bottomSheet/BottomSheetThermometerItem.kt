@@ -27,6 +27,7 @@ import com.klewerro.mitemperature2alt.presentation.bottomSheet.components.Bottom
 fun BottomSheetThermometerItem(
     thermometer: Thermometer,
     onConnectButtonClick: () -> Unit,
+    onThermometerCancelButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
     isSynchronizing: Boolean = false
 ) {
@@ -103,7 +104,8 @@ fun BottomSheetThermometerItem(
                     thermometer.rssi,
                     thermometer.thermometerConnectionStatus,
                     isSynchronizing = isSynchronizing,
-                    modifier = Modifier.layoutId("bottomSheetThermometerStatus")
+                    modifier = Modifier.layoutId("bottomSheetThermometerStatus"),
+                    onCancelClick = onThermometerCancelButtonClick
                 )
             }
             if (thermometer.thermometerConnectionStatus ==
@@ -126,6 +128,7 @@ private fun BottomSheetThermometerItemPreview() {
         BottomSheetThermometerItem(
             thermometer = ThermometerPreviewModels.thermometer,
             onConnectButtonClick = {},
+            onThermometerCancelButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -140,6 +143,7 @@ private fun BottomSheetThermometerItemPreviewThermometerConnectionStatusConnecti
                 thermometerConnectionStatus = ThermometerConnectionStatus.CONNECTING
             ),
             onConnectButtonClick = {},
+            onThermometerCancelButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -154,6 +158,7 @@ private fun BottomSheetThermometerItemPreviewThermometerConnectionStatusConnecte
                 thermometerConnectionStatus = ThermometerConnectionStatus.CONNECTED
             ),
             onConnectButtonClick = {},
+            onThermometerCancelButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -168,6 +173,7 @@ private fun BottomSheetThermometerItemPreviewThermometerConnectionStatusDisconne
                 thermometerConnectionStatus = ThermometerConnectionStatus.DISCONNECTING
             ),
             onConnectButtonClick = {},
+            onThermometerCancelButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -182,6 +188,7 @@ private fun BottomSheetThermometerItemPreviewThermometerConnectionStatusDisconne
                 thermometerConnectionStatus = ThermometerConnectionStatus.DISCONNECTED
             ),
             onConnectButtonClick = {},
+            onThermometerCancelButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -196,6 +203,7 @@ private fun BottomSheetThermometerItemPreviewRssiExcellent() {
                 rssi = RssiStrength.EXCELLENT
             ),
             onConnectButtonClick = {},
+            onThermometerCancelButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -210,6 +218,7 @@ private fun BottomSheetThermometerItemPreviewRssiVeryGood() {
                 rssi = RssiStrength.VERY_GOOD
             ),
             onConnectButtonClick = {},
+            onThermometerCancelButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -224,6 +233,7 @@ private fun BottomSheetThermometerItemPreviewRssiGood() {
                 rssi = RssiStrength.GOOD
             ),
             onConnectButtonClick = {},
+            onThermometerCancelButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -238,6 +248,7 @@ private fun BottomSheetThermometerItemPreviewRssiPoor() {
                 rssi = RssiStrength.POOR
             ),
             onConnectButtonClick = {},
+            onThermometerCancelButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -252,6 +263,7 @@ private fun BottomSheetThermometerItemPreviewRssiUnusable() {
                 rssi = RssiStrength.UNUSABLE
             ),
             onConnectButtonClick = {},
+            onThermometerCancelButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -266,6 +278,7 @@ private fun BottomSheetThermometerItemPreviewRssiUnknown() {
                 rssi = RssiStrength.UNKNOWN
             ),
             onConnectButtonClick = {},
+            onThermometerCancelButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -279,6 +292,7 @@ private fun BottomSheetThermometerItemPerformingOperation() {
             thermometer = ThermometerPreviewModels.thermometer,
             isSynchronizing = true,
             onConnectButtonClick = {},
+            onThermometerCancelButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )
     }

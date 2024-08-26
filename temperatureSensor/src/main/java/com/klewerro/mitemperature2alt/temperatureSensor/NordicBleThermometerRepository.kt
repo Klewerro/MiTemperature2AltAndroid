@@ -10,8 +10,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -251,6 +254,7 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
         var counter: Int
         coroutineScope.launch {
             deviceClient.subscribeToThermometerHourlyRecords()
+                ?.cancellable()
                 ?.transformWhile {
                     counter = it.index + 1
                     Timber.d(
@@ -259,6 +263,12 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
                     emit(it)
                     currentItemNumberUpdate(counter)
                     counter < totalRecords
+                }
+                ?.onEach {
+                    coroutineScope.ensureActive()
+                }
+                ?.catch {
+                    continuation.resume(emptyList())
                 }
                 ?.toCollection(testCollection)
         }.invokeOnCompletion {

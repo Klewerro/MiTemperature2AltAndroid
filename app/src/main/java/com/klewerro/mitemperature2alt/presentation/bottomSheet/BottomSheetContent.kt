@@ -30,6 +30,7 @@ fun BottomSheetContent(
     thermometers: List<Thermometer>,
     thermometerWithRunningOperation: Thermometer? = null,
     onConnectThermometerClick: (Thermometer) -> Unit,
+    onThermometerCancelButtonClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -92,6 +93,7 @@ fun BottomSheetContent(
                     onConnectButtonClick = {
                         onConnectThermometerClick(thermometer)
                     },
+                    onThermometerCancelButtonClick = onThermometerCancelButtonClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(spacing.spaceSmall)
@@ -112,7 +114,8 @@ fun BottomSheetContentPreview() {
                 ThermometerPreviewModels.thermometer,
                 ThermometerPreviewModels.thermometer
             ),
-            onConnectThermometerClick = {}
+            onConnectThermometerClick = {},
+            onThermometerCancelButtonClick = {}
         )
     }
 }
@@ -128,7 +131,8 @@ fun BottomSheetContentOperationPendingPreview() {
                 ThermometerPreviewModels.thermometer,
                 ThermometerPreviewModels.thermometer
             ),
-            onConnectThermometerClick = {}
+            onConnectThermometerClick = {},
+            onThermometerCancelButtonClick = {}
         )
     }
 }
@@ -148,7 +152,8 @@ fun BottomSheetContentGettingHourlyRecordsPreview() {
                 ThermometerPreviewModels.thermometer,
                 ThermometerPreviewModels.thermometer
             ),
-            onConnectThermometerClick = {}
+            onConnectThermometerClick = {},
+            onThermometerCancelButtonClick = {}
         )
     }
 }

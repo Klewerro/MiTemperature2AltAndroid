@@ -1,13 +1,17 @@
 package com.klewerro.mitemperature2alt.presentation.bottomSheet.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.NetworkWifi1Bar
 import androidx.compose.material.icons.filled.NetworkWifi2Bar
 import androidx.compose.material.icons.filled.NetworkWifi3Bar
@@ -26,21 +30,24 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.klewerro.mitemperature2alt.coreUi.R as RCore
 import com.klewerro.mitemperature2alt.domain.model.RssiStrength
 import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
+import com.klewerro.mitemperature2alt.coreUi.R as RCore
 
 @Composable
 fun BottomSheetThermometerStatus(
     rssiStrength: RssiStrength,
     thermometerConnectionStatus: ThermometerConnectionStatus,
     modifier: Modifier = Modifier,
-    isSynchronizing: Boolean = false
+    isSynchronizing: Boolean = false,
+    onCancelClick: () -> Unit
 ) {
     when {
         isSynchronizing -> ThermometerProgress(
             text = stringResource(RCore.string.syncing),
-            modifier = modifier
+            modifier = modifier,
+            isCancelIconVisible = true,
+            onCancelIconClick = onCancelClick
         )
 
         thermometerConnectionStatus == ThermometerConnectionStatus.DISCONNECTED -> Text(
@@ -51,7 +58,9 @@ fun BottomSheetThermometerStatus(
         thermometerConnectionStatus == ThermometerConnectionStatus.CONNECTING -> {
             ThermometerProgress(
                 text = stringResource(RCore.string.connecting),
-                modifier = modifier
+                modifier = modifier,
+                isCancelIconVisible = false,
+                onCancelIconClick = onCancelClick
             )
         }
 
@@ -96,16 +105,34 @@ fun BottomSheetThermometerStatus(
 }
 
 @Composable
-private fun ThermometerProgress(text: String, modifier: Modifier = Modifier) {
+private fun ThermometerProgress(
+    text: String,
+    isCancelIconVisible: Boolean,
+    modifier: Modifier = Modifier,
+    onCancelIconClick: () -> Unit = {}
+) {
     var textSize by remember {
         mutableStateOf(IntSize.Zero)
     }
     Row(modifier = modifier) {
-        CircularProgressIndicator(
+        Box(
             modifier = modifier
                 .padding(horizontal = 8.dp)
                 .size(with(LocalDensity.current) { textSize.height.toDp() })
-        )
+        ) {
+            CircularProgressIndicator()
+            if (isCancelIconVisible) {
+                Icon(
+                    imageVector = Icons.Default.Cancel,
+                    contentDescription = "",
+                    tint = MaterialTheme.colors.error,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clickable { onCancelIconClick() }
+                )
+            }
+        }
+
         Text(
             text = text,
             modifier = Modifier.onGloballyPositioned { layoutCoordinates ->

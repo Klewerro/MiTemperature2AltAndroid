@@ -75,9 +75,25 @@ class MainActivity : ComponentActivity() {
                         BottomSheetContent(
                             thermometerOperationType = bleOperationsSate.thermometerOperationType,
                             thermometers = bleOperationsSate.thermometers,
+                            thermometerWithRunningOperation = with(
+                                bleOperationsSate.thermometerOperationType
+                            ) {
+                                when (this) {
+                                    is ThermometerOperationType.RetrievingHourlyRecords -> {
+                                        this.thermometer
+                                    }
+                                    else -> null
+                                }
+                            },
+
                             onConnectThermometerClick = { thermometer ->
                                 bleOperationsViewModel.onEvent(
                                     BleOperationsEvent.ConnectToDevice(thermometer)
+                                )
+                            },
+                            onThermometerCancelButtonClick = {
+                                bleOperationsViewModel.onEvent(
+                                    BleOperationsEvent.CancelHourlyRecordsSync
                                 )
                             }
                         )

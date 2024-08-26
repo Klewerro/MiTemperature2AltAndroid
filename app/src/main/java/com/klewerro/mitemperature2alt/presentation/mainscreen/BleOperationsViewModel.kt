@@ -11,6 +11,7 @@ import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ThermometerList
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -26,6 +27,8 @@ class BleOperationsViewModel @Inject constructor(
     private val getHourlyResultsUseCase: GetHourlyResultsUseCase,
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
+
+    private var getHourlyRecordsJob: Job? = null
 
     private val _state = MutableStateFlow(BleOperationsState())
     val state = combine(
@@ -63,7 +66,9 @@ class BleOperationsViewModel @Inject constructor(
                             changeThermometerOperationType(ThermometerOperationType.Idle)
                         }
                         .onSuccess {
-                            automaticallyGetHourlyRecords(this, event.thermometer)
+                            getHourlyRecordsJob = this.launch {
+                                automaticallyGetHourlyRecords(this, event.thermometer)
+                            }
                         }
                 }
             }
@@ -74,6 +79,12 @@ class BleOperationsViewModel @Inject constructor(
                         error = null
                     )
                 }
+            }
+
+            BleOperationsEvent.CancelHourlyRecordsSync -> {
+                getHourlyRecordsJob?.cancel()
+                getHourlyRecordsJob = null
+                changeThermometerOperationType(ThermometerOperationType.Idle)
             }
         }
     }
