@@ -27,7 +27,8 @@ import com.klewerro.mitemperature2alt.presentation.bottomSheet.components.Bottom
 fun BottomSheetThermometerItem(
     thermometer: Thermometer,
     onConnectButtonClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isSynchronizing: Boolean = false
 ) {
     val spacing = LocalSpacing.current
 
@@ -101,6 +102,7 @@ fun BottomSheetThermometerItem(
                 BottomSheetThermometerStatus(
                     thermometer.rssi,
                     thermometer.thermometerConnectionStatus,
+                    isSynchronizing = isSynchronizing,
                     modifier = Modifier.layoutId("bottomSheetThermometerStatus")
                 )
             }
@@ -263,6 +265,19 @@ private fun BottomSheetThermometerItemPreviewRssiUnknown() {
             thermometer = ThermometerPreviewModels.thermometer.copy(
                 rssi = RssiStrength.UNKNOWN
             ),
+            onConnectButtonClick = {},
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BottomSheetThermometerItemPerformingOperation() {
+    MiTemperature2AltTheme {
+        BottomSheetThermometerItem(
+            thermometer = ThermometerPreviewModels.thermometer,
+            isSynchronizing = true,
             onConnectButtonClick = {},
             modifier = Modifier.fillMaxWidth()
         )

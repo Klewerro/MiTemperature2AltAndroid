@@ -33,6 +33,8 @@
     <string name="connecting_thermometer_error">Connecting thermometer error</string>
     <string name="connecting">Connecting</string>
     <string name="disconnected">Disconnected</string>
+    <string name="disconnecting">Disconnecting</string>
+    <string name="syncing">Syncing</string>
     <string name="string_of_string_thermometers_connected">%1$s of %2$s thermometers connected</string>
     <string name="connecting_to_string">Connecting to %1$s</string>
     <string name="getting_hourly_records_for_string_int_of_int">Getting hourly records for %1$s (%2$d of %3$d)</string>

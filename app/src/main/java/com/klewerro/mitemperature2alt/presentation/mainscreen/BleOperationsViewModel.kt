@@ -85,7 +85,7 @@ class BleOperationsViewModel @Inject constructor(
         getHourlyResultsUseCase(coroutineScope, thermometer.address) { progressCallback ->
             changeThermometerOperationType(
                 ThermometerOperationType.RetrievingHourlyRecords(
-                    thermometerName = thermometer.name,
+                    thermometer = thermometer,
                     currentRecordNumber = progressCallback.currentItemNumber,
                     numberOrRecords = progressCallback.itemsCount
                 )

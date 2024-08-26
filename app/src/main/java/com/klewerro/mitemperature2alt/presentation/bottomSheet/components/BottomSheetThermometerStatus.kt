@@ -23,8 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.klewerro.mitemperature2alt.coreUi.R as RCore
 import com.klewerro.mitemperature2alt.domain.model.RssiStrength
 import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 
@@ -32,37 +34,28 @@ import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 fun BottomSheetThermometerStatus(
     rssiStrength: RssiStrength,
     thermometerConnectionStatus: ThermometerConnectionStatus,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isSynchronizing: Boolean = false
 ) {
-    when (thermometerConnectionStatus) {
-        ThermometerConnectionStatus.DISCONNECTED -> {
-            Text(
-                text = "Disconnected",
+    when {
+        isSynchronizing -> ThermometerProgress(
+            text = stringResource(RCore.string.syncing),
+            modifier = modifier
+        )
+
+        thermometerConnectionStatus == ThermometerConnectionStatus.DISCONNECTED -> Text(
+            text = stringResource(RCore.string.disconnected),
+            modifier = modifier
+        )
+
+        thermometerConnectionStatus == ThermometerConnectionStatus.CONNECTING -> {
+            ThermometerProgress(
+                text = stringResource(RCore.string.connecting),
                 modifier = modifier
             )
         }
 
-        ThermometerConnectionStatus.CONNECTING -> {
-            var textSize by remember {
-                mutableStateOf(IntSize.Zero)
-            }
-            Row(modifier = modifier) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .size(with(LocalDensity.current) { textSize.height.toDp() })
-                )
-                Text(
-                    text = "Connecting",
-                    modifier = Modifier.onGloballyPositioned { layoutCoordinates ->
-                        textSize = layoutCoordinates.size
-                    },
-                    color = MaterialTheme.colors.primary
-                )
-            }
-        }
-
-        ThermometerConnectionStatus.CONNECTED -> {
+        thermometerConnectionStatus == ThermometerConnectionStatus.CONNECTED -> {
             Row(modifier = modifier) {
                 Image(
                     imageVector = when (rssiStrength) {
@@ -84,20 +77,41 @@ fun BottomSheetThermometerStatus(
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
                 Text(
-                    text = "Connected",
+                    text = stringResource(RCore.string.connected),
                     color = MaterialTheme.colors.primary
                 )
             }
         }
 
-        ThermometerConnectionStatus.DISCONNECTING -> {
+        thermometerConnectionStatus == ThermometerConnectionStatus.DISCONNECTING -> {
             Row(modifier = modifier) {
                 CircularProgressIndicator(modifier = Modifier.padding(horizontal = 8.dp))
                 Text(
-                    text = "Disconnecting",
+                    text = stringResource(RCore.string.disconnecting),
                     color = MaterialTheme.colors.primary
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun ThermometerProgress(text: String, modifier: Modifier = Modifier) {
+    var textSize by remember {
+        mutableStateOf(IntSize.Zero)
+    }
+    Row(modifier = modifier) {
+        CircularProgressIndicator(
+            modifier = modifier
+                .padding(horizontal = 8.dp)
+                .size(with(LocalDensity.current) { textSize.height.toDp() })
+        )
+        Text(
+            text = text,
+            modifier = Modifier.onGloballyPositioned { layoutCoordinates ->
+                textSize = layoutCoordinates.size
+            },
+            color = MaterialTheme.colors.primary
+        )
     }
 }

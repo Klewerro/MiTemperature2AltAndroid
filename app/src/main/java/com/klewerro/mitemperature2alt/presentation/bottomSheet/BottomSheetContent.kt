@@ -28,6 +28,7 @@ import com.klewerro.mitemperature2alt.presentation.mainscreen.ThermometerOperati
 fun BottomSheetContent(
     thermometerOperationType: ThermometerOperationType,
     thermometers: List<Thermometer>,
+    thermometerWithRunningOperation: Thermometer? = null,
     onConnectThermometerClick: (Thermometer) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -73,7 +74,7 @@ fun BottomSheetContent(
 
                 is ThermometerOperationType.RetrievingHourlyRecords -> stringResource(
                     R.string.getting_hourly_records_for_string_int_of_int,
-                    thermometerOperationType.thermometerName,
+                    thermometerOperationType.thermometer.name,
                     thermometerOperationType.currentRecordNumber,
                     thermometerOperationType.numberOrRecords
                 )
@@ -84,8 +85,10 @@ fun BottomSheetContent(
 
         LazyColumn {
             items(thermometers) { thermometer ->
+                val isFetching = thermometerWithRunningOperation?.address == thermometer.address
                 BottomSheetThermometerItem(
                     thermometer = thermometer,
+                    isSynchronizing = isFetching,
                     onConnectButtonClick = {
                         onConnectThermometerClick(thermometer)
                     },
@@ -136,7 +139,7 @@ fun BottomSheetContentGettingHourlyRecordsPreview() {
     MiTemperature2AltTheme {
         BottomSheetContent(
             thermometerOperationType = ThermometerOperationType.RetrievingHourlyRecords(
-                ThermometerPreviewModels.thermometer.name,
+                ThermometerPreviewModels.thermometer,
                 1,
                 32
             ),
