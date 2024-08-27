@@ -29,7 +29,8 @@ fun BottomSheetThermometerItem(
     onConnectButtonClick: () -> Unit,
     onThermometerCancelButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isSynchronizing: Boolean = false
+    isSynchronizing: Boolean = false,
+    isClickingEnabled: Boolean
 ) {
     val spacing = LocalSpacing.current
 
@@ -95,6 +96,7 @@ fun BottomSheetThermometerItem(
             ) {
                 Button(
                     onClick = onConnectButtonClick,
+                    enabled = isClickingEnabled,
                     modifier = Modifier.layoutId("connectButton")
                 ) {
                     Text(text = stringResource(id = R.string.connect))
@@ -129,6 +131,7 @@ private fun BottomSheetThermometerItemPreview() {
             thermometer = ThermometerPreviewModels.thermometer,
             onConnectButtonClick = {},
             onThermometerCancelButtonClick = {},
+            isClickingEnabled = true,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -144,6 +147,7 @@ private fun BottomSheetThermometerItemPreviewThermometerConnectionStatusConnecti
             ),
             onConnectButtonClick = {},
             onThermometerCancelButtonClick = {},
+            isClickingEnabled = true,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -159,6 +163,7 @@ private fun BottomSheetThermometerItemPreviewThermometerConnectionStatusConnecte
             ),
             onConnectButtonClick = {},
             onThermometerCancelButtonClick = {},
+            isClickingEnabled = true,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -174,6 +179,7 @@ private fun BottomSheetThermometerItemPreviewThermometerConnectionStatusDisconne
             ),
             onConnectButtonClick = {},
             onThermometerCancelButtonClick = {},
+            isClickingEnabled = true,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -189,6 +195,7 @@ private fun BottomSheetThermometerItemPreviewThermometerConnectionStatusDisconne
             ),
             onConnectButtonClick = {},
             onThermometerCancelButtonClick = {},
+            isClickingEnabled = false,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -204,6 +211,7 @@ private fun BottomSheetThermometerItemPreviewRssiExcellent() {
             ),
             onConnectButtonClick = {},
             onThermometerCancelButtonClick = {},
+            isClickingEnabled = true,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -219,6 +227,7 @@ private fun BottomSheetThermometerItemPreviewRssiVeryGood() {
             ),
             onConnectButtonClick = {},
             onThermometerCancelButtonClick = {},
+            isClickingEnabled = true,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -234,6 +243,7 @@ private fun BottomSheetThermometerItemPreviewRssiGood() {
             ),
             onConnectButtonClick = {},
             onThermometerCancelButtonClick = {},
+            isClickingEnabled = true,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -249,6 +259,7 @@ private fun BottomSheetThermometerItemPreviewRssiPoor() {
             ),
             onConnectButtonClick = {},
             onThermometerCancelButtonClick = {},
+            isClickingEnabled = true,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -264,6 +275,7 @@ private fun BottomSheetThermometerItemPreviewRssiUnusable() {
             ),
             onConnectButtonClick = {},
             onThermometerCancelButtonClick = {},
+            isClickingEnabled = true,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -279,6 +291,7 @@ private fun BottomSheetThermometerItemPreviewRssiUnknown() {
             ),
             onConnectButtonClick = {},
             onThermometerCancelButtonClick = {},
+            isClickingEnabled = true,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -293,6 +306,7 @@ private fun BottomSheetThermometerItemPerformingOperation() {
             isSynchronizing = true,
             onConnectButtonClick = {},
             onThermometerCancelButtonClick = {},
+            isClickingEnabled = true,
             modifier = Modifier.fillMaxWidth()
         )
     }

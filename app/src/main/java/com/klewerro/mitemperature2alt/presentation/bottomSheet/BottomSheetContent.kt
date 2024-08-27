@@ -94,6 +94,7 @@ fun BottomSheetContent(
                         onConnectThermometerClick(thermometer)
                     },
                     onThermometerCancelButtonClick = onThermometerCancelButtonClick,
+                    isClickingEnabled = thermometerOperationType == ThermometerOperationType.Idle,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(spacing.spaceSmall)
