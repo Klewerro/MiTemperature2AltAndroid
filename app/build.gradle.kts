@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.bundles.androidX)
     implementation(libs.bundles.compose)
     implementation(libs.contraintLayout)
+    implementation(libs.revealswipe)
     implementation(libs.timber)
 
     // Hilt

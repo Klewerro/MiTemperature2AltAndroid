@@ -10,7 +10,6 @@ import com.klewerro.mitemperature2alt.domain.usecase.ScanAndConnectToDeviceUseCa
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ThermometerListUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -63,13 +62,8 @@ class BleOperationsViewModel @Inject constructor(
                                     )
                                 )
                             }
-                            changeThermometerOperationType(ThermometerOperationType.Idle)
                         }
-                        .onSuccess {
-                            getHourlyRecordsJob = this.launch {
-                                automaticallyGetHourlyRecords(this, event.thermometer)
-                            }
-                        }
+                    changeThermometerOperationType(ThermometerOperationType.Idle)
                 }
             }
 
@@ -86,23 +80,24 @@ class BleOperationsViewModel @Inject constructor(
                 getHourlyRecordsJob = null
                 changeThermometerOperationType(ThermometerOperationType.Idle)
             }
+
+            is BleOperationsEvent.SyncHourlyRecords -> getHourlyRecords(event.thermometer)
         }
     }
 
-    private suspend fun automaticallyGetHourlyRecords(
-        coroutineScope: CoroutineScope,
-        thermometer: Thermometer
-    ) {
-        getHourlyResultsUseCase(coroutineScope, thermometer.address) { progressCallback ->
-            changeThermometerOperationType(
-                ThermometerOperationType.RetrievingHourlyRecords(
-                    thermometer = thermometer,
-                    currentRecordNumber = progressCallback.currentItemNumber,
-                    numberOrRecords = progressCallback.itemsCount
+    private fun getHourlyRecords(thermometer: Thermometer) {
+        getHourlyRecordsJob = viewModelScope.launch(dispatchers.io) {
+            getHourlyResultsUseCase(this, thermometer.address) { progressCallback ->
+                changeThermometerOperationType(
+                    ThermometerOperationType.RetrievingHourlyRecords(
+                        thermometer = thermometer,
+                        currentRecordNumber = progressCallback.currentItemNumber,
+                        numberOrRecords = progressCallback.itemsCount
+                    )
                 )
-            )
+            }
+            changeThermometerOperationType(ThermometerOperationType.Idle)
         }
-        changeThermometerOperationType(ThermometerOperationType.Idle)
     }
 
     private fun changeThermometerOperationType(operationType: ThermometerOperationType) {

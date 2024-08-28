@@ -95,7 +95,13 @@ class MainActivity : ComponentActivity() {
                                 bleOperationsViewModel.onEvent(
                                     BleOperationsEvent.CancelHourlyRecordsSync
                                 )
-                            }
+                            },
+                            onSyncThermometerClick = {
+                                bleOperationsViewModel.onEvent(
+                                    BleOperationsEvent.SyncHourlyRecords(it)
+                                )
+                            },
+                            onDisconnectThermometerClick = { TODO("To implementation.") }
                         )
                     },
                     sheetShape = RoundedCornerShape(12.dp),

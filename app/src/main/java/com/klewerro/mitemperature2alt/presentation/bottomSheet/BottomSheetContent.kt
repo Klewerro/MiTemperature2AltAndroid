@@ -28,10 +28,12 @@ import com.klewerro.mitemperature2alt.presentation.mainscreen.ThermometerOperati
 fun BottomSheetContent(
     thermometerOperationType: ThermometerOperationType,
     thermometers: List<Thermometer>,
-    thermometerWithRunningOperation: Thermometer? = null,
     onConnectThermometerClick: (Thermometer) -> Unit,
     onThermometerCancelButtonClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onSyncThermometerClick: (Thermometer) -> Unit,
+    onDisconnectThermometerClick: (Thermometer) -> Unit,
+    modifier: Modifier = Modifier,
+    thermometerWithRunningOperation: Thermometer? = null
 ) {
     val spacing = LocalSpacing.current
 
@@ -94,6 +96,12 @@ fun BottomSheetContent(
                         onConnectThermometerClick(thermometer)
                     },
                     onThermometerCancelButtonClick = onThermometerCancelButtonClick,
+                    onSyncClick = {
+                        onSyncThermometerClick(thermometer)
+                    },
+                    onDisconnectClick = {
+                        onDisconnectThermometerClick(thermometer)
+                    },
                     isClickingEnabled = thermometerOperationType == ThermometerOperationType.Idle,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -116,7 +124,9 @@ fun BottomSheetContentPreview() {
                 ThermometerPreviewModels.thermometer
             ),
             onConnectThermometerClick = {},
-            onThermometerCancelButtonClick = {}
+            onThermometerCancelButtonClick = {},
+            onSyncThermometerClick = {},
+            onDisconnectThermometerClick = {}
         )
     }
 }
@@ -133,7 +143,9 @@ fun BottomSheetContentOperationPendingPreview() {
                 ThermometerPreviewModels.thermometer
             ),
             onConnectThermometerClick = {},
-            onThermometerCancelButtonClick = {}
+            onThermometerCancelButtonClick = {},
+            onSyncThermometerClick = {},
+            onDisconnectThermometerClick = {}
         )
     }
 }
@@ -154,7 +166,9 @@ fun BottomSheetContentGettingHourlyRecordsPreview() {
                 ThermometerPreviewModels.thermometer
             ),
             onConnectThermometerClick = {},
-            onThermometerCancelButtonClick = {}
+            onThermometerCancelButtonClick = {},
+            onSyncThermometerClick = {},
+            onDisconnectThermometerClick = {}
         )
     }
 }
