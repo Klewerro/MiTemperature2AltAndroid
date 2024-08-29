@@ -34,6 +34,10 @@ class ThermometerDeviceBleClient(private val connection: ClientBleGatt) {
         )
     }
 
+    fun disconnect() {
+        connection.disconnect()
+    }
+
     suspend fun readThermometerStatus(): ThermometerStatus? {
         val readResult = temperatureHumidityCharacteristic?.read()
         return readResult?.let {

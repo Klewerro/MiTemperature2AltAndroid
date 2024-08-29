@@ -7,15 +7,18 @@ import com.klewerro.mitemperature2alt.coreUi.util.UiText
 import com.klewerro.mitemperature2alt.domain.model.Thermometer
 import com.klewerro.mitemperature2alt.domain.usecase.GetHourlyResultsUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.ScanAndConnectToDeviceUseCase
+import com.klewerro.mitemperature2alt.domain.usecase.thermometer.DisconnectUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ThermometerListUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,10 +27,12 @@ class BleOperationsViewModel @Inject constructor(
     thermometerListUseCase: ThermometerListUseCase,
     private val scanAndConnectToDeviceUseCase: ScanAndConnectToDeviceUseCase,
     private val getHourlyResultsUseCase: GetHourlyResultsUseCase,
+    private val disconnectUseCase: DisconnectUseCase,
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
     private var getHourlyRecordsJob: Job? = null
+    private var deviceConnectionJobs: MutableMap<String, Job> = mutableMapOf()
 
     private val _state = MutableStateFlow(BleOperationsState())
     val state = combine(
@@ -62,6 +67,11 @@ class BleOperationsViewModel @Inject constructor(
                                     )
                                 )
                             }
+                            this.coroutineContext.job.cancelAndJoin()
+                        }
+                        .onSuccess {
+                            deviceConnectionJobs[event.thermometer.address] =
+                                this.coroutineContext.job
                         }
                     changeThermometerOperationType(ThermometerOperationType.Idle)
                 }
@@ -82,6 +92,7 @@ class BleOperationsViewModel @Inject constructor(
             }
 
             is BleOperationsEvent.SyncHourlyRecords -> getHourlyRecords(event.thermometer)
+            is BleOperationsEvent.Disconnect -> disconnectThermometer(event.thermometer)
         }
     }
 
@@ -97,6 +108,14 @@ class BleOperationsViewModel @Inject constructor(
                 )
             }
             changeThermometerOperationType(ThermometerOperationType.Idle)
+        }
+    }
+
+    private fun disconnectThermometer(thermometer: Thermometer) {
+        viewModelScope.launch(dispatchers.io) {
+            disconnectUseCase(thermometer.address)
+            deviceConnectionJobs[thermometer.address]?.cancelAndJoin()
+            deviceConnectionJobs.remove(thermometer.address)
         }
     }
 

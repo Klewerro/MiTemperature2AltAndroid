@@ -8,4 +8,5 @@ sealed class BleOperationsEvent {
     data object ErrorDismissed : BleOperationsEvent()
     data object CancelHourlyRecordsSync : BleOperationsEvent()
     data class SyncHourlyRecords(val thermometer: Thermometer) : BleOperationsEvent()
+    data class Disconnect(val thermometer: Thermometer) : BleOperationsEvent()
 }

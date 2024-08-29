@@ -91,6 +91,10 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
         }
     }
 
+    override fun disconnect(deviceAddress: String) {
+        connectedDevicesClients[deviceAddress]?.disconnect()
+    }
+
     override suspend fun readCurrentThermometerStatus(deviceAddress: String): ThermometerStatus? {
         connectedDevicesClients[deviceAddress]?.let { deviceClient ->
             val readStatus = deviceClient.readThermometerStatus()
@@ -160,6 +164,11 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
                 }
                 ?.distinctUntilChanged()
                 ?.launchIn(coroutineScope)
+                ?.invokeOnCompletion {
+                    _connectedDevicesStatuses.update {
+                        it.minus(deviceAddress)
+                    }
+                }
         }
     }
 
@@ -168,8 +177,8 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
         coroutineScope: CoroutineScope
     ) {
         connectedDevicesClients[deviceAddress]?.let { deviceClient ->
-            coroutineScope.launch(Dispatchers.IO) {
-                deviceClient.connectionState.collect { gattConnectionState ->
+            deviceClient.connectionState
+                .onEach { gattConnectionState ->
                     _thermometerConnectionStatuses.updateUsingMutableMap(
                         deviceAddress,
                         when (gattConnectionState) {
@@ -187,7 +196,12 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
                         }
                     )
                 }
-            }
+                .launchIn(coroutineScope)
+                .invokeOnCompletion {
+                    _thermometerConnectionStatuses.update {
+                        it.minus(deviceAddress)
+                    }
+                }
         }
     }
 
@@ -200,6 +214,10 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
                         it.plus(deviceAddress to rssi)
                     }
                     delay(BleConstants.READ_RSSI_DELAY)
+                }
+            }.invokeOnCompletion {
+                _rssiStrengths.update {
+                    it.minus(deviceAddress)
                 }
             }
         }
@@ -234,6 +252,11 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
                     mappedConnectionStatus
                 )
             }.launchIn(coroutineScope)
+            .invokeOnCompletion {
+                _thermometerConnectionStatuses.update {
+                    it.minus(address)
+                }
+            }
     }
 
     private fun <V, K> MutableStateFlow<Map<V, K>>.updateUsingMutableMap(key: V, value: K) {

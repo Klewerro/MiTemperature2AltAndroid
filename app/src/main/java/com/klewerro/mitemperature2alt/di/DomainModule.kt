@@ -5,6 +5,7 @@ import com.klewerro.mitemperature2alt.domain.repository.PersistenceRepository
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
 import com.klewerro.mitemperature2alt.domain.usecase.GetHourlyResultsUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.ScanAndConnectToDeviceUseCase
+import com.klewerro.mitemperature2alt.domain.usecase.thermometer.DisconnectUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ThermometerListUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
@@ -44,6 +45,11 @@ object DomainModule {
         thermometerRepository: ThermometerRepository,
         hourlyRecordRepository: HourlyRecordRepository
     ) = GetHourlyResultsUseCase(thermometerRepository, hourlyRecordRepository)
+
+    @Provides
+    @ViewModelScoped
+    fun provideDisconnectUseCase(thermometerRepository: ThermometerRepository) =
+        DisconnectUseCase(thermometerRepository)
 }
 
 @Module

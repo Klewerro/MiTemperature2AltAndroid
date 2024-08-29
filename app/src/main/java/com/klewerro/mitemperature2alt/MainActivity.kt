@@ -42,6 +42,7 @@ import com.klewerro.mitemperature2alt.presentation.bottomSheet.BottomSheetConten
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsEvent
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
+import com.klewerro.mitemperature2alt.presentation.mainscreen.ThermometerOperationType
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
 import com.klewerro.mitemperature2alt.presentation.navigation.Route
 import dagger.hilt.android.AndroidEntryPoint
@@ -101,7 +102,11 @@ class MainActivity : ComponentActivity() {
                                     BleOperationsEvent.SyncHourlyRecords(it)
                                 )
                             },
-                            onDisconnectThermometerClick = { TODO("To implementation.") }
+                            onDisconnectThermometerClick = {
+                                bleOperationsViewModel.onEvent(
+                                    BleOperationsEvent.Disconnect(it)
+                                )
+                            }
                         )
                     },
                     sheetShape = RoundedCornerShape(12.dp),

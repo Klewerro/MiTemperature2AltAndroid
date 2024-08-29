@@ -19,6 +19,7 @@ interface ThermometerRepository {
     fun scanForDevices(coroutineScope: CoroutineScope): Job
     suspend fun connectToDevice(coroutineScope: CoroutineScope, address: String)
     suspend fun scanAndConnect(coroutineScope: CoroutineScope, address: String)
+    fun disconnect(deviceAddress: String)
 
     suspend fun readCurrentThermometerStatus(deviceAddress: String): ThermometerStatus?
     suspend fun readLastIndexAndTotalRecords(deviceAddress: String): LastIndexTotalRecords?
