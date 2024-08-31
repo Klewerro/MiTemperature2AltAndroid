@@ -196,6 +196,8 @@ class NordicBleThermometerRepositoryTest {
                 val expectedConnectedItem = mapOf(
                     mac1 to ThermometerConnectionStatus.CONNECTED
                 )
+                awaitItem() // Last item, called after invokeOnCompletion
+
                 assertThat(connectingItem).isEqualTo(expectedConnectingItem)
                 assertThat(connectedItem).isEqualTo(expectedConnectedItem)
             }
@@ -226,6 +228,8 @@ class NordicBleThermometerRepositoryTest {
                 val expectedDisconnectedItem = mapOf(
                     mac1 to ThermometerConnectionStatus.DISCONNECTED
                 )
+                awaitItem() // Last item, called after invokeOnCompletion
+
                 assertThat(connectingItem).isEqualTo(expectedConnectingItem)
                 assertThat(connectedItem).isEqualTo(expectedConnectedItem)
                 assertThat(disconnectedItem).isEqualTo(expectedDisconnectedItem)

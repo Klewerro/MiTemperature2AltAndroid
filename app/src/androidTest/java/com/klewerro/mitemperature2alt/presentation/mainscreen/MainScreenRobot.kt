@@ -7,12 +7,11 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.hasClickAction
-import androidx.compose.ui.test.hasParent
-import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.klewerro.mitemperature2alt.MainActivityComposeRule
+import com.klewerro.mitemperature2alt.ProjectSemanticMatchers
 import com.klewerro.mitemperature2alt.coreUi.R
 
 class MainScreenRobot(
@@ -23,7 +22,7 @@ class MainScreenRobot(
         .onNode(
             hasClickAction() and
                 hasText(context.getString(R.string.connect)) and
-                hasParent(hasTestTag("thermometerBox"))
+                ProjectSemanticMatchers.thermometerBox
         )
 
     private val hasCelsiusTextMatcher = hasText("°C", substring = true, ignoreCase = true)
@@ -32,11 +31,14 @@ class MainScreenRobot(
         connectThermometerBoxNode.performClick()
     }
 
+    val test: SemanticsMatcher = hasText("", ignoreCase = true)
+
     @OptIn(ExperimentalTestApi::class)
     fun waitUntilConnectingTextExists() = apply {
         composeRule
             .waitUntilExactlyOneExists(
-                hasText(context.getString(R.string.connecting), ignoreCase = true),
+                hasText(context.getString(R.string.connecting), ignoreCase = true) and
+                    ProjectSemanticMatchers.thermometerBox,
                 1_500
             )
     }
@@ -61,8 +63,14 @@ class MainScreenRobot(
     }
 
     fun assertConnectingTextIsDisplayed() = apply {
+//        composeRule
+//            .onNodeWithText(context.getString(R.string.connecting), ignoreCase = true)
+//            .assertIsDisplayed()
         composeRule
-            .onNodeWithText(context.getString(R.string.connecting), ignoreCase = true)
+            .onNode(
+                hasText(context.getString(R.string.connecting), ignoreCase = true) and
+                    ProjectSemanticMatchers.thermometerBox
+            )
             .assertIsDisplayed()
     }
 
@@ -75,7 +83,8 @@ class MainScreenRobot(
     fun assertProgressBarVisibility(isDisplayed: Boolean) = apply {
         composeRule
             .onNode(
-                SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo)
+                SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo) and
+                    ProjectSemanticMatchers.thermometerBox
             )
             .run {
                 if (isDisplayed) {

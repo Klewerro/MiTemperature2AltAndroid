@@ -1,6 +1,8 @@
 package com.klewerro.mitemperature2alt.coreTest.fake
 
 import com.klewerro.mitemperature2alt.coreTest.generators.ThermometerScanResultsGenerator
+import com.klewerro.mitemperature2alt.domain.model.HourlyRecord
+import com.klewerro.mitemperature2alt.domain.model.LastIndexTotalRecords
 import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
@@ -103,8 +105,18 @@ class FakeThermometerRepository : ThermometerRepository {
         }
     }
 
+    override fun disconnect(deviceAddress: String) {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun readCurrentThermometerStatus(deviceAddress: String): ThermometerStatus =
         thermometerStatus
+
+    override suspend fun readLastIndexAndTotalRecords(
+        deviceAddress: String
+    ): LastIndexTotalRecords? {
+        TODO("Not yet implemented")
+    }
 
     override suspend fun subscribeToCurrentThermometerStatus(
         deviceAddress: String,
@@ -147,5 +159,14 @@ class FakeThermometerRepository : ThermometerRepository {
             }
             delay(operationDelay)
         }
+    }
+
+    override suspend fun readThermometerHourlyRecords(
+        coroutineScope: CoroutineScope,
+        deviceAddress: String,
+        startIndex: Int,
+        progressUpdate: (Int, Int) -> Unit
+    ): List<HourlyRecord>? {
+        TODO("Not yet implemented")
     }
 }

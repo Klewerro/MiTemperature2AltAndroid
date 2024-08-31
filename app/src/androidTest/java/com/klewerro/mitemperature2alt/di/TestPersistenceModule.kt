@@ -2,7 +2,9 @@ package com.klewerro.mitemperature2alt.di
 
 import android.app.Application
 import androidx.room.Room
+import com.klewerro.mitemperature2alt.domain.repository.HourlyRecordRepository
 import com.klewerro.mitemperature2alt.domain.repository.PersistenceRepository
+import com.klewerro.mitemperature2alt.persistence.RoomHourRecordRepository
 import com.klewerro.mitemperature2alt.persistence.RoomThermometerRepository
 import com.klewerro.mitemperature2alt.persistence.ThermometerDatabase
 import com.klewerro.mitemperature2alt.persistence.di.PersistenceModule
@@ -21,18 +23,21 @@ object TestPersistenceModule {
 
     @Provides
     @Singleton
-    fun provideThermometerDatabase(app: Application): ThermometerDatabase {
-        return Room.inMemoryDatabaseBuilder(
+    fun provideThermometerDatabase(app: Application): ThermometerDatabase =
+        Room.inMemoryDatabaseBuilder(
             app,
             ThermometerDatabase::class.java
         ).build()
-    }
 
     @Provides
     @Singleton
     fun providePersistenceRepository(
         thermometerDatabase: ThermometerDatabase
-    ): PersistenceRepository {
-        return RoomThermometerRepository(thermometerDatabase.thermometerDao)
-    }
+    ): PersistenceRepository = RoomThermometerRepository(thermometerDatabase.thermometerDao)
+
+    @Provides
+    @Singleton
+    fun provideHourRecordRepository(
+        thermometerDatabase: ThermometerDatabase
+    ): HourlyRecordRepository = RoomHourRecordRepository(thermometerDatabase.hourRecordDao)
 }

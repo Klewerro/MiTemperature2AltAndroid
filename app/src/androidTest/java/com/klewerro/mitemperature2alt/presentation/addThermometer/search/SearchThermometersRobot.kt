@@ -15,6 +15,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.klewerro.mitemperature2alt.MainActivityComposeRule
+import com.klewerro.mitemperature2alt.ProjectSemanticMatchers
 import com.klewerro.mitemperature2alt.coreUi.R
 
 @OptIn(ExperimentalTestApi::class)
@@ -114,7 +115,10 @@ class SearchThermometersRobot(
     fun assertThermometerBoxWithThermometerNameIsDisplayedOnMainScreen(thermometerName: String) =
         apply {
             composeRule
-                .onNodeWithText(thermometerName)
+                .onNode(
+                    ProjectSemanticMatchers.thermometerBox and
+                        hasText(thermometerName)
+                )
                 .assertIsDisplayed()
         }
 }
