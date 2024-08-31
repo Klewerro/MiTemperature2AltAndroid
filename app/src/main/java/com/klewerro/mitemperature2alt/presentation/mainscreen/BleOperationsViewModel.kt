@@ -5,10 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.coreUi.util.UiText
 import com.klewerro.mitemperature2alt.domain.model.Thermometer
+import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
 import com.klewerro.mitemperature2alt.domain.usecase.GetHourlyResultsUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.ScanAndConnectToDeviceUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.DisconnectUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ThermometerListUseCase
+import com.klewerro.mitemperature2alt.domain.usecase.ThermometerListUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -25,9 +25,9 @@ import javax.inject.Inject
 @HiltViewModel
 class BleOperationsViewModel @Inject constructor(
     thermometerListUseCase: ThermometerListUseCase,
+    private val thermometerRepository: ThermometerRepository,
     private val scanAndConnectToDeviceUseCase: ScanAndConnectToDeviceUseCase,
     private val getHourlyResultsUseCase: GetHourlyResultsUseCase,
-    private val disconnectUseCase: DisconnectUseCase,
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
@@ -113,7 +113,7 @@ class BleOperationsViewModel @Inject constructor(
 
     private fun disconnectThermometer(thermometer: Thermometer) {
         viewModelScope.launch(dispatchers.io) {
-            disconnectUseCase(thermometer.address)
+            thermometerRepository.disconnect(thermometer.address)
             deviceConnectionJobs[thermometer.address]?.cancelAndJoin()
             deviceConnectionJobs.remove(thermometer.address)
         }

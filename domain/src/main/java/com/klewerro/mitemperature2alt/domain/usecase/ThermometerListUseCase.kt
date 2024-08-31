@@ -1,4 +1,4 @@
-package com.klewerro.mitemperature2alt.domain.usecase.thermometer
+package com.klewerro.mitemperature2alt.domain.usecase
 
 import com.klewerro.mitemperature2alt.domain.mapper.RssiStrengthMapper
 import com.klewerro.mitemperature2alt.domain.model.Thermometer
