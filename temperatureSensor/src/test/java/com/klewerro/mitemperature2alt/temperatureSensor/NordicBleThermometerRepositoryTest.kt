@@ -5,11 +5,17 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotEqualTo
+import assertk.assertions.isNotNull
+import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.klewerro.mitemperature2alt.coreTest.fake.FakeThermometerDevicesBleScanner
+import com.klewerro.mitemperature2alt.domain.model.HourlyRecord
+import com.klewerro.mitemperature2alt.domain.model.LastIndexTotalRecords
 import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import no.nordicsemi.android.kotlin.ble.core.data.GattConnectionState
@@ -235,6 +241,122 @@ class NordicBleThermometerRepositoryTest {
                 assertThat(disconnectedItem).isEqualTo(expectedDisconnectedItem)
             }
         }
+    }
+    // endregion
+
+    // region readThermometerHourlyRecords
+    @Test
+    fun `readThermometerHourlyRecords if totalRecords == 0 return null`() {
+        runTest {
+            nordicBleThermometerRepository.scanAndConnect(this, mac1)
+
+            val result = nordicBleThermometerRepository.readThermometerHourlyRecords(
+                coroutineScope = this,
+                deviceAddress = mac1,
+                startIndex = 0
+            ) { currentItem, total ->
+                // Unused
+            }
+
+            assertThat(result).isNull()
+        }
+    }
+
+    @Test
+    fun `readThermometerHourlyRecords if totalRecords == 0 wont call callback`() {
+        runTest {
+            nordicBleThermometerRepository.scanAndConnect(this, mac1)
+
+            var wasCallbackCalled = false
+            nordicBleThermometerRepository.readThermometerHourlyRecords(
+                coroutineScope = this,
+                deviceAddress = mac1,
+                startIndex = 0
+            ) { currentItem, total ->
+                wasCallbackCalled = true
+            }
+
+            assertThat(wasCallbackCalled).isFalse()
+        }
+    }
+
+    @Test
+    fun `readThermometerHourlyRecords return correct number of records and callbacks`() {
+        val totalRecords = 15
+        fakeThermometerDevicesBleScanner.lastIndexTotalRecords = LastIndexTotalRecords(
+            lastIndex = totalRecords - 1,
+            totalRecords = totalRecords
+        )
+        runTest {
+            nordicBleThermometerRepository.scanAndConnect(this, mac1)
+
+            var callbackCounter = 0
+            val result = nordicBleThermometerRepository.readThermometerHourlyRecords(
+                coroutineScope = this,
+                deviceAddress = mac1,
+                startIndex = 0
+            ) { currentItem, total ->
+                ++callbackCounter
+            }
+
+            assertThat(result).isNotNull()
+            assertThat(result?.size).isEqualTo(totalRecords)
+            assertThat(callbackCounter).isEqualTo(totalRecords + 1) // Plus initial 0 progress emission
+        }
+    }
+
+    @Test
+    fun `readThermometerHourlyRecords when operation is aborted returns incomplete list of collected hourlyRecords and callbacks`() {
+        val totalRecords = 15
+        fakeThermometerDevicesBleScanner.lastIndexTotalRecords = LastIndexTotalRecords(
+            lastIndex = totalRecords - 1,
+            totalRecords = totalRecords
+        )
+        var callbackCounter = 0
+        var result: List<HourlyRecord>? = emptyList()
+        assertThrows<java.util.concurrent.CancellationException> {
+            runTest {
+                nordicBleThermometerRepository.scanAndConnect(this, mac1)
+
+                result = nordicBleThermometerRepository.readThermometerHourlyRecords(
+                    coroutineScope = this,
+                    deviceAddress = mac1,
+                    startIndex = 0
+                ) { currentItem, total ->
+                    if (currentItem == 5) {
+                        this.coroutineContext.job.cancel("Cancelled for testing purposes")
+                    }
+                    callbackCounter++
+                }
+            }
+        }
+
+        assertThat(result?.size).isEqualTo(5)
+        assertThat(callbackCounter).isEqualTo(5 + 1)
+    }
+
+    @Test
+    fun `readThermometerHourlyRecords when exception is thrown during collecting hourlyRecords return emptyList`() {
+        val totalRecords = 15
+        fakeThermometerDevicesBleScanner.lastIndexTotalRecords = LastIndexTotalRecords(
+            lastIndex = totalRecords - 1,
+            totalRecords = totalRecords
+        )
+        fakeThermometerDevicesBleScanner.subscribeToThermometerHourlyRecordsThrowException = true
+        var result: List<HourlyRecord>? = listOf<HourlyRecord>()
+        runTest {
+            nordicBleThermometerRepository.scanAndConnect(this, mac1)
+
+            result = nordicBleThermometerRepository.readThermometerHourlyRecords(
+                coroutineScope = this,
+                deviceAddress = mac1,
+                startIndex = 0
+            ) { currentItem, total ->
+                // Unused
+            }
+        }
+
+        assertThat(result?.size).isEqualTo(0)
     }
     // endregion
 }

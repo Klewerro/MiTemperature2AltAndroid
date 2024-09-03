@@ -273,7 +273,7 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
         totalRecords: Int,
         currentItemNumberUpdate: (Int) -> Unit
     ) = suspendCoroutine<List<HourlyRecord>> { continuation ->
-        val testCollection = mutableListOf<HourlyRecord>()
+        val collectedRecords = mutableListOf<HourlyRecord>()
         var counter: Int
         coroutineScope.launch {
             deviceClient.subscribeToThermometerHourlyRecords()
@@ -291,11 +291,11 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
                     coroutineScope.ensureActive()
                 }
                 ?.catch {
-                    continuation.resume(emptyList())
+                    Timber.e(it, "Exception occurred during ")
                 }
-                ?.toCollection(testCollection)
+                ?.toCollection(collectedRecords)
         }.invokeOnCompletion {
-            continuation.resume(testCollection)
+            continuation.resume(collectedRecords)
         }
     }
 }
