@@ -7,6 +7,7 @@ import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
+import kotlin.random.Random
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -15,7 +16,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 class FakeThermometerRepository : ThermometerRepository {
 
@@ -26,6 +26,20 @@ class FakeThermometerRepository : ThermometerRepository {
         1.23f
     )
     var isConnectToDeviceThrowingError = false
+    var hourlyRecords: List<HourlyRecord>? = (0..15).map { i ->
+        HourlyRecord(
+            index = i,
+            time = 1,
+            temperatureMin = (10 + i).toFloat(),
+            temperatureMax = (20 + i).toFloat(),
+            humidityMin = 30 + i,
+            humidityMax = 50 + i
+        )
+    }
+    var lastIndexTotalRecords: LastIndexTotalRecords? = LastIndexTotalRecords(
+        lastIndex = 0,
+        totalRecords = hourlyRecords?.size ?: 0
+    )
 
     val isScanningForDevicesInternal = MutableStateFlow(false)
     override val isScanningForDevices: StateFlow<Boolean> = isScanningForDevicesInternal
@@ -115,7 +129,8 @@ class FakeThermometerRepository : ThermometerRepository {
     override suspend fun readLastIndexAndTotalRecords(
         deviceAddress: String
     ): LastIndexTotalRecords? {
-        TODO("Not yet implemented")
+        delay(operationDelay)
+        return lastIndexTotalRecords
     }
 
     override suspend fun subscribeToCurrentThermometerStatus(
@@ -167,6 +182,16 @@ class FakeThermometerRepository : ThermometerRepository {
         startIndex: Int,
         progressUpdate: (Int, Int) -> Unit
     ): List<HourlyRecord>? {
-        TODO("Not yet implemented")
+        progressUpdate(0, hourlyRecords?.size ?: 0)
+        delay(operationDelay)
+        return hourlyRecords?.let { hourlyRecordsValue ->
+            hourlyRecordsValue.forEach { record ->
+                delay(50)
+                progressUpdate(record.index + 1, hourlyRecordsValue.size)
+            }
+            hourlyRecords
+        } ?: run {
+            null
+        }
     }
 }
