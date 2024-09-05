@@ -8,9 +8,14 @@ An alternative application for reading data from the Mi Temeprature & Humidity M
 - Dagger hilt
 - [Nordic Kotlin BLE library (scanner and client)](https://github.com/NordicSemiconductor/Kotlin-BLE-Library)
 
-|![Screenshot1](files%2Fscreenshots%2FScreenshot1.png)|![Screenshot2](files%2Fscreenshots%2FScreenshot2.png)|![Screenshot3](files%2Fscreenshots%2FScreenshot3.png)|
+|![Screenshot1](files/screenshots/1.png)|![Screenshot2](files/screenshots/2.png)|![Screenshot3](files/screenshots/3.png)|
 |---|---|---|
-|![Screenshot4](files%2Fscreenshots%2FScreenshot4.png)|![Screenshot5](files%2Fscreenshots%2FScreenshot5.png)|   |
+|![Screenshot4](files/screenshots/4.png)|![Screenshot5](files/screenshots/5.png)|![Screenshot6](files/screenshots/6.png)|
+|![Screenshot7](files/screenshots/7.png)|![Screenshot8](files/screenshots/8.png)|![Screenshot9](files/screenshots/9.png)|
+
+
+
+
 
 ### Todo:
 - [ ] Saving thermometer and automatic reconnect after application start
