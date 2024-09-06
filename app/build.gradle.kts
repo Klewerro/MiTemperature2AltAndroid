@@ -1,9 +1,9 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.junit5)
-    id("kotlin-kapt")
 }
 
 android {
@@ -17,7 +17,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.klewerro.mitemperature2alt.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -41,14 +41,20 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.3"
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
+
     packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
+        resources.excludes.addAll(
+            listOf(
+                "/META-INF/{AL2.0,LGPL2.1}",
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
+            )
+        )
     }
 }
 
@@ -56,16 +62,23 @@ dependencies {
 
     // Module imports
     implementation(project(":temperatureSensor"))
+    implementation(project(":persistence"))
     implementation(project(":domain"))
+    implementation(project(":coreUi"))
+    implementation(project(":addThermometer:addThermometerPresentation"))
     testImplementation(project(":coreTest"))
+    androidTestImplementation(project(":coreTest"))
 
     implementation(libs.bundles.androidX)
     implementation(libs.bundles.compose)
+    implementation(libs.contraintLayout)
+    implementation(libs.revealswipe)
+    implementation(libs.timber)
 
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
 
     // Test dependencies
     // Test
@@ -81,10 +94,14 @@ dependencies {
     // UI test
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
-    androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.androidx.test.compose.junit)
+    androidTestImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.assertK)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.androidx.rules)
 
     // Debug dependencies
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.manifest)
+    debugImplementation(libs.leakCanary)
 }

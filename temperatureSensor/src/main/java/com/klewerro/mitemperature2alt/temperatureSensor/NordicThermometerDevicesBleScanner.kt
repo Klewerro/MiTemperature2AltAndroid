@@ -2,8 +2,7 @@ package com.klewerro.mitemperature2alt.temperatureSensor
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
-import com.klewerro.mitemperature2alt.domain.model.ConnectionStatus
+import com.klewerro.mitemperature2alt.domain.model.ScannedDeviceStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.temperatureSensor.contracts.ThermometerDevicesBleScanner
 import kotlinx.coroutines.CoroutineScope
@@ -12,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
@@ -20,11 +20,11 @@ import kotlinx.coroutines.flow.update
 import no.nordicsemi.android.kotlin.ble.client.main.callback.ClientBleGatt
 import no.nordicsemi.android.kotlin.ble.scanner.BleScanner
 import no.nordicsemi.android.kotlin.ble.scanner.aggregator.BleScanResultAggregator
+import timber.log.Timber
 
 @SuppressLint("MissingPermission")
-class NordicThermometerDevicesBleScanner(
-    private val context: Context
-) : ThermometerDevicesBleScanner {
+class NordicThermometerDevicesBleScanner(private val context: Context) :
+    ThermometerDevicesBleScanner {
 
     private val aggregator = BleScanResultAggregator()
 
@@ -48,7 +48,7 @@ class NordicThermometerDevicesBleScanner(
                             bleScanResult.device.name ?: "",
                             bleScanResult.device.address,
                             bleScanResult.scanResult.last().rssi,
-                            ConnectionStatus.NOT_CONNECTED
+                            ScannedDeviceStatus.NOT_CONNECTED
                         )
                     }
             }
@@ -62,6 +62,27 @@ class NordicThermometerDevicesBleScanner(
             .launchIn(coroutineScope)
     }
 
+    override suspend fun scanAndConnect(
+        coroutineScope: CoroutineScope,
+        address: String
+    ): ThermometerDeviceBleClient {
+        _isScanning.update { true }
+        val bleDevice = BleScanner(context)
+            .scan()
+            .filter { it.device.name == BleConstants.DEVICE_NAME && it.device.address == address }
+            .onCompletion {
+                _isScanning.update { false }
+            }
+            .first()
+            .device
+
+        val gattConnection = ClientBleGatt.connect(context, bleDevice, coroutineScope)
+        val client = ThermometerDeviceBleClient(gattConnection).apply {
+            discoverDeviceOperations()
+        }
+        return client
+    }
+
     override suspend fun connectToDevice(
         coroutineScope: CoroutineScope,
         bleDeviceAddress: String
@@ -71,10 +92,7 @@ class NordicThermometerDevicesBleScanner(
 
         val gattConnection = ClientBleGatt.connect(context, bleDevice, coroutineScope)
         val isConnected = gattConnection.isConnected
-        Log.d(
-            "ThermometerDevicesBleScanner",
-            "connectToDevice ${bleDevice.name} connected: $isConnected"
-        )
+        Timber.d("connectToDevice ${bleDevice.name} connected: $isConnected")
 
         val client = ThermometerDeviceBleClient(gattConnection).apply {
             discoverDeviceOperations()

@@ -39,6 +39,8 @@ dependencies {
 
     implementation(libs.androidx.core)
     implementation(libs.androidx.appcompat)
+    implementation(libs.kotlin.ble.client)
+    api(libs.timber)
 
     // Test
     implementation(libs.junit)

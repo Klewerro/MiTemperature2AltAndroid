@@ -13,8 +13,10 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.klewerro.mitemperature2alt.ui.LocalSpacing
+import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
+import com.klewerro.mitemperature2alt.coreUi.R
 
 @Composable
 fun TopBar(title: String, shouldBeButtonVisible: Boolean, onButtonClick: () -> Unit) {
@@ -26,7 +28,7 @@ fun TopBar(title: String, shouldBeButtonVisible: Boolean, onButtonClick: () -> U
             if (shouldBeButtonVisible) {
                 Icon(
                     imageVector = Icons.Default.AddCircle,
-                    contentDescription = "Add new thermometer",
+                    contentDescription = stringResource(R.string.add_new_thermometer),
                     modifier = Modifier
                         .size(28.dp)
                         .clip(RoundedCornerShape(spacing.radiusCircle))
