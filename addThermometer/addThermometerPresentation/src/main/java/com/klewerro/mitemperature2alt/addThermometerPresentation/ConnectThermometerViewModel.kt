@@ -104,7 +104,10 @@ class ConnectThermometerViewModel @Inject constructor(
         }
 
         viewModelScope.launch(dispatchers.io) {
-            persistenceRepository.saveThermometer(state.value.thermometerAddress, thermometerName)
+            persistenceRepository.saveThermometer(
+                macAddress = state.value.thermometerAddress,
+                name = thermometerName
+            )
             _state.update {
                 it.copy(
                     thermometerSaved = true
