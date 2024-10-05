@@ -39,17 +39,29 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
+    }
 }
 
 dependencies {
-    api(project(":domain"))
+    implementation(project(":coreUi"))
+    implementation(project(":domain"))
+
+    implementation(libs.bundles.androidX)
+    implementation(libs.bundles.compose)
+    implementation(libs.timber)
 
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation)
     ksp(libs.hilt.android.compiler)
 
-    // Test
+    // Test dependencies
     testImplementation(libs.junit)
     testImplementation(libs.junit5.api)
     testRuntimeOnly(libs.junit5.engine)
@@ -58,4 +70,8 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.turbine)
+
+    // Debug dependencies
+    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.manifest)
 }

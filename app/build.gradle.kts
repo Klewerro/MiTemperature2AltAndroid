@@ -66,6 +66,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":coreUi"))
     implementation(project(":addThermometer:addThermometerPresentation"))
+    implementation(project(":thermometerDetails"))
     testImplementation(project(":coreTest"))
     androidTestImplementation(project(":coreTest"))
 

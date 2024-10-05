@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
+import com.klewerro.mitemperature2alt.domain.model.Thermometer
 import com.klewerro.mitemperature2alt.presentation.mainscreen.components.MainScreenThermometerBox
 import com.klewerro.mitemperature2alt.presentation.mainscreen.components.NoConnectedThermometersInformation
 
@@ -21,6 +22,7 @@ import com.klewerro.mitemperature2alt.presentation.mainscreen.components.NoConne
 fun MainScreen(
     state: BleOperationsState,
     onEvent: (BleOperationsEvent) -> Unit,
+    onThermometerClick: (Thermometer) -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
@@ -53,6 +55,9 @@ fun MainScreen(
                 items(state.thermometers) { thermometer ->
                     MainScreenThermometerBox(
                         thermometer = thermometer,
+                        onClick = {
+                            onThermometerClick(thermometer)
+                        },
                         onConnectClick = {
                             onEvent(
                                 BleOperationsEvent.ConnectToDevice(thermometer)

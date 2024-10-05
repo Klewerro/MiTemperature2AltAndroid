@@ -3,7 +3,6 @@ package com.klewerro.mitemperature2alt
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -45,6 +44,7 @@ import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
 import com.klewerro.mitemperature2alt.presentation.mainscreen.ThermometerOperationType
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
 import com.klewerro.mitemperature2alt.presentation.navigation.Route
+import com.klewerro.mitemperature2alt.thermometerDetails.presentation.ThermometerDetailsScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 
@@ -83,6 +83,7 @@ class MainActivity : ComponentActivity() {
                                     is ThermometerOperationType.RetrievingHourlyRecords -> {
                                         this.thermometer
                                     }
+
                                     else -> null
                                 }
                             },
@@ -138,6 +139,12 @@ class MainActivity : ComponentActivity() {
                                     onEvent = { event ->
                                         bleOperationsViewModel.onEvent(event)
                                     },
+                                    onThermometerClick = { thermometer ->
+                                        Route.ThermometerDetails.HourlyRecords.navigate(
+                                            navController,
+                                            thermometer.address
+                                        )
+                                    },
                                     snackbarHostState = bottomSheetScaffoldState.snackbarHostState
                                 )
                                 titleResourceIdState = Route.MainRoutes.Main.screenName
@@ -159,6 +166,19 @@ class MainActivity : ComponentActivity() {
                                 navController,
                                 bleOperationsViewModel.viewModelScope
                             )
+
+                            composable(
+                                route = Route.ThermometerDetails.HourlyRecords.fullRoute,
+                                arguments = listOf(
+                                    navArgument(UiConstants.NAV_PARAM_ADDRESS) {
+                                        type = NavType.StringType
+                                    }
+                                )
+                            ) {
+                                titleResourceIdState =
+                                    Route.ThermometerDetails.HourlyRecords.screenName
+                                ThermometerDetailsScreen()
+                            }
                         }
                     }
                 }

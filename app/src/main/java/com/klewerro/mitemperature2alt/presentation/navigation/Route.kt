@@ -38,7 +38,16 @@ sealed class Route(
             "connect",
             UiConstants.NAV_PARAM_ADDRESS
         )
+
         data object Connecting : Route(R.string.connecting_to_thermometer, "connect_connecting")
         data object SetName : Route(R.string.set_thermometer_name, "connect_name")
+    }
+
+    sealed class ThermometerDetails {
+        data object HourlyRecords : Route(
+            R.string.details,
+            "hourly_records",
+            UiConstants.NAV_PARAM_ADDRESS
+        )
     }
 }

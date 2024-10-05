@@ -1,6 +1,7 @@
 package com.klewerro.mitemperature2alt.presentation.mainscreen.components
 
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 @Composable
 fun MainScreenThermometerBox(
     thermometer: Thermometer,
+    onClick: () -> Unit,
     onConnectClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -42,7 +44,7 @@ fun MainScreenThermometerBox(
     ) {
         when (thermometer.thermometerConnectionStatus) {
             ThermometerConnectionStatus.CONNECTING -> {
-                ThermometerBox {
+                ThermometerBox(modifier = Modifier.clickable { onClick() }) {
                     Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -67,18 +69,21 @@ fun MainScreenThermometerBox(
 
             ThermometerConnectionStatus.CONNECTED -> {
                 ThermometerTemperatureBox(
-                    thermometer.temperature,
-                    thermometer.humidity,
-                    thermometer.voltage,
-                    modifier.fillMaxSize(),
+                    temperature = thermometer.temperature,
+                    humidity = thermometer.humidity,
+                    voltage = thermometer.voltage,
+                    modifier = modifier
+                        .fillMaxSize()
+                        .clickable { onClick() },
                     nameComposable = {
                         Text(text = thermometer.name)
                     }
                 )
             }
+
             ThermometerConnectionStatus.DISCONNECTING,
             ThermometerConnectionStatus.DISCONNECTED -> {
-                ThermometerBox {
+                ThermometerBox(modifier = Modifier.clickable { onClick() }) {
                     Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -127,6 +132,7 @@ private fun MainScreenThermometerBoxPreview() {
                 rssi = RssiStrength.GOOD,
                 thermometerConnectionStatus = ThermometerConnectionStatus.CONNECTED
             ),
+            onClick = {},
             onConnectClick = {}
         )
     }
@@ -151,6 +157,7 @@ private fun MainScreenThermometerBoxDisconnectedPreview() {
                 rssi = RssiStrength.UNKNOWN,
                 thermometerConnectionStatus = ThermometerConnectionStatus.DISCONNECTED
             ),
+            onClick = {},
             onConnectClick = {}
         )
     }
@@ -175,6 +182,7 @@ private fun MainScreenThermometerBoxConnectingPreview() {
                 rssi = RssiStrength.UNKNOWN,
                 thermometerConnectionStatus = ThermometerConnectionStatus.CONNECTING
             ),
+            onClick = {},
             onConnectClick = {}
         )
     }
