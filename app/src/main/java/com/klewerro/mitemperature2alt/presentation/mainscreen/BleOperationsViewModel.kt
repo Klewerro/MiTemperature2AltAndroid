@@ -67,13 +67,14 @@ class BleOperationsViewModel @Inject constructor(
                                     )
                                 )
                             }
+                            changeThermometerOperationType(ThermometerOperationType.Idle)
                             this.coroutineContext.job.cancelAndJoin()
                         }
                         .onSuccess {
                             deviceConnectionJobs[event.thermometer.address] =
                                 this.coroutineContext.job
+                            changeThermometerOperationType(ThermometerOperationType.Idle)
                         }
-                    changeThermometerOperationType(ThermometerOperationType.Idle)
                 }
             }
 

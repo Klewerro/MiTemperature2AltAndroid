@@ -10,8 +10,10 @@ import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -24,6 +26,11 @@ class FakeThermometerRepository : ThermometerRepository {
         21.0f,
         51,
         1.23f
+    )
+    var thermometerStatus2 = ThermometerStatus(
+        22.0f,
+        52,
+        2.23f
     )
     var isConnectToDeviceThrowingError = false
     var hourlyRecords: List<HourlyRecord>? = (0..15).map { i ->
@@ -50,7 +57,7 @@ class FakeThermometerRepository : ThermometerRepository {
     val connectedDevicesStatusesInternal =
         MutableStateFlow<Map<String, ThermometerStatus>>(emptyMap())
     override val connectedDevicesStatuses: StateFlow<Map<String, ThermometerStatus>> =
-        connectedDevicesStatusesInternal
+        connectedDevicesStatusesInternal.asStateFlow()
 
     val rssiStrengthsInternal = MutableStateFlow<Map<String, Int>>(emptyMap())
     override val rssiStrengths: StateFlow<Map<String, Int>> = rssiStrengthsInternal
@@ -120,7 +127,7 @@ class FakeThermometerRepository : ThermometerRepository {
     }
 
     override fun disconnect(deviceAddress: String) {
-        TODO("Not yet implemented")
+        // Empty
     }
 
     override suspend fun readCurrentThermometerStatus(deviceAddress: String): ThermometerStatus =
@@ -138,26 +145,33 @@ class FakeThermometerRepository : ThermometerRepository {
         coroutineScope: CoroutineScope
     ) {
         coroutineScope.launch {
+            var lastSynced = thermometerStatus2
             if (isActive) {
                 connectedDevicesStatusesInternal.update {
-                    it.toMutableMap().apply {
-                        this.plus(deviceAddress to thermometerStatus)
-                    }
+//                    val syncItem = if (lastSynced == thermometerStatus) {
+//                        thermometerStatus2
+//                    } else {
+//                        thermometerStatus
+//                    }
+//                    lastSynced = syncItem
+                    it.plus(deviceAddress to thermometerStatus)
                 }
                 delay(operationDelay)
+                ensureActive()
             }
+        }.invokeOnCompletion {
+            val i = 1
         }
     }
 
     override suspend fun subscribeToRssi(deviceAddress: String, coroutineScope: CoroutineScope) {
         coroutineScope.launch {
-            if (isActive) {
+            while (isActive) {
                 rssiStrengthsInternal.update {
-                    it.toMutableMap().apply {
-                        this.plus(deviceAddress to Random.nextInt(-99, -1))
-                    }
+                    it.plus(deviceAddress to Random(System.currentTimeMillis()).nextInt(-99, -1))
                 }
                 delay(operationDelay)
+                ensureActive()
             }
         }
     }
@@ -168,11 +182,10 @@ class FakeThermometerRepository : ThermometerRepository {
     ) {
         coroutineScope.launch {
             thermometerConnectionStatusesInternal.update {
-                it.toMutableMap().apply {
-                    this.plus(deviceAddress to ThermometerConnectionStatus.CONNECTED)
-                }
+                it.plus(deviceAddress to ThermometerConnectionStatus.CONNECTED)
             }
             delay(operationDelay)
+            ensureActive()
         }
     }
 

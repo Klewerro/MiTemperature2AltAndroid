@@ -15,6 +15,7 @@ import com.klewerro.mitemperature2alt.coreTest.fake.FakeThermometerRepository
 import com.klewerro.mitemperature2alt.coreTest.util.MainCoroutineExtension
 import com.klewerro.mitemperature2alt.coreTest.util.TestDispatchers
 import com.klewerro.mitemperature2alt.coreUi.UiConstants
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -73,6 +74,11 @@ class ConnectThermometerViewModelTest {
                 )
                 val statusConnectingState = awaitItem()
                 val stateAfterSuccessConnection = awaitItem()
+
+                connectThermometerViewModel.viewModelScope.cancel(
+                    "Cancel for test purposes. Need to be cancelled, " +
+                        "because otherwise job won't end (because observing thermometer status)."
+                )
 
                 initialState.toString()
                 statusConnectingState.toString()
