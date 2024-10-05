@@ -10,8 +10,10 @@ import com.klewerro.mitemperature2alt.domain.usecase.GetHourlyResultsUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.ScanAndConnectToDeviceUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.ThermometerListUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
+import com.klewerro.mitemperature2alt.temperatureSensor.BleConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -59,12 +62,30 @@ class BleOperationsViewModel @Inject constructor(
                 )
                 viewModelScope.launch(dispatchers.io) {
                     scanAndConnectToDeviceUseCase(this, event.thermometer.address)
-                        .onFailure {
+                        .onFailure { throwable ->
                             _state.update {
                                 it.copy(
-                                    error = UiText.StringResource(
-                                        R.string.unexpected_error_during_connecting_to_device
-                                    )
+                                    error = when (throwable) {
+                                        is TimeoutCancellationException -> {
+                                            with(event.thermometer) {
+                                                Timber.i("Couldn't connect to $name ($address)")
+                                                UiText.StringResource(
+                                                    R.string.connect_thermometer_timeout_message,
+                                                    listOf(
+                                                        name,
+                                                        BleConstants.CONNECT_THERMOMETER_TIMEOUT /
+                                                            1_000
+                                                    )
+                                                )
+                                            }
+                                        }
+
+                                        else -> {
+                                            UiText.StringResource(
+                                                R.string.unexpected_error_during_connecting_to_device
+                                            )
+                                        }
+                                    }
                                 )
                             }
                             changeThermometerOperationType(ThermometerOperationType.Idle)

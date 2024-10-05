@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import no.nordicsemi.android.kotlin.ble.core.data.GattConnectionState
 import timber.log.Timber
 import kotlin.coroutines.resume
@@ -68,26 +69,28 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
     }
 
     override suspend fun scanAndConnect(coroutineScope: CoroutineScope, address: String) {
-        _thermometerConnectionStatuses.updateUsingMutableMap(
-            address,
-            ThermometerConnectionStatus.CONNECTING
-        )
-        try {
-            val deviceClient = scanner.scanAndConnect(coroutineScope, address)
-            deviceClient.readThermometerStatus()?.let { thermometerStatus ->
-                _connectedDevicesStatuses.update {
-                    it.plus(address to thermometerStatus)
-                }
-            }
-            connectedDevicesClients = connectedDevicesClients.plus(address to deviceClient)
-            observeConnectionStatus(address, deviceClient, coroutineScope)
-        } catch (illegalStateException: IllegalStateException) {
-            Timber.e(illegalStateException)
+        withTimeout(BleConstants.CONNECT_THERMOMETER_TIMEOUT) {
             _thermometerConnectionStatuses.updateUsingMutableMap(
                 address,
-                ThermometerConnectionStatus.DISCONNECTED
+                ThermometerConnectionStatus.CONNECTING
             )
-            throw illegalStateException
+            try {
+                val deviceClient = scanner.scanAndConnect(coroutineScope, address)
+                deviceClient.readThermometerStatus()?.let { thermometerStatus ->
+                    _connectedDevicesStatuses.update {
+                        it.plus(address to thermometerStatus)
+                    }
+                }
+                connectedDevicesClients = connectedDevicesClients.plus(address to deviceClient)
+                observeConnectionStatus(address, deviceClient, coroutineScope)
+            } catch (illegalStateException: IllegalStateException) {
+                Timber.e(illegalStateException)
+                _thermometerConnectionStatuses.updateUsingMutableMap(
+                    address,
+                    ThermometerConnectionStatus.DISCONNECTED
+                )
+                throw illegalStateException
+            }
         }
     }
 

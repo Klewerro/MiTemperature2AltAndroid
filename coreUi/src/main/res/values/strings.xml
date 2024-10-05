@@ -14,6 +14,7 @@
     <string name="no_connected_thermometers_rationale">Please click \'+\' icon on the status-bar right corner to search for devices.</string>
     <string name="unexpected_error_occurred_try_again">Unexpected error occurred, please try again.</string>
     <string name="unexpected_error_during_connecting_to_device">Unexpected error occurred during connecting to the device. Please restart application and try again.</string>
+    <string name="connect_thermometer_timeout_message">Could not connect to %1$s thermometer within %2$d seconds</string>
     <string name="name">Name</string>
     <string name="save">Save</string>
     <string name="saved">Saved</string>

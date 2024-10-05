@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,7 +30,8 @@ fun MainScreen(
     LaunchedEffect(key1 = state.error) {
         state.error?.let { errorUiText ->
             snackbarHostState.showSnackbar(
-                message = errorUiText.asString(context)
+                message = errorUiText.asString(context),
+                duration = SnackbarDuration.Long
             )
             onEvent(BleOperationsEvent.ErrorDismissed)
         }
