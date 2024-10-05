@@ -4,11 +4,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.ConnectToDeviceUseCase
-import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.SaveThermometerUseCase
 import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.coreUi.UiConstants
 import com.klewerro.mitemperature2alt.coreUi.util.UiText
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
+import com.klewerro.mitemperature2alt.domain.repository.PersistenceRepository
+import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -24,9 +24,9 @@ import javax.inject.Inject
 @HiltViewModel
 class ConnectThermometerViewModel @Inject constructor(
     savedState: SavedStateHandle,
+    private val persistenceRepository: PersistenceRepository,
+    private val thermometerRepository: ThermometerRepository,
     private val connectToDeviceUseCase: ConnectToDeviceUseCase,
-    private val readCurrentThermometerStatusUseCase: ReadCurrentThermometerStatusUseCase,
-    private val saveThermometerUseCase: SaveThermometerUseCase,
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
     private val _state = MutableStateFlow(ConnectThermometerState())
@@ -61,7 +61,7 @@ class ConnectThermometerViewModel @Inject constructor(
                 }
                 with(state.value.thermometerAddress) {
                     connectToDeviceUseCase(bleViewModelScope, this)
-                    val currentStatus = readCurrentThermometerStatusUseCase(this)
+                    val currentStatus = thermometerRepository.readCurrentThermometerStatus(this)
                     _state.update {
                         it.copy(
                             connectingStatus = ConnectingStatus.CONNECTED,
@@ -104,7 +104,10 @@ class ConnectThermometerViewModel @Inject constructor(
         }
 
         viewModelScope.launch(dispatchers.io) {
-            saveThermometerUseCase(state.value.thermometerAddress, thermometerName)
+            persistenceRepository.saveThermometer(
+                macAddress = state.value.thermometerAddress,
+                name = thermometerName
+            )
             _state.update {
                 it.copy(
                     thermometerSaved = true

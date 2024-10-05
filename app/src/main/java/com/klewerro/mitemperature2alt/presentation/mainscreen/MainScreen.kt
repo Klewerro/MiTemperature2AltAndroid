@@ -6,7 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.ScaffoldState
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -20,7 +21,7 @@ import com.klewerro.mitemperature2alt.presentation.mainscreen.components.NoConne
 fun MainScreen(
     state: BleOperationsState,
     onEvent: (BleOperationsEvent) -> Unit,
-    scaffoldState: ScaffoldState,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -28,9 +29,9 @@ fun MainScreen(
 
     LaunchedEffect(key1 = state.error) {
         state.error?.let { errorUiText ->
-            scaffoldState.snackbarHostState
-            scaffoldState.snackbarHostState.showSnackbar(
-                message = errorUiText.asString(context)
+            snackbarHostState.showSnackbar(
+                message = errorUiText.asString(context),
+                duration = SnackbarDuration.Long
             )
             onEvent(BleOperationsEvent.ErrorDismissed)
         }
@@ -52,9 +53,9 @@ fun MainScreen(
                 items(state.thermometers) { thermometer ->
                     MainScreenThermometerBox(
                         thermometer = thermometer,
-                        onConnectClick = { deviceAddress ->
+                        onConnectClick = {
                             onEvent(
-                                BleOperationsEvent.ConnectToDevice(deviceAddress)
+                                BleOperationsEvent.ConnectToDevice(thermometer)
                             )
                         },
                         modifier = Modifier.padding(vertical = spacing.spaceNormal)

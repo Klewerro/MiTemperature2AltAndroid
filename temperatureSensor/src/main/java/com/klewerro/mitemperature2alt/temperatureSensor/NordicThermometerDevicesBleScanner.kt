@@ -23,9 +23,8 @@ import no.nordicsemi.android.kotlin.ble.scanner.aggregator.BleScanResultAggregat
 import timber.log.Timber
 
 @SuppressLint("MissingPermission")
-class NordicThermometerDevicesBleScanner(
-    private val context: Context
-) : ThermometerDevicesBleScanner {
+class NordicThermometerDevicesBleScanner(private val context: Context) :
+    ThermometerDevicesBleScanner {
 
     private val aggregator = BleScanResultAggregator()
 

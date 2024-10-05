@@ -4,9 +4,7 @@ import app.cash.turbine.test
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.scan.IsScanningForDevicesUseCase
-import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.scan.ScanForDevicesUseCase
-import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.scan.SearchedDevicesUseCase
+import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.SearchedDevicesUseCase
 import com.klewerro.mitemperature2alt.coreTest.fake.FakePersistenceRepository
 import com.klewerro.mitemperature2alt.coreTest.fake.FakeThermometerRepository
 import com.klewerro.mitemperature2alt.coreTest.util.MainCoroutineExtension
@@ -27,8 +25,6 @@ class DeviceSearchViewModelTest {
     private lateinit var fakeThermometerRepository: FakeThermometerRepository
     private lateinit var fakePersistenceRepository: FakePersistenceRepository
     private lateinit var searchedDevicesUseCase: SearchedDevicesUseCase
-    private lateinit var isScanningForDevicesUseCase: IsScanningForDevicesUseCase
-    private lateinit var scanForDevicesUseCase: ScanForDevicesUseCase
     private lateinit var deviceSearchViewModel:
         com.klewerro.mitemperature2alt.addThermometerPresentation.search.DeviceSearchViewModel
 
@@ -46,22 +42,18 @@ class DeviceSearchViewModelTest {
             fakeThermometerRepository,
             fakePersistenceRepository
         )
-        isScanningForDevicesUseCase = IsScanningForDevicesUseCase(fakeThermometerRepository)
-        scanForDevicesUseCase = ScanForDevicesUseCase(fakeThermometerRepository)
         val testDispatchers = TestDispatchers(mainCoroutineExtension.testDispatcher)
-        deviceSearchViewModel =
-            com.klewerro.mitemperature2alt.addThermometerPresentation.search.DeviceSearchViewModel(
-                searchedDevicesUseCase = searchedDevicesUseCase,
-                isScanningForDevicesUseCase = isScanningForDevicesUseCase,
-                scanForDevicesUseCase = scanForDevicesUseCase,
-                dispatchers = testDispatchers
-            )
+        deviceSearchViewModel = DeviceSearchViewModel(
+            thermometerRepository = fakeThermometerRepository,
+            searchedDevicesUseCase = searchedDevicesUseCase,
+            dispatchers = testDispatchers
+        )
     }
 
     @RepeatedTest(10) // Repeated, because it can easily became flaky
     fun `scanForDevices when scan is already scanning stopping current job and starting new one`() =
         runTest {
-            isScanningForDevicesUseCase().test {
+            fakeThermometerRepository.isScanningForDevices.test {
                 assertThat(awaitItem()).isFalse()
                 val testJob = launch {
                     deviceSearchViewModel.onEvent(DeviceSearchEvent.ScanForDevices())

@@ -1,7 +1,12 @@
 package com.klewerro.mitemperature2alt.presentation.mainscreen
 
+import com.klewerro.mitemperature2alt.domain.model.Thermometer
+
 sealed class BleOperationsEvent {
-    data class ConnectToDevice(val address: String) : BleOperationsEvent()
+    data class ConnectToDevice(val thermometer: Thermometer) : BleOperationsEvent()
     data class ErrorConnectingToSavedThermometer(val name: String) : BleOperationsEvent()
     data object ErrorDismissed : BleOperationsEvent()
+    data object CancelHourlyRecordsSync : BleOperationsEvent()
+    data class SyncHourlyRecords(val thermometer: Thermometer) : BleOperationsEvent()
+    data class Disconnect(val thermometer: Thermometer) : BleOperationsEvent()
 }

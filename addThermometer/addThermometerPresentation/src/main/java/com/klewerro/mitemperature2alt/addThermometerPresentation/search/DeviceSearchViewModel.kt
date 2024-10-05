@@ -2,11 +2,10 @@ package com.klewerro.mitemperature2alt.addThermometerPresentation.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.scan.IsScanningForDevicesUseCase
-import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.scan.ScanForDevicesUseCase
-import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.scan.SearchedDevicesUseCase
+import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.SearchedDevicesUseCase
 import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.coreUi.util.UiText
+import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -20,9 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DeviceSearchViewModel @Inject constructor(
+    val thermometerRepository: ThermometerRepository,
     val searchedDevicesUseCase: SearchedDevicesUseCase,
-    val isScanningForDevicesUseCase: IsScanningForDevicesUseCase,
-    private val scanForDevicesUseCase: ScanForDevicesUseCase,
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
@@ -32,7 +30,7 @@ class DeviceSearchViewModel @Inject constructor(
     private val _state = MutableStateFlow(DeviceSearchState())
     val state = combine(
         _state,
-        isScanningForDevicesUseCase(),
+        thermometerRepository.isScanningForDevices,
         searchedDevicesUseCase()
     ) { stateValue, isScanning, searchedDevices ->
         stateValue.copy(
@@ -72,7 +70,7 @@ class DeviceSearchViewModel @Inject constructor(
         }
         if (!isScanStoppedByUser) {
             viewModelScope.launch(dispatchers.io) {
-                scanningBleDevicesJob = scanForDevicesUseCase(this)
+                scanningBleDevicesJob = thermometerRepository.scanForDevices(this)
             }
         }
     }

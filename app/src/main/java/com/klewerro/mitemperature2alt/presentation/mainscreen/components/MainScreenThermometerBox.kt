@@ -31,7 +31,7 @@ import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 @Composable
 fun MainScreenThermometerBox(
     thermometer: Thermometer,
-    onConnectClick: (String) -> Unit,
+    onConnectClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -97,7 +97,7 @@ fun MainScreenThermometerBox(
                             textAlign = TextAlign.Center
                         )
                         Spacer(Modifier.height(spacing.spaceLarge))
-                        OutlinedButton(onClick = { onConnectClick(thermometer.address) }) {
+                        OutlinedButton(onClick = onConnectClick) {
                             Text(text = stringResource(R.string.connect))
                         }
                     }

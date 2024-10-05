@@ -6,9 +6,8 @@ import com.klewerro.mitemperature2alt.persistence.entity.ThermometerEntity
 import com.klewerro.mitemperature2alt.persistence.mapper.toSavedThermometer
 import kotlinx.coroutines.flow.map
 
-class RoomThermometerRepository(
-    private val thermometerDao: ThermometerDao
-) : PersistenceRepository {
+class RoomThermometerRepository(private val thermometerDao: ThermometerDao) :
+    PersistenceRepository {
 
     override val savedThermometers = thermometerDao.getAllThermometers().map {
         it.map { thermometerEntity ->
@@ -16,7 +15,7 @@ class RoomThermometerRepository(
         }
     }
 
-    override suspend fun saveThermometer(name: String, macAddress: String) {
+    override suspend fun saveThermometer(macAddress: String, name: String) {
         thermometerDao.insertThermometer(
             ThermometerEntity(
                 address = macAddress,

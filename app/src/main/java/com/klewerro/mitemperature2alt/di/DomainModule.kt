@@ -1,10 +1,11 @@
 package com.klewerro.mitemperature2alt.di
 
+import com.klewerro.mitemperature2alt.domain.repository.HourlyRecordRepository
 import com.klewerro.mitemperature2alt.domain.repository.PersistenceRepository
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
+import com.klewerro.mitemperature2alt.domain.usecase.GetHourlyResultsUseCase
 import com.klewerro.mitemperature2alt.domain.usecase.ScanAndConnectToDeviceUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.ThermometerListUseCase
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
+import com.klewerro.mitemperature2alt.domain.usecase.ThermometerListUseCase
 import com.klewerro.mitemperature2alt.domain.util.DispatcherProvider
 import com.klewerro.mitemperature2alt.domain.util.StandardDispatchers
 import dagger.Module
@@ -21,11 +22,6 @@ object DomainModule {
 
     @Provides
     @ViewModelScoped
-    fun provideReadCurrentThermometerStatusUseCase(thermometerRepository: ThermometerRepository) =
-        ReadCurrentThermometerStatusUseCase(thermometerRepository)
-
-    @Provides
-    @ViewModelScoped
     fun provideThermometerListUseCase(
         persistenceRepository: PersistenceRepository,
         thermometerRepository: ThermometerRepository
@@ -35,6 +31,13 @@ object DomainModule {
     @ViewModelScoped
     fun provideScanAndConnectToDeviceUseCase(thermometerRepository: ThermometerRepository) =
         ScanAndConnectToDeviceUseCase(thermometerRepository)
+
+    @Provides
+    @ViewModelScoped
+    fun provideGetHourlyResultsUseCase(
+        thermometerRepository: ThermometerRepository,
+        hourlyRecordRepository: HourlyRecordRepository
+    ) = GetHourlyResultsUseCase(thermometerRepository, hourlyRecordRepository)
 }
 
 @Module

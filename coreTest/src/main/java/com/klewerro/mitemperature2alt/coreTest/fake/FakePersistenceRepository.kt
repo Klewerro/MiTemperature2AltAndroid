@@ -8,12 +8,12 @@ import kotlinx.coroutines.flow.update
 
 class FakePersistenceRepository : PersistenceRepository {
 
-    private var _savedThermometers = MutableStateFlow<List<SavedThermometer>>(emptyList())
+    var savedThermometersInternal = MutableStateFlow<List<SavedThermometer>>(emptyList())
 
-    override val savedThermometers: Flow<List<SavedThermometer>> = _savedThermometers
+    override val savedThermometers: Flow<List<SavedThermometer>> = savedThermometersInternal
 
     override suspend fun saveThermometer(name: String, macAddress: String) {
-        _savedThermometers.update {
+        savedThermometersInternal.update {
             val savedThermometer = SavedThermometer(macAddress, name)
             it.plus(savedThermometer)
         }

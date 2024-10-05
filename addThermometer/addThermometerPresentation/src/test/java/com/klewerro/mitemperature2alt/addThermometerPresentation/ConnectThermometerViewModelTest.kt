@@ -10,13 +10,12 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.ConnectToDeviceUseCase
-import com.klewerro.mitemperature2alt.addThermometerDomain.usecase.SaveThermometerUseCase
 import com.klewerro.mitemperature2alt.coreTest.fake.FakePersistenceRepository
 import com.klewerro.mitemperature2alt.coreTest.fake.FakeThermometerRepository
 import com.klewerro.mitemperature2alt.coreTest.util.MainCoroutineExtension
 import com.klewerro.mitemperature2alt.coreTest.util.TestDispatchers
 import com.klewerro.mitemperature2alt.coreUi.UiConstants
-import com.klewerro.mitemperature2alt.domain.usecase.thermometer.operations.ReadCurrentThermometerStatusUseCase
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,8 +27,6 @@ class ConnectThermometerViewModelTest {
     private lateinit var fakePersistenceRepository: FakePersistenceRepository
     private lateinit var savedStateHandle: SavedStateHandle
     private lateinit var connectToDeviceUseCase: ConnectToDeviceUseCase
-    private lateinit var readCurrentThermometerStatusUseCase: ReadCurrentThermometerStatusUseCase
-    private lateinit var saveThermometerUseCase: SaveThermometerUseCase
     private lateinit var connectThermometerViewModel: ConnectThermometerViewModel
 
     private val deviceAddress = "00:00:00:00:01"
@@ -52,17 +49,13 @@ class ConnectThermometerViewModelTest {
             )
         )
         connectToDeviceUseCase = ConnectToDeviceUseCase(fakeThermometerRepository)
-        readCurrentThermometerStatusUseCase = ReadCurrentThermometerStatusUseCase(
-            fakeThermometerRepository
-        )
-        saveThermometerUseCase = SaveThermometerUseCase(fakePersistenceRepository)
 
         connectThermometerViewModel = ConnectThermometerViewModel(
-            savedStateHandle,
-            connectToDeviceUseCase,
-            readCurrentThermometerStatusUseCase,
-            saveThermometerUseCase,
-            testDispatchers
+            savedState = savedStateHandle,
+            persistenceRepository = fakePersistenceRepository,
+            thermometerRepository = fakeThermometerRepository,
+            connectToDeviceUseCase = connectToDeviceUseCase,
+            dispatchers = testDispatchers
         )
     }
 
@@ -81,6 +74,11 @@ class ConnectThermometerViewModelTest {
                 )
                 val statusConnectingState = awaitItem()
                 val stateAfterSuccessConnection = awaitItem()
+
+                connectThermometerViewModel.viewModelScope.cancel(
+                    "Cancel for test purposes. Need to be cancelled, " +
+                        "because otherwise job won't end (because observing thermometer status)."
+                )
 
                 initialState.toString()
                 statusConnectingState.toString()

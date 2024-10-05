@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ScaffoldState
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -41,7 +41,7 @@ import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 
 @Composable
 fun SearchThermometersScreen(
-    scaffoldState: ScaffoldState,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     deviceSearchViewModel: DeviceSearchViewModel = hiltViewModel(),
     onDeviceListItemClick: (String) -> Unit
@@ -54,7 +54,7 @@ fun SearchThermometersScreen(
         onDeviceListItemClick = {
             onDeviceListItemClick(it.address)
         },
-        scaffoldState,
+        snackbarHostState,
         modifier
     )
 }
@@ -64,7 +64,7 @@ private fun SearchThermometersScreenContent(
     deviceSearchState: DeviceSearchState,
     onDeviceSearchEvent: (DeviceSearchEvent) -> Unit,
     onDeviceListItemClick: (ThermometerScanResult) -> Unit,
-    scaffoldState: ScaffoldState,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -122,8 +122,7 @@ private fun SearchThermometersScreenContent(
 
     LaunchedEffect(key1 = deviceSearchState.error) {
         deviceSearchState.error?.let { errorUiText ->
-            scaffoldState.snackbarHostState
-            scaffoldState.snackbarHostState.showSnackbar(
+            snackbarHostState.showSnackbar(
                 message = errorUiText.asString(context)
             )
             onDeviceSearchEvent(DeviceSearchEvent.ErrorDismissed)

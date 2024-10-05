@@ -3,23 +3,25 @@ package com.klewerro.mitemperature2alt
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.material.BottomSheetValue
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
+import androidx.compose.material.rememberBottomSheetScaffoldState
+import androidx.compose.material.rememberBottomSheetState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -36,22 +38,30 @@ import com.klewerro.mitemperature2alt.addThermometerPresentation.name.ConnectThe
 import com.klewerro.mitemperature2alt.addThermometerPresentation.search.SearchThermometersScreen
 import com.klewerro.mitemperature2alt.coreUi.UiConstants
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
+import com.klewerro.mitemperature2alt.presentation.bottomSheet.BottomSheetContent
+import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsEvent
 import com.klewerro.mitemperature2alt.presentation.mainscreen.BleOperationsViewModel
 import com.klewerro.mitemperature2alt.presentation.mainscreen.MainScreen
+import com.klewerro.mitemperature2alt.presentation.mainscreen.ThermometerOperationType
 import com.klewerro.mitemperature2alt.presentation.mainscreen.TopBar
 import com.klewerro.mitemperature2alt.presentation.navigation.Route
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 
+@OptIn(ExperimentalMaterialApi::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val test = ViewModelProvider(this)
         setContent {
             MiTemperature2AltTheme {
                 val navController = rememberNavController()
-                val scaffoldState = rememberScaffoldState()
+                val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+                    bottomSheetState = rememberBottomSheetState(
+                        initialValue = BottomSheetValue.Collapsed
+                    )
+                )
                 val bleOperationsViewModel: BleOperationsViewModel = hiltViewModel()
                 val bleOperationsSate by bleOperationsViewModel.state.collectAsStateWithLifecycle()
 
@@ -59,9 +69,48 @@ class MainActivity : ComponentActivity() {
                     mutableIntStateOf(Route.MainRoutes.Main.screenName)
                 }
 
-                Scaffold(
+                BottomSheetScaffold(
                     modifier = Modifier.fillMaxSize(),
-                    scaffoldState = scaffoldState,
+                    scaffoldState = bottomSheetScaffoldState,
+                    sheetContent = {
+                        BottomSheetContent(
+                            thermometerOperationType = bleOperationsSate.thermometerOperationType,
+                            thermometers = bleOperationsSate.thermometers,
+                            thermometerWithRunningOperation = with(
+                                bleOperationsSate.thermometerOperationType
+                            ) {
+                                when (this) {
+                                    is ThermometerOperationType.RetrievingHourlyRecords -> {
+                                        this.thermometer
+                                    }
+                                    else -> null
+                                }
+                            },
+
+                            onConnectThermometerClick = { thermometer ->
+                                bleOperationsViewModel.onEvent(
+                                    BleOperationsEvent.ConnectToDevice(thermometer)
+                                )
+                            },
+                            onThermometerCancelButtonClick = {
+                                bleOperationsViewModel.onEvent(
+                                    BleOperationsEvent.CancelHourlyRecordsSync
+                                )
+                            },
+                            onSyncThermometerClick = {
+                                bleOperationsViewModel.onEvent(
+                                    BleOperationsEvent.SyncHourlyRecords(it)
+                                )
+                            },
+                            onDisconnectThermometerClick = {
+                                bleOperationsViewModel.onEvent(
+                                    BleOperationsEvent.Disconnect(it)
+                                )
+                            }
+                        )
+                    },
+                    sheetShape = RoundedCornerShape(12.dp),
+                    sheetPeekHeight = 48.dp,
                     topBar = {
                         TopBar(
                             title = stringResource(titleResourceIdState),
@@ -89,13 +138,13 @@ class MainActivity : ComponentActivity() {
                                     onEvent = { event ->
                                         bleOperationsViewModel.onEvent(event)
                                     },
-                                    scaffoldState = scaffoldState
+                                    snackbarHostState = bottomSheetScaffoldState.snackbarHostState
                                 )
                                 titleResourceIdState = Route.MainRoutes.Main.screenName
                             }
                             composable(Route.MainRoutes.ScanForDevices.fullRoute) {
                                 SearchThermometersScreen(
-                                    scaffoldState,
+                                    bottomSheetScaffoldState.snackbarHostState,
                                     onDeviceListItemClick = { clickedDeviceAddress ->
                                         Route.ConnectDeviceRoutes.ConnectDeviceGraph.navigate(
                                             navController,
@@ -178,21 +227,5 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MiTemperature2AltTheme {
-        Greeting("Android")
     }
 }

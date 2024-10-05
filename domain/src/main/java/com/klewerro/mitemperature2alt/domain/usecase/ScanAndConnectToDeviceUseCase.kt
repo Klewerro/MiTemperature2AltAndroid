@@ -2,6 +2,7 @@ package com.klewerro.mitemperature2alt.domain.usecase
 
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.TimeoutCancellationException
 
 class ScanAndConnectToDeviceUseCase(private val thermometerRepository: ThermometerRepository) {
     suspend operator fun invoke(viewModelScope: CoroutineScope, address: String): Result<Unit> =
@@ -13,5 +14,7 @@ class ScanAndConnectToDeviceUseCase(private val thermometerRepository: Thermomet
             Result.success(Unit)
         } catch (illegalStateException: Exception) {
             Result.failure(illegalStateException)
+        } catch (te: TimeoutCancellationException) {
+            Result.failure(te)
         }
 }
