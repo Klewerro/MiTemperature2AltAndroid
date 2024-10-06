@@ -27,7 +27,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.klewerro.mitemperature2alt.core.util.LocalDateTimeUtils.formatTest
+import com.klewerro.mitemperature2alt.core.util.LocalDateTimeUtils.formatToFullHourDate
 import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
 import com.klewerro.mitemperature2alt.domain.model.HourlyRecord
@@ -82,7 +82,7 @@ fun HourlyRecordItem(hourlyRecord: HourlyRecord, modifier: Modifier = Modifier) 
 
         Spacer(modifier = Modifier.width(spacing.spaceNormal))
         Text(
-            text = hourlyRecord.dateTime.formatTest(),
+            text = hourlyRecord.dateTime.formatToFullHourDate(),
             textAlign = TextAlign.End,
             modifier = Modifier.weight(1f)
         )

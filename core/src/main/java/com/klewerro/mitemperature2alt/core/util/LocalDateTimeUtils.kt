@@ -1,6 +1,7 @@
 package com.klewerro.mitemperature2alt.core.util
 
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -21,9 +22,20 @@ object LocalDateTimeUtils {
     fun LocalDateTime.toEpochSecondUtc(): Int = this.toInstant(TimeZone.UTC).epochSeconds.toInt()
 
     @OptIn(FormatStringsInDatetimeFormats::class)
-    fun LocalDateTime.formatTest(): String = this.format(
+    fun LocalDateTime.formatToFullHourDate(shortenedYear: Boolean = true): String = this.format(
         LocalDateTime.Format {
-            byUnicodePattern("HH:mm, dd.MM.yy")
+            byUnicodePattern(
+                if (shortenedYear) "HH:mm, dd.MM.yy" else "HH:mm, dd.MM.yyyy"
+            )
+        }
+    )
+
+    @OptIn(FormatStringsInDatetimeFormats::class)
+    fun LocalDate.formatToSimpleDate(shortenedYear: Boolean = true): String = this.format(
+        LocalDate.Format {
+            byUnicodePattern(
+                if (shortenedYear) "dd.MM.yy" else "dd.MM.yyyy"
+            )
         }
     )
 }

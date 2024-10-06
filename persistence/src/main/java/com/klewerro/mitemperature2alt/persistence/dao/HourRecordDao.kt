@@ -16,6 +16,16 @@ interface HourRecordDao {
     @Query("SELECT * FROM hour_record WHERE thermometerAddress = :address")
     fun observeThermometerAll(address: String): Flow<List<HourRecordEntity>>
 
+    @Query(
+        "SELECT * FROM hour_record " +
+            "WHERE thermometerAddress = :address and time between :startTime and :endTime"
+    )
+    fun getThermometerRange(
+        address: String,
+        startTime: Int,
+        endTime: Int
+    ): Flow<List<HourRecordEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHourRecords(vararg hourRecords: HourRecordEntity)
 }

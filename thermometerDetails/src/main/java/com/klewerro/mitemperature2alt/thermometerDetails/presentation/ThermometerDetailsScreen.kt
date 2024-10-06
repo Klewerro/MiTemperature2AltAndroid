@@ -27,6 +27,7 @@ import com.klewerro.mitemperature2alt.coreUi.LocalSpacing
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
 import com.klewerro.mitemperature2alt.domain.model.HourlyRecord
 import com.klewerro.mitemperature2alt.domain.model.SavedThermometer
+import com.klewerro.mitemperature2alt.thermometerDetails.presentation.composable.DaySelector
 import com.klewerro.mitemperature2alt.thermometerDetails.presentation.composable.HourlyRecordItem
 import kotlinx.datetime.LocalDateTime
 
@@ -39,6 +40,7 @@ fun ThermometerDetailsScreen(
     val thermometerDetailsState by thermometerDetailsViewModel.state.collectAsStateWithLifecycle()
     ThermometerDetailsScreenContent(
         state = thermometerDetailsState,
+        onEvent = thermometerDetailsViewModel::onEvent,
         modifier = modifier
             .fillMaxSize()
             .padding(spacing.spaceScreen)
@@ -49,6 +51,7 @@ fun ThermometerDetailsScreen(
 @Composable
 private fun ThermometerDetailsScreenContent(
     state: ThermometerDetailsState,
+    onEvent: (ThermometerDetailsEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -67,6 +70,14 @@ private fun ThermometerDetailsScreenContent(
                     fontStyle = FontStyle.Italic
                 )
             }
+            Spacer(Modifier.height(spacing.spaceSmall))
+            DaySelector(
+                date = state.selectedDate,
+                onPreviousDayClick = { onEvent(ThermometerDetailsEvent.OnPreviousDaySelected) },
+                onNextDayClick = { onEvent(ThermometerDetailsEvent.OnNextDaySelected) },
+                onDateClick = { /*Todo: Implement date picker*/ },
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(Modifier.height(spacing.spaceSmall))
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(spacing.spaceSmall),
@@ -125,7 +136,8 @@ private fun ThermometerDetailsScreenPreview() {
     )
     MiTemperature2AltTheme {
         ThermometerDetailsScreenContent(
-            state = state
+            state = state,
+            onEvent = {}
         )
     }
 }

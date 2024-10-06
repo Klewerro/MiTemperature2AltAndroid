@@ -46,4 +46,6 @@
     <string name="min_temperature">"Min temperature"</string>
     <string name="max_humidity">Max humidity</string>
     <string name="min_humidity">Min humidity</string>
+    <string name="previous_day">Previous day</string>
+    <string name="next_day">Next day</string>
 </resources>
