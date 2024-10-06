@@ -1,5 +1,6 @@
 package com.klewerro.mitemperature2alt.persistence.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
@@ -18,7 +19,7 @@ import androidx.room.PrimaryKey
 )
 data class HourRecordEntity(
     @PrimaryKey val index: Int,
-    val time: Int,
+    @ColumnInfo(name = "time") val epochSecondTime: Int,
     val temperatureMin: Float,
     val temperatureMax: Float,
     val humidityMin: Int,

@@ -1,5 +1,6 @@
 package com.klewerro.mitemperature2alt.temperatureSensor
 
+import com.klewerro.mitemperature2alt.core.util.LocalDateTimeUtils.convertEpochSecondToLocalDateTimeUtc
 import com.klewerro.mitemperature2alt.domain.model.HourlyRecord
 import com.klewerro.mitemperature2alt.domain.model.LastIndexTotalRecords
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
@@ -70,7 +71,7 @@ object Converters {
 
         return HourlyRecord(
             index,
-            time,
+            time.convertEpochSecondToLocalDateTimeUtc(),
             temperatureMin = minTempFloat,
             temperatureMax = maxTempFloat,
             humidityMin = minHumidity.toInt(),

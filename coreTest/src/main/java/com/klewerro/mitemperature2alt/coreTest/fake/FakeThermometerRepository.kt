@@ -7,6 +7,7 @@ import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerScanResult
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
+import kotlin.random.Random
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlin.random.Random
+import kotlinx.datetime.LocalDateTime
 
 class FakeThermometerRepository : ThermometerRepository {
 
@@ -36,7 +37,7 @@ class FakeThermometerRepository : ThermometerRepository {
     var hourlyRecords: List<HourlyRecord>? = (0..15).map { i ->
         HourlyRecord(
             index = i,
-            time = 1,
+            dateTime = LocalDateTime(1, 1, 1, 1, 1, 1),
             temperatureMin = (10 + i).toFloat(),
             temperatureMax = (20 + i).toFloat(),
             humidityMin = 30 + i,

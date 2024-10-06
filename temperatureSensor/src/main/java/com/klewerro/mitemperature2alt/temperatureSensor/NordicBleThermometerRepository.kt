@@ -6,6 +6,8 @@ import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
 import com.klewerro.mitemperature2alt.temperatureSensor.contracts.ThermometerDevicesBleScanner
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -26,8 +28,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import no.nordicsemi.android.kotlin.ble.core.data.GattConnectionState
 import timber.log.Timber
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleScanner) :
     ThermometerRepository {
@@ -284,7 +284,7 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
                 ?.transformWhile {
                     counter = it.index + 1
                     Timber.d(
-                        "HourlyRecord collected: time: ${it.time} [${it.index + 1}/$totalRecords]"
+                        "HourlyRecord collected: time: ${it.dateTime} [${it.index + 1}/$totalRecords]"
                     )
                     emit(it)
                     currentItemNumberUpdate(counter)
