@@ -42,4 +42,8 @@
     <string name="getting_hourly_records_for_string_int_of_int">Getting hourly records for %1$s (%2$d of %3$d)</string>
     <string name="last_synchronization_datetime">Last synchronization date and time</string>
     <string name="details">Details</string>
+    <string name="max_temperature">Max temperature</string>
+    <string name="min_temperature">"Min temperature"</string>
+    <string name="max_humidity">Max humidity</string>
+    <string name="min_humidity">Min humidity</string>
 </resources>
