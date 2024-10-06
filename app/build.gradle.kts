@@ -64,6 +64,7 @@ dependencies {
     implementation(project(":temperatureSensor"))
     implementation(project(":persistence"))
     implementation(project(":domain"))
+    implementation(project(":core"))
     implementation(project(":coreUi"))
     implementation(project(":addThermometer:addThermometerPresentation"))
     implementation(project(":thermometerDetails"))

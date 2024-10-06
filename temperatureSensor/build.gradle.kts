@@ -38,6 +38,7 @@ android {
 dependencies {
     // Module imports
     implementation(project(":domain"))
+    implementation(project(":core"))
     testImplementation(project(":coreTest"))
 
     // Hilt

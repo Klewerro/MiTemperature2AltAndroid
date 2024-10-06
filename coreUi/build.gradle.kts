@@ -5,10 +5,16 @@ plugins {
 
 android {
     namespace = "com.klewerro.mitemperature2alt.coreUi"
-    compileSdk = libs.versions.sdk.compile.get().toInt()
+    compileSdk =
+        libs.versions.sdk.compile
+            .get()
+            .toInt()
 
     defaultConfig {
-        minSdk = libs.versions.sdk.min.get().toInt()
+        minSdk =
+            libs.versions.sdk.min
+                .get()
+                .toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -40,6 +46,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
     implementation(project(":domain"))
 
     implementation(libs.bundles.androidX)

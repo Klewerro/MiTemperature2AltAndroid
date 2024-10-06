@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
     testImplementation(project(":coreTest"))
 
     implementation(libs.coroutines.core)

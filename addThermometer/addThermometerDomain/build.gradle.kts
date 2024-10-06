@@ -36,6 +36,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
     api(project(":domain"))
 
     implementation(libs.coroutines.core)

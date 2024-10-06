@@ -47,6 +47,7 @@ kotlin-ble-client = { module = "no.nordicsemi.android.kotlin.ble:client", versio
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.1"}
 
 # test dependencies
 junit = { module = "junit:junit", version = "4.13.2"}
