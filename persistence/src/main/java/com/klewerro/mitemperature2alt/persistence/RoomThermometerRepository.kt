@@ -15,6 +15,11 @@ class RoomThermometerRepository(private val thermometerDao: ThermometerDao) :
         }
     }
 
+    override fun observeThermometer(macAddress: String) = thermometerDao.getThermometer(macAddress)
+        .map {
+            it.toSavedThermometer()
+        }
+
     override suspend fun saveThermometer(macAddress: String, name: String) {
         thermometerDao.insertThermometer(
             ThermometerEntity(

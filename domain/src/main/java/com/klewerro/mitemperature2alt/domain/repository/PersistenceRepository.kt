@@ -5,5 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface PersistenceRepository {
     val savedThermometers: Flow<List<SavedThermometer>>
-    suspend fun saveThermometer(name: String, macAddress: String)
+    suspend fun saveThermometer(macAddress: String, name: String)
+    fun observeThermometer(macAddress: String): Flow<SavedThermometer>
 }

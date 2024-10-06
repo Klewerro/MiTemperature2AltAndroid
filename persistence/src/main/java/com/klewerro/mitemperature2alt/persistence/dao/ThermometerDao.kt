@@ -13,6 +13,9 @@ interface ThermometerDao {
     @Query("SELECT * from thermometer")
     fun getAllThermometers(): Flow<List<ThermometerEntity>>
 
+    @Query("SELECT * from thermometer WHERE address = :address")
+    fun getThermometer(address: String): Flow<ThermometerEntity>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertThermometer(thermometer: ThermometerEntity): Long
 }
