@@ -6,11 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.klewerro.mitemperature2alt.coreUi.UiConstants
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import kotlinx.datetime.atDate
+import kotlinx.datetime.atTime
 
 @HiltViewModel
 class ConnectThermometerTimeViewModel @Inject constructor(
@@ -26,17 +28,58 @@ class ConnectThermometerTimeViewModel @Inject constructor(
             val deviceTime = thermometerRepository.readInternalClock(deviceAddress = deviceAddress)
             _state.update {
                 it.copy(
-                    thermometerTime = deviceTime
+                    thermometerDateTime = deviceTime
                 )
             }
         }
     }
 
-    fun selectOption(index: Int) {
-        _state.update {
-            it.copy(
-                selectedOption = index
-            )
+    fun onEvent(event: ConnectThermometerTimeEvent) {
+        when (event) {
+            is ConnectThermometerTimeEvent.SelectedOptionChanged -> {
+                _state.update {
+                    it.copy(
+                        selectedOption = event.index
+                    )
+                }
+            }
+
+            ConnectThermometerTimeEvent.CloseTimePicker -> _state.update {
+                it.copy(
+                    isTimePickerOpened = false
+                )
+            }
+
+            ConnectThermometerTimeEvent.OpenDatePicker -> _state.update {
+                it.copy(
+                    isDatePickerOpened = true
+                )
+            }
+
+            ConnectThermometerTimeEvent.CloseDatePicker -> _state.update {
+                it.copy(
+                    isDatePickerOpened = false
+                )
+            }
+
+            is ConnectThermometerTimeEvent.DatePicked -> _state.update {
+                it.copy(
+                    userPickedDateTime = event.date.atTime(0, 0),
+                    isDatePickerOpened = false,
+                    isTimePickerOpened = true
+                )
+            }
+
+            is ConnectThermometerTimeEvent.TimePicked -> _state.update { stateValue ->
+                stateValue.userPickedDateTime?.date?.let { dateValue ->
+                    stateValue.copy(
+                        userPickedDateTime = event.time.atDate(dateValue),
+                        isTimePickerOpened = false
+                    )
+                } ?: run {
+                    stateValue
+                }
+            }
         }
     }
 }
