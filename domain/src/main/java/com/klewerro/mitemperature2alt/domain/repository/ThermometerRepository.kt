@@ -38,4 +38,5 @@ interface ThermometerRepository {
     ): List<HourlyRecord>?
 
     suspend fun readInternalClock(deviceAddress: String): LocalDateTime?
+    suspend fun writeInternalClock(deviceAddress: String, dateTime: LocalDateTime)
 }

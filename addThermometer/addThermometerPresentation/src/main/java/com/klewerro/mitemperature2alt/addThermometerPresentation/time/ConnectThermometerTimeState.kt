@@ -6,8 +6,9 @@ import kotlinx.datetime.LocalDateTime
 data class ConnectThermometerTimeState(
     val deviceDateTime: LocalDateTime = LocalDateTimeUtils.getCurrentUtcTime(),
     val thermometerDateTime: LocalDateTime? = null,
-    val userPickedDateTime: LocalDateTime? = null,
-    val selectedOption: Int = 0,
+    val userProvidedDateTime: LocalDateTime? = null,
+    val dateTimeType: DateTimeType = DateTimeType.THERMOMETER,
     val isTimePickerOpened: Boolean = false,
-    val isDatePickerOpened: Boolean = false
+    val isDatePickerOpened: Boolean = false,
+    val sendingTime: Boolean = false
 )

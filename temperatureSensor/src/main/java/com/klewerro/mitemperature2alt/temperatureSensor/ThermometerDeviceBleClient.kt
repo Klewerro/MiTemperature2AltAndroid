@@ -7,9 +7,12 @@ import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
 import com.klewerro.mitemperature2alt.temperatureSensor.BleConstants.toUUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import no.nordicsemi.android.common.core.DataByteArray
 import no.nordicsemi.android.kotlin.ble.client.main.callback.ClientBleGatt
 import no.nordicsemi.android.kotlin.ble.client.main.service.ClientBleGattCharacteristic
 import no.nordicsemi.android.kotlin.ble.core.data.GattConnectionState
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 @SuppressLint("MissingPermission")
 class ThermometerDeviceBleClient(private val connection: ClientBleGatt) {
@@ -73,5 +76,15 @@ class ThermometerDeviceBleClient(private val connection: ClientBleGatt) {
         return readResult?.let {
             Converters.convertToEpochSecond(it)
         }
+    }
+
+    suspend fun writeInternalClock(epochSecondTime: Int) {
+        val epochSecondTimeByteArray = ByteBuffer
+            .allocate(Int.SIZE_BYTES)
+            .order(ByteOrder.LITTLE_ENDIAN)
+            .putInt(epochSecondTime)
+            .array()
+
+        internalClockCharacteristic?.write(DataByteArray.from(*epochSecondTimeByteArray))
     }
 }

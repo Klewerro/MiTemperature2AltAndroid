@@ -239,7 +239,7 @@ class MainActivity : ComponentActivity() {
                 )
             ) {
                 ConnectThermometerTimeScreen(
-                    onNextButtonClick = {
+                    onTimeSend = {
                         navController.navigate(
                             Route.ConnectDeviceRoutes.SetName.fullRoute
                         )

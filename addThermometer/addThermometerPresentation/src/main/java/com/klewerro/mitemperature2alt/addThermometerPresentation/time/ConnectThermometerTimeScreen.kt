@@ -14,6 +14,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,18 +34,26 @@ import kotlinx.datetime.LocalTime
 
 @Composable
 fun ConnectThermometerTimeScreen(
-    onNextButtonClick: () -> Unit,
+    onTimeSend: () -> Unit,
     modifier: Modifier = Modifier,
     connectThermometerTimeViewModel: ConnectThermometerTimeViewModel = hiltViewModel()
 ) {
     val connectThermometerTimeState by
     connectThermometerTimeViewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(true) {
+        connectThermometerTimeViewModel.dataSend.collect {
+            if (it) {
+                onTimeSend()
+            }
+        }
+    }
+
     ConnectThermometerTimeScreenContent(
         state = connectThermometerTimeState,
         onEvent = {
             connectThermometerTimeViewModel.onEvent(it)
         },
-        onNextButtonClick = onNextButtonClick,
         modifier = modifier
     )
 }
@@ -54,7 +63,6 @@ fun ConnectThermometerTimeScreen(
 private fun ConnectThermometerTimeScreenContent(
     state: ConnectThermometerTimeState,
     onEvent: (ConnectThermometerTimeEvent) -> Unit,
-    onNextButtonClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -68,30 +76,32 @@ private fun ConnectThermometerTimeScreenContent(
         modifier = modifier
             .fillMaxSize()
             .padding(spacing.spaceScreen),
-        verticalArrangement = Arrangement.spacedBy(spacing.spaceSmall, Alignment.CenterVertically),
+        verticalArrangement = Arrangement.spacedBy(spacing.spaceNormal, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ThermometerTimeSelectableCard(
             state.thermometerDateTime,
-            state.selectedOption == 0,
+            state.dateTimeType == DateTimeType.THERMOMETER,
             onClick = {
-                onEvent(ConnectThermometerTimeEvent.SelectedOptionChanged(0))
+                onEvent(ConnectThermometerTimeEvent.SelectedOptionChanged(DateTimeType.THERMOMETER))
             }
         )
 
         DeviceTimeSelectableCard(
             state.deviceDateTime,
-            state.selectedOption == 1,
+            state.dateTimeType == DateTimeType.DEVICE,
             onClick = {
-                onEvent(ConnectThermometerTimeEvent.SelectedOptionChanged(1))
+                onEvent(ConnectThermometerTimeEvent.SelectedOptionChanged(DateTimeType.DEVICE))
             }
         )
 
         PickerTimeSelectableCard(
-            state.userPickedDateTime,
-            state.selectedOption == 2,
+            state.userProvidedDateTime,
+            state.dateTimeType == DateTimeType.USER_PROVIDED,
             onClick = {
-                onEvent(ConnectThermometerTimeEvent.SelectedOptionChanged(2))
+                onEvent(
+                    ConnectThermometerTimeEvent.SelectedOptionChanged(DateTimeType.USER_PROVIDED)
+                )
             },
             onPickDateTimeClick = {
                 onEvent(ConnectThermometerTimeEvent.OpenDatePicker)
@@ -152,8 +162,13 @@ private fun ConnectThermometerTimeScreenContent(
             }
         }
 
-        Button(onClick = onNextButtonClick) {
-            Text("Next")
+        Button(
+            onClick = {
+                onEvent(ConnectThermometerTimeEvent.SendTimeToThermometer)
+            },
+            enabled = !state.sendingTime
+        ) {
+            Text("Send to the thermometer")
         }
     }
 }
@@ -167,6 +182,6 @@ private fun ConnectThermometerTimeScreenContentPreview() {
             LocalDateTimeUtils.getCurrentUtcTime(),
             null
         )
-        ConnectThermometerTimeScreenContent(state = state, onEvent = {}, onNextButtonClick = {})
+        ConnectThermometerTimeScreenContent(state = state, onEvent = {})
     }
 }

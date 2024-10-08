@@ -1,8 +1,8 @@
 package com.klewerro.mitemperature2alt.temperatureSensor
 
-import android.util.Log
 import com.klewerro.mitemperature2alt.core.util.LocalDateTimeUtils.convertEpochSecondToLocalDateTimeUtc
 import com.klewerro.mitemperature2alt.core.util.LocalDateTimeUtils.formatToFullHourDate
+import com.klewerro.mitemperature2alt.core.util.LocalDateTimeUtils.toEpochSecondUtc
 import com.klewerro.mitemperature2alt.domain.model.HourlyRecord
 import com.klewerro.mitemperature2alt.domain.model.LastIndexTotalRecords
 import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
@@ -234,16 +234,23 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
         connectedDevicesClients[deviceAddress]?.let { deviceClient ->
             val result = deviceClient.readInternalClock()?.convertEpochSecondToLocalDateTimeUtc()
             if (result == null) {
-                Log.d("GetHourlyResultsUseCase", "Couldn't convert internal time!")
+                Timber.d("readInternalClock: Couldn't convert internal time!")
             } else {
-                Log.d(
-                    "GetHourlyResultsUseCase",
-                    "Internal time: ${result.formatToFullHourDate(shortenedYear = false)}."
+                Timber.d(
+                    "readInternalClock: Internal time: ${result.formatToFullHourDate(
+                        shortenedYear = false
+                    )}."
                 )
             }
 
             result
         }
+
+    override suspend fun writeInternalClock(deviceAddress: String, dateTime: LocalDateTime) {
+        connectedDevicesClients[deviceAddress]?.let { deviceClient ->
+            deviceClient.writeInternalClock(dateTime.toEpochSecondUtc())
+        }
+    }
 
     private fun observeConnectionStatus(
         address: String,

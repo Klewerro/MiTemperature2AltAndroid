@@ -7,24 +7,32 @@ import com.klewerro.mitemperature2alt.coreUi.UiConstants
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.atDate
 import kotlinx.datetime.atTime
 
 @HiltViewModel
 class ConnectThermometerTimeViewModel @Inject constructor(
-    private val savedState: SavedStateHandle,
+    savedState: SavedStateHandle,
     private val thermometerRepository: ThermometerRepository
 ) : ViewModel() {
+    private val deviceAddress = savedState.get<String>(UiConstants.NAV_PARAM_ADDRESS)!!
     private val _state = MutableStateFlow(ConnectThermometerTimeState())
     val state = _state.asStateFlow()
 
+    private val dataSendChannel = Channel<Boolean>()
+    val dataSend = dataSendChannel.receiveAsFlow()
+
     init {
         viewModelScope.launch {
-            val deviceAddress = savedState.get<String>(UiConstants.NAV_PARAM_ADDRESS)!!
             val deviceTime = thermometerRepository.readInternalClock(deviceAddress = deviceAddress)
             _state.update {
                 it.copy(
@@ -39,7 +47,7 @@ class ConnectThermometerTimeViewModel @Inject constructor(
             is ConnectThermometerTimeEvent.SelectedOptionChanged -> {
                 _state.update {
                     it.copy(
-                        selectedOption = event.index
+                        dateTimeType = event.dateTimeType
                     )
                 }
             }
@@ -64,21 +72,59 @@ class ConnectThermometerTimeViewModel @Inject constructor(
 
             is ConnectThermometerTimeEvent.DatePicked -> _state.update {
                 it.copy(
-                    userPickedDateTime = event.date.atTime(0, 0),
+                    userProvidedDateTime = event.date.atTime(0, 0),
                     isDatePickerOpened = false,
                     isTimePickerOpened = true
                 )
             }
 
-            is ConnectThermometerTimeEvent.TimePicked -> _state.update { stateValue ->
-                stateValue.userPickedDateTime?.date?.let { dateValue ->
-                    stateValue.copy(
-                        userPickedDateTime = event.time.atDate(dateValue),
-                        isTimePickerOpened = false
+            is ConnectThermometerTimeEvent.TimePicked -> timePicked(event.time)
+
+            ConnectThermometerTimeEvent.SendTimeToThermometer -> sendTimeToThermometerAndContinue()
+        }
+    }
+
+    private fun timePicked(time: LocalTime) {
+        _state.update { stateValue ->
+            stateValue.userProvidedDateTime?.date?.let { dateValue ->
+                stateValue.copy(
+                    userProvidedDateTime = time.atDate(dateValue),
+                    isTimePickerOpened = false
+                )
+            } ?: run {
+                stateValue
+            }
+        }
+    }
+
+    private fun sendTimeToThermometerAndContinue() {
+        _state.update {
+            it.copy(
+                sendingTime = true
+            )
+        }
+        getSelectedDateTime()?.let { dateTimeToSave ->
+            viewModelScope.launch(Dispatchers.IO) {
+                thermometerRepository.writeInternalClock(
+                    deviceAddress = deviceAddress,
+                    dateTime = dateTimeToSave
+                )
+                dataSendChannel.send(true)
+                _state.update {
+                    it.copy(
+                        sendingTime = false
                     )
-                } ?: run {
-                    stateValue
                 }
+            }
+        }
+    }
+
+    private fun getSelectedDateTime(): LocalDateTime? {
+        with(state.value) {
+            return when (dateTimeType) {
+                DateTimeType.DEVICE -> deviceDateTime
+                DateTimeType.THERMOMETER -> thermometerDateTime
+                DateTimeType.USER_PROVIDED -> userProvidedDateTime
             }
         }
     }
