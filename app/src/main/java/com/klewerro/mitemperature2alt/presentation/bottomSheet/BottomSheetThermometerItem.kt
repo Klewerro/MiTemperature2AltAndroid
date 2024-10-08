@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -57,7 +58,7 @@ fun BottomSheetThermometerItem(
             RevealDirection.StartToEnd,
             RevealDirection.EndToStart
         ),
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+        snapAnimationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
     ),
     shape: CornerBasedShape = RoundedCornerShape(LocalSpacing.current.radiusSmall)
 ) {
@@ -95,8 +96,19 @@ fun BottomSheetThermometerItem(
             onDisconnectClick()
             true
         },
+        card = { _, content ->
+            Card(
+                modifier = Modifier.matchParentSize(),
+                contentColor = MaterialTheme.colors.onSecondary,
+                shape = shape,
+                content = {
+                    Column(modifier = Modifier.matchParentSize()) {
+                        content()
+                    }
+                }
+            )
+        },
         modifier = modifier
-
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -202,7 +214,7 @@ private fun HiddenContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.padding(horizontal = 8.dp)
     ) {
-        Icon(imageVector = imageVector, contentDescription = text)
+        Icon(imageVector = imageVector, contentDescription = contentDescription)
         Text(text = text)
     }
 }
