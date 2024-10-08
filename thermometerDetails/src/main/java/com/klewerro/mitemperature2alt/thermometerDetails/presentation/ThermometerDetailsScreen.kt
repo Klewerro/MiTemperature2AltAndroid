@@ -15,10 +15,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -29,7 +36,11 @@ import com.klewerro.mitemperature2alt.domain.model.HourlyRecord
 import com.klewerro.mitemperature2alt.domain.model.SavedThermometer
 import com.klewerro.mitemperature2alt.thermometerDetails.presentation.composable.DaySelector
 import com.klewerro.mitemperature2alt.thermometerDetails.presentation.composable.HourlyRecordItem
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import com.klewerro.mitemperature2alt.coreUi.R as RCore
 
 @Composable
 fun ThermometerDetailsScreen(
@@ -47,7 +58,7 @@ fun ThermometerDetailsScreen(
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun ThermometerDetailsScreenContent(
     state: ThermometerDetailsState,
@@ -55,6 +66,16 @@ private fun ThermometerDetailsScreenContent(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
+    val datePickerState = rememberDatePickerState(
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+                utcTimeMillis <= System.currentTimeMillis()
+
+            override fun isSelectableYear(year: Int): Boolean =
+                year <= Clock.System.now().toLocalDateTime(TimeZone.UTC).year
+        }
+    )
+
     Column(modifier = modifier.fillMaxSize()) {
         state.thermometer?.let {
             FlowRow(
@@ -75,7 +96,9 @@ private fun ThermometerDetailsScreenContent(
                 date = state.selectedDate,
                 onPreviousDayClick = { onEvent(ThermometerDetailsEvent.OnPreviousDaySelected) },
                 onNextDayClick = { onEvent(ThermometerDetailsEvent.OnNextDaySelected) },
-                onDateClick = { /*Todo: Implement date picker*/ },
+                onDateClick = {
+                    onEvent(ThermometerDetailsEvent.DatePickerOpened)
+                },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(spacing.spaceSmall))
@@ -90,11 +113,44 @@ private fun ThermometerDetailsScreenContent(
             }
         } ?: run {
             Text(
-                text = "Unexpected error.",
+                text = stringResource(RCore.string.unexpected_error_occurred_try_again),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .weight(1f)
             )
+        }
+
+        if (state.isDatePickerOpened) {
+            DatePickerDialog(
+                onDismissRequest = {
+                    onEvent(ThermometerDetailsEvent.DatePickerDismissed)
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        datePickerState.selectedDateMillis?.let {
+                            onEvent(
+                                ThermometerDetailsEvent.DatePickerDateSelected(
+                                    it
+                                )
+                            )
+                        }
+                    }) {
+                        Text(stringResource(android.R.string.ok))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        onEvent(ThermometerDetailsEvent.DatePickerDismissed)
+                    }) {
+                        Text(stringResource(android.R.string.cancel))
+                    }
+                }
+            ) {
+                DatePicker(
+                    datePickerState,
+                    showModeToggle = false
+                )
+            }
         }
     }
 }

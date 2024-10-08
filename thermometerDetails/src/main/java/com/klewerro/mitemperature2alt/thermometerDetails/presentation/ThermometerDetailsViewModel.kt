@@ -92,6 +92,24 @@ class ThermometerDetailsViewModel @Inject constructor(
                 }
                 refreshRecords()
             }
+
+            ThermometerDetailsEvent.DatePickerOpened -> _state.update {
+                it.copy(
+                    isDatePickerOpened = true
+                )
+            }
+            ThermometerDetailsEvent.DatePickerDismissed -> _state.update {
+                it.copy(
+                    isDatePickerOpened = false
+                )
+            }
+
+            is ThermometerDetailsEvent.DatePickerDateSelected -> _state.update {
+                it.copy(
+                    selectedDate = event.selectedDateLocalDate,
+                    isDatePickerOpened = false
+                )
+            }
         }
     }
 

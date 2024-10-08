@@ -15,8 +15,13 @@ object LocalDateTimeUtils {
         val instant = Instant.fromEpochSeconds(this.toLong())
         val localDateTime = instant.toLocalDateTime(TimeZone.UTC)
 
-        localDateTime.toInstant(TimeZone.UTC).epochSeconds
         return localDateTime
+    }
+
+    fun Long.convertEpochMillisToLocalDate(): LocalDate {
+        val instant = Instant.fromEpochMilliseconds(this)
+        val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+        return localDateTime.date
     }
 
     fun LocalDateTime.toEpochSecondUtc(): Int = this.toInstant(TimeZone.UTC).epochSeconds.toInt()

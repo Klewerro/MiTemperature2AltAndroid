@@ -12,5 +12,6 @@ data class ThermometerDetailsState(
     val hourlyRecords: List<HourlyRecord> = emptyList(),
     val selectedDate: LocalDate = Clock.System.now().toLocalDateTime(
         TimeZone.currentSystemDefault()
-    ).date
+    ).date,
+    val isDatePickerOpened: Boolean = false
 )

@@ -1,6 +1,5 @@
 package com.klewerro.mitemperature2alt.thermometerDetails.presentation.composable
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,6 +7,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
@@ -41,13 +41,16 @@ fun DaySelector(
                 tint = MaterialTheme.colors.primary
             )
         }
-        Text(
-            text = date.formatToSimpleDate(shortenedYear = false),
-            style = MaterialTheme.typography.h2,
-            modifier = Modifier.clickable {
+        TextButton(
+            onClick = {
                 onDateClick()
             }
-        )
+        ) {
+            Text(
+                text = date.formatToSimpleDate(shortenedYear = false),
+                style = MaterialTheme.typography.h2
+            )
+        }
         Row {
             IconButton(onClick = onNextDayClick) {
                 Icon(
