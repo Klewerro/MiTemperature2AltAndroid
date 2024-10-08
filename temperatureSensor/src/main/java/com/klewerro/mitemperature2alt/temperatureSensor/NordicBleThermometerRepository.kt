@@ -1,13 +1,14 @@
 package com.klewerro.mitemperature2alt.temperatureSensor
 
+import android.util.Log
+import com.klewerro.mitemperature2alt.core.util.LocalDateTimeUtils.convertEpochSecondToLocalDateTimeUtc
+import com.klewerro.mitemperature2alt.core.util.LocalDateTimeUtils.formatToFullHourDate
 import com.klewerro.mitemperature2alt.domain.model.HourlyRecord
 import com.klewerro.mitemperature2alt.domain.model.LastIndexTotalRecords
 import com.klewerro.mitemperature2alt.domain.model.ThermometerConnectionStatus
 import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
 import com.klewerro.mitemperature2alt.domain.repository.ThermometerRepository
 import com.klewerro.mitemperature2alt.temperatureSensor.contracts.ThermometerDevicesBleScanner
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -26,8 +27,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import kotlinx.datetime.LocalDateTime
 import no.nordicsemi.android.kotlin.ble.core.data.GattConnectionState
 import timber.log.Timber
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleScanner) :
     ThermometerRepository {
@@ -225,6 +229,21 @@ class NordicBleThermometerRepository(private val scanner: ThermometerDevicesBleS
             }
         }
     }
+
+    override suspend fun readInternalClock(deviceAddress: String): LocalDateTime? =
+        connectedDevicesClients[deviceAddress]?.let { deviceClient ->
+            val result = deviceClient.readInternalClock()?.convertEpochSecondToLocalDateTimeUtc()
+            if (result == null) {
+                Log.d("GetHourlyResultsUseCase", "Couldn't convert internal time!")
+            } else {
+                Log.d(
+                    "GetHourlyResultsUseCase",
+                    "Internal time: ${result.formatToFullHourDate(shortenedYear = false)}."
+                )
+            }
+
+            result
+        }
 
     private fun observeConnectionStatus(
         address: String,

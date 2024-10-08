@@ -78,4 +78,9 @@ object Converters {
             humidityMax = maxHumidity.toInt()
         )
     }
+
+    fun convertToEpochSecond(dataByteArray: DataByteArray): Int {
+        val value = dataByteArray.value
+        return ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN).getInt()
+    }
 }

@@ -11,6 +11,7 @@ object BleConstants {
     const val CHARACTERISTIC_DEVICE_TEMPERATURE_HUMIDITY = "ebe0ccc1-7a0a-4b0c-8a1a-6ff2997da3a6"
     const val CHARACTERISTIC_LAST_INDEX_TOTAL_RECORDS = "ebe0ccb9-7a0a-4b0c-8a1a-6ff2997da3a6"
     const val CHARACTERISTIC_HOURLY_RECORDS = "ebe0ccbc-7a0a-4b0c-8a1a-6ff2997da3a6"
+    const val CHARACTERISTIC_INTERNAL_CLOCK = "ebe0ccb7-7a0a-4b0c-8a1a-6ff2997da3a6"
 
     fun String.toUUID(): UUID = UUID.fromString(this)
 }

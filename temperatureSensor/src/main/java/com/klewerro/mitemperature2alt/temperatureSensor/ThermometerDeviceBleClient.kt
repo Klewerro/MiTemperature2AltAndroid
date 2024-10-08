@@ -17,6 +17,7 @@ class ThermometerDeviceBleClient(private val connection: ClientBleGatt) {
     private var temperatureHumidityCharacteristic: ClientBleGattCharacteristic? = null
     private var lastIndexTotalRecordsCharacteristic: ClientBleGattCharacteristic? = null
     private var hourlyRecordsCharacteristic: ClientBleGattCharacteristic? = null
+    private var internalClockCharacteristic: ClientBleGattCharacteristic? = null
 
     val connectionState: Flow<GattConnectionState> = connection.connectionState
 
@@ -31,6 +32,9 @@ class ThermometerDeviceBleClient(private val connection: ClientBleGatt) {
         )
         hourlyRecordsCharacteristic = service?.findCharacteristic(
             BleConstants.CHARACTERISTIC_HOURLY_RECORDS.toUUID()
+        )
+        internalClockCharacteristic = service?.findCharacteristic(
+            BleConstants.CHARACTERISTIC_INTERNAL_CLOCK.toUUID()
         )
     }
 
@@ -63,4 +67,11 @@ class ThermometerDeviceBleClient(private val connection: ClientBleGatt) {
         }
 
     suspend fun readRssi(): Int = connection.readRssi()
+
+    suspend fun readInternalClock(): Int? {
+        val readResult = internalClockCharacteristic?.read()
+        return readResult?.let {
+            Converters.convertToEpochSecond(it)
+        }
+    }
 }

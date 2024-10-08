@@ -8,6 +8,7 @@ import com.klewerro.mitemperature2alt.domain.model.ThermometerStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.datetime.LocalDateTime
 
 interface ThermometerRepository {
     val isScanningForDevices: StateFlow<Boolean>
@@ -35,4 +36,6 @@ interface ThermometerRepository {
         startIndex: Int,
         progressUpdate: (Int, Int) -> Unit
     ): List<HourlyRecord>?
+
+    suspend fun readInternalClock(deviceAddress: String): LocalDateTime?
 }
