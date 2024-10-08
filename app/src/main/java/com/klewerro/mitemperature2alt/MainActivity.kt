@@ -219,7 +219,7 @@ class MainActivity : ComponentActivity() {
                     },
                     onDeviceConnected = {
                         navController.navigate(
-                            Route.ConnectDeviceRoutes.SetTime.fullRoute
+                            "${Route.ConnectDeviceRoutes.SetTime.route}/${connectThermometerViewModel.state.value.thermometerAddress}"
                         ) {
                             // Removes ConnectThermometerScreen backstack
                             popUpTo(Route.ConnectDeviceRoutes.Connecting.fullRoute) {
@@ -230,7 +230,14 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
-            composable(Route.ConnectDeviceRoutes.SetTime.fullRoute) {
+            composable(
+                route = Route.ConnectDeviceRoutes.SetTime.fullRoute,
+                arguments = listOf(
+                    navArgument(UiConstants.NAV_PARAM_ADDRESS) {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
                 ConnectThermometerTimeScreen(
                     onNextButtonClick = {
                         navController.navigate(

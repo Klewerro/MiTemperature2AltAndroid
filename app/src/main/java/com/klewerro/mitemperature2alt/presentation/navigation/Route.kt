@@ -5,11 +5,7 @@ import androidx.navigation.NavController
 import com.klewerro.mitemperature2alt.coreUi.R
 import com.klewerro.mitemperature2alt.coreUi.UiConstants
 
-sealed class Route(
-    @StringRes val screenName: Int,
-    private val route: String,
-    vararg params: String
-) {
+sealed class Route(@StringRes val screenName: Int, val route: String, vararg params: String) {
     val fullRoute: String = if (params.isEmpty()) {
         route
     } else {
@@ -40,7 +36,12 @@ sealed class Route(
         )
 
         data object Connecting : Route(R.string.connecting_to_thermometer, "connect_connecting")
-        data object SetTime : Route(R.string.set_thermometer_name, "connect_time")
+        data object SetTime : Route(
+            R.string.set_thermometer_name,
+            "connect_time",
+            UiConstants.NAV_PARAM_ADDRESS
+        )
+
         data object SetName : Route(R.string.set_thermometer_name, "connect_name")
     }
 
