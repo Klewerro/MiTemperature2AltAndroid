@@ -1,5 +1,6 @@
 package com.klewerro.mitemperature2alt.core.util
 
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -11,6 +12,8 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
 object LocalDateTimeUtils {
+    fun getCurrentUtcTime() = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+
     fun Int.convertEpochSecondToLocalDateTimeUtc(): LocalDateTime {
         val instant = Instant.fromEpochSeconds(this.toLong())
         val localDateTime = instant.toLocalDateTime(TimeZone.UTC)

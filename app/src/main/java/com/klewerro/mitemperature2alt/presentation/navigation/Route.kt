@@ -40,6 +40,7 @@ sealed class Route(
         )
 
         data object Connecting : Route(R.string.connecting_to_thermometer, "connect_connecting")
+        data object SetTime : Route(R.string.set_thermometer_name, "connect_time")
         data object SetName : Route(R.string.set_thermometer_name, "connect_name")
     }
 

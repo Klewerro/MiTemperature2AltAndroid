@@ -35,6 +35,7 @@ import com.klewerro.mitemperature2alt.addThermometerPresentation.ConnectThermome
 import com.klewerro.mitemperature2alt.addThermometerPresentation.ThermometerConnectingScreen
 import com.klewerro.mitemperature2alt.addThermometerPresentation.name.ConnectThermometerNameScreen
 import com.klewerro.mitemperature2alt.addThermometerPresentation.search.SearchThermometersScreen
+import com.klewerro.mitemperature2alt.addThermometerPresentation.time.ConnectThermometerTimeScreen
 import com.klewerro.mitemperature2alt.coreUi.UiConstants
 import com.klewerro.mitemperature2alt.coreUi.theme.MiTemperature2AltTheme
 import com.klewerro.mitemperature2alt.presentation.bottomSheet.BottomSheetContent
@@ -218,7 +219,7 @@ class MainActivity : ComponentActivity() {
                     },
                     onDeviceConnected = {
                         navController.navigate(
-                            Route.ConnectDeviceRoutes.SetName.fullRoute
+                            Route.ConnectDeviceRoutes.SetTime.fullRoute
                         ) {
                             // Removes ConnectThermometerScreen backstack
                             popUpTo(Route.ConnectDeviceRoutes.Connecting.fullRoute) {
@@ -228,6 +229,17 @@ class MainActivity : ComponentActivity() {
                     }
                 )
             }
+
+            composable(Route.ConnectDeviceRoutes.SetTime.fullRoute) {
+                ConnectThermometerTimeScreen(
+                    onNextButtonClick = {
+                        navController.navigate(
+                            Route.ConnectDeviceRoutes.SetName.fullRoute
+                        )
+                    }
+                )
+            }
+
             composable(Route.ConnectDeviceRoutes.SetName.fullRoute) {
                 val parentEntry = remember(it) {
                     navController.getBackStackEntry(
